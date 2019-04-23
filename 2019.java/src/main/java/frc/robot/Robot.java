@@ -7,13 +7,14 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.*;
+import com.kauailabs.navx.frc.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,8 +24,13 @@ import frc.robot.subsystems.*;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Elevator mElevator = Elevator.getInstance();
+  
   public static OI m_oi;
+
+  Elevator elevator = Elevator.getInstance();          //use subsystem.getInstance to call an instance of that subsystem in teleop/auto
+  Drivebase drivebase = Drivebase.getInstance();
+  Tray tray = Tray.getInstance();
+  Rangefinder rangefinder = Rangefinder.getInstance();
 
   Command m_autonomousCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -36,9 +42,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_oi = new OI();
-    m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
+    //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
-    SmartDashboard.putData("Auto mode", m_chooser);
+    //SmartDashboard.putData("Auto mode", m_chooser);
   }
 
   /**
@@ -119,6 +125,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+
     Scheduler.getInstance().run();
   }
 
