@@ -8,9 +8,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -18,7 +17,6 @@ import frc.robot.RobotMap;
 import edu.wpi.first.wpilibj.drive.*;
 import frc.utility.DefaultDriveTalonSRX;
 import frc.robot.OI;
-import frc.robot.Robot;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
 
@@ -46,7 +44,8 @@ public class Drivebase extends Subsystem {
 
   private DifferentialDrive mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
 
-  private static DoubleSolenoid mShifter = new DoubleSolenoid(RobotMap.mPCM_A, RobotMap.mShift_High_ID, RobotMap.mShift_Low_ID);
+  private static Solenoid mShifter_High = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_High_ID);
+  private static Solenoid mShifter_Low = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_Low_ID);
 
   public static int HIGH_GEAR = 0;
   public static int LOW_GEAR = 1;
@@ -64,14 +63,18 @@ public class Drivebase extends Subsystem {
 
     mDrive.arcadeDrive(OI.getThrottleInput(), OI.getSteeringInput(), true);
     mDrive.setRightSideInverted(false);
+    mShifter_High.set(RobotMap.On);
+    mShifter_Low.set(RobotMap.Off);
   }
 
   public static void UpShift() {
-    mShifter.set(Value.kForward);
+    mShifter_High.set(RobotMap.On);
+    mShifter_Low.set(RobotMap.Off);
     CURRENT_GEAR = HIGH_GEAR;
   }
   public static void DownShift() {
-    mShifter.set(Value.kReverse);
+    mShifter_High.set(RobotMap.Off);
+    mShifter_Low.set(RobotMap.On);
     CURRENT_GEAR = LOW_GEAR;
   }
   public static int getCurrentGear() {

@@ -8,8 +8,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.RobotMap;
 
@@ -28,8 +27,10 @@ public class Tray extends Subsystem {
       return instance;
     }
     
-    private static final DoubleSolenoid mTray_Extension = new DoubleSolenoid(RobotMap.mPCM_A, RobotMap.mTray_Extend_ID, RobotMap.mTray_Retract_ID);
-    private static final DoubleSolenoid mTalons = new DoubleSolenoid(RobotMap.mPCM_A, RobotMap.mTalons_Hold_ID, RobotMap.mTalons_Release_ID);
+    private static final Solenoid mTray_Extend = new Solenoid(RobotMap.mPCM_A, RobotMap.mTray_Extend_ID);
+    private static final Solenoid mTray_Retract = new Solenoid(RobotMap.mPCM_B, RobotMap.mTray_Retract_ID);
+    private static final Solenoid mTalons_Hold = new Solenoid(RobotMap.mPCM_A, RobotMap.mTalons_Hold_ID);
+    private static final Solenoid mTalons_Release = new Solenoid(RobotMap.mPCM_B, RobotMap.mTalons_Release_ID);
     private static final TalonSRX mShooter = new TalonSRX(RobotMap.mShooter_ID);
 
     public static final DigitalInput mCargo_Loaded_Sensor = new DigitalInput(RobotMap.mCargo_Loaded_Sensor_ID);
@@ -70,19 +71,23 @@ public class Tray extends Subsystem {
         mShooter.set(ControlMode.PercentOutput, 0.0);
     }
     public static void ExtendTray() {
-        mTray_Extension.set(Value.kForward);
+        mTray_Extend.set(RobotMap.On);
+        mTray_Retract.set(RobotMap.Off);
         TRAY_STATE = TRAY_STATE_EXTENDED;
     }
     public static void RetractTray() {
-        mTray_Extension.set(Value.kReverse);
+        mTray_Extend.set(RobotMap.Off);
+        mTray_Retract.set(RobotMap.On);
         TRAY_STATE = TRAY_STATE_RETRACTED;
     }
     public static void TalonsHold() {
-        mTalons.set(Value.kForward);
+        mTalons_Hold.set(RobotMap.On);
+        mTalons_Release.set(RobotMap.Off);
         TALON_STATE = TALON_STATE_HOLDING;
     }
     public static void TalonsRelease() {
-        mTalons.set(Value.kReverse);
+        mTalons_Hold.set(RobotMap.Off);
+        mTalons_Release.set(RobotMap.On);
         TALON_STATE = TALON_STATE_RELEASED;
     }
     public static void TalonsAutoGrab() {
