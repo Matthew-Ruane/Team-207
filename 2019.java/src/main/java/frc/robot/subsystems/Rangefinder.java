@@ -28,7 +28,7 @@ public class Rangefinder extends Subsystem {
   public static double kDistance = mRangefinder.getRangeInches();
   public static SendableBuilder RangefinderDisplay;
 
-  public Rangefinder() {
+  public void Rangefinder() {
     mRangefinder.setEnabled(true);
     mRangefinder.initSendable(RangefinderDisplay);
   }

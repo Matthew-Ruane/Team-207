@@ -28,7 +28,7 @@ public class Elevator extends Subsystem {
     }
 
     private static double kEncoderTicksPerInch = 1000;
-    private static double kPosition;
+    private static double kPosition = 0;
 
     //all heights are in units of in
     public static final double COLLECT_CARGO = 1;
@@ -54,7 +54,7 @@ public class Elevator extends Subsystem {
     private static final TalonSRX mElevator_Master = new TalonSRX(RobotMap.mElevator_Master_ID);
     private static final TalonSRX mElevator_Slave = new TalonSRX(RobotMap.mElevator_Slave_ID);
     
-    public Elevator() {
+    public void Elevator() {
 
       //Elevator Drive Motor Config
 

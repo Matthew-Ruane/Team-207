@@ -50,7 +50,7 @@ public class Tray extends Subsystem {
 
     public static boolean WantHatch = false;
 
-    public Tray() {
+    public void Tray() {
         mShooter.setNeutralMode(NeutralMode.Brake);
         mShooter.configContinuousCurrentLimit(30);
         mShooter.configPeakCurrentLimit(0);

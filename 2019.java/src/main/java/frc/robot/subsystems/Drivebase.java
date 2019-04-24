@@ -51,7 +51,7 @@ public class Drivebase extends Subsystem {
   public static int LOW_GEAR = 1;
   public static int CURRENT_GEAR = HIGH_GEAR;
 
-  public Drivebase() {
+  public void Drivebase() {
 
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
     mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
