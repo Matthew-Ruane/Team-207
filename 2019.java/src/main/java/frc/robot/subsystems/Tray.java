@@ -91,8 +91,6 @@ public class Tray extends Subsystem {
         TALON_STATE = TALON_STATE_RELEASED;
     }
     public static void TalonsAutoGrab() {
-        ExtendTray();
-        TalonsRelease();
         while (WantHatch == true) {
             if (mHatch_Loaded_Sensor.get()) {
                 TalonsHold();

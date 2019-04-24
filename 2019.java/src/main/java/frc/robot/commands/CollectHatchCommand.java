@@ -29,16 +29,16 @@ public class CollectHatchCommand extends Command {
     Elevator.DesiredPosition = ElevatorPositions.COLLECT;
     Elevator.Mode = ElevatorModes.HATCH;
     Tray.StopIntakeCargo();
+    Tray.TalonsRelease();
+    Tray.ExtendTray();
+    Tray.WantHatch = true;
     Elevator.SetElevatorPosition();
+    Tray.TalonsAutoGrab();
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-      if (Tray.mHatch_Loaded_Sensor.get() && Tray.WantHatch == true) {
-        Tray.TalonsHold();
-        Tray.WantHatch = false;
-      }
   }
 
   // Make this return true when this Command no longer needs to run execute()
