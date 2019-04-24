@@ -27,20 +27,20 @@ public class Elevator extends Subsystem {
       return instance;
     }
 
-    private static double kEncoderTicksPerInch = 1000;
+    private static double kEncoderTicksPerInch = 574;
     private static double kPosition = 0;
 
     //all heights are in units of in
-    public static final double COLLECT_CARGO = 1;
-    public static final double ROCKET_BOTTOM_HEIGHT_CARGO = 3;
-    public static final double ROCKET_MID_HEIGHT_CARGO = 6;
-    public static final double ROCKET_TOP_HEIGHT_CARGO = 9;
-    public static final double SHIP_HEIGHT_CARGO = 12;
-    public static final double SHIP_HEIGHT_HATCH = 16;
-    public static final double COLLECT_HATCH = 1;
-    public static final double ROCKET_BOTTOM_HEIGHT_HATCH = 3;
-    public static final double ROCKET_MID_HEIGHT_HATCH = 6;
-    public static final double ROCKET_TOP_HEIGHT_HATCH = 9;
+    public static final double COLLECT_CARGO = 2.6;
+    public static final double ROCKET_BOTTOM_HEIGHT_CARGO = 5.23;
+    public static final double ROCKET_MID_HEIGHT_CARGO = 34.84;
+    public static final double ROCKET_TOP_HEIGHT_CARGO = 60.9;
+    public static final double SHIP_HEIGHT_CARGO = 19.5;
+    public static final double SHIP_HEIGHT_HATCH = 8.3;
+    public static final double COLLECT_HATCH = 8.3;
+    public static final double ROCKET_BOTTOM_HEIGHT_HATCH = 8.3;
+    public static final double ROCKET_MID_HEIGHT_HATCH = 36.5;
+    public static final double ROCKET_TOP_HEIGHT_HATCH = 61.8;
 
     public static enum ElevatorPositions {
       ROCKET_BOTTOM, ROCKET_MID, ROCKET_TOP, CARGO_SHIP, COLLECT;

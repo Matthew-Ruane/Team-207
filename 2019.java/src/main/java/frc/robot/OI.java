@@ -32,7 +32,7 @@ public class OI {
         //gamepad methods to move elevator to different positions
         Gamepad.getButtonA().whenPressed(new RocketBottomCommand());
         Gamepad.getButtonB().whenPressed(new RocketMidCommand());
-        Gamepad.getButtonY().whenPressed(new RocketMidCommand());
+        Gamepad.getButtonY().whenPressed(new RocketTopCommand());
         //Fallback Gamepad method to switch between ball and hatch mode
         Gamepad.getButtonBack().whenPressed(new CargoModeCommand());
         Gamepad.getButtonStart().whenPressed(new HatchModeCommand());

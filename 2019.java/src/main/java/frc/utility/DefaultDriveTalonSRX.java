@@ -23,6 +23,7 @@ public class DefaultDriveTalonSRX extends WPI_TalonSRX {
 		configPeakCurrentDuration(100);
 		configPeakCurrentLimit(40);
 		setNeutralMode(NeutralMode.Coast);
+		setSafetyEnabled(false);
 
 	}
 

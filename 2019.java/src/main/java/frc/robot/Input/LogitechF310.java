@@ -49,13 +49,13 @@ public class LogitechF310 extends Joystick {
     }
     //Buttons
     public Button getButtonA() {
-        return mButtons[0];
+        return mButtons[1];
     }
     public Button getButtonB() {
-        return mButtons[3];
+        return mButtons[2];
     }
     public Button getButtonX() {
-        return mButtons[1];
+        return mButtons[3];
     }
     public Button getButtonY() {
         return mButtons[4];
@@ -66,22 +66,22 @@ public class LogitechF310 extends Joystick {
     public Button getRightBumper() {
         return mButtons[6];
     }
-    public Button getLeftTrigger() {
-        return mButtons[7];
+    public double getLeftTrigger() {
+        return getRawAxis(2);
     }
-    public Button getRightTrigger() {
-        return mButtons[8];
+    public Double getRightTrigger() {
+        return getRawAxis(3);
     }
     public Button getButtonBack() {
-        return mButtons[9];
+        return mButtons[7];
     }
     public Button getButtonStart() {
-        return mButtons[10];
+        return mButtons[8];
     }
     public Button getButtonLeftStick() {
-        return mButtons[11];
+        return mButtons[9];
     }
     public Button getButtonRightStick() {
-        return mButtons[12];
+        return mButtons[10];
     }
 }

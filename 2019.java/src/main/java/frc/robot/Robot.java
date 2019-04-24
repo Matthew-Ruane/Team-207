@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.*;
 import com.kauailabs.navx.frc.*;
+import edu.wpi.first.wpilibj.drive.*;
+import frc.robot.OI;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -25,12 +27,14 @@ import com.kauailabs.navx.frc.*;
  */
 public class Robot extends TimedRobot {
   
-  public static OI m_oi;
+  private static OI m_oi;
 
   Elevator elevator = Elevator.getInstance();          //use subsystem.getInstance to call an instance of that subsystem in teleop/auto
   Drivebase drivebase = Drivebase.getInstance();
-  Tray tray = Tray.getInstance();
-  Rangefinder rangefinder = Rangefinder.getInstance();
+  //Tray tray = Tray.getInstance();
+  //Rangefinder rangefinder = Rangefinder.getInstance();
+  
+  
 
   Command m_autonomousCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -42,6 +46,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_oi = new OI();
+    m_oi.registerControls();
     //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     //SmartDashboard.putData("Auto mode", m_chooser);
@@ -57,6 +62,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
   }
 
   /**
@@ -125,6 +131,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    Drivebase.mDrive.arcadeDrive(OI.getThrottleInput(), OI.getSteeringInputInverted(), true);
 
     Scheduler.getInstance().run();
   }

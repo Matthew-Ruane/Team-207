@@ -14,11 +14,9 @@ import frc.robot.subsystems.Elevator.ElevatorModes;
 import frc.robot.subsystems.Elevator.ElevatorPositions;
 
 public class CollectCargoCommand extends Command {
-  private static Tray TraySubsystem;
   public CollectCargoCommand() {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
-    requires(TraySubsystem);
   }
 
   // Called just before this Command runs the first time
