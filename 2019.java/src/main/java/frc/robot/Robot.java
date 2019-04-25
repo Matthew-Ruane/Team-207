@@ -30,8 +30,6 @@ public class Robot extends TimedRobot {
   Drivebase drivebase = Drivebase.getInstance();
   Tray tray = Tray.getInstance();
   Rangefinder rangefinder = Rangefinder.getInstance();
-  
-  
 
   Command m_autonomousCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
