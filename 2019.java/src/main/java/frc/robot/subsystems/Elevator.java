@@ -77,9 +77,9 @@ public class Elevator extends Subsystem {
         
       //Elevator PID Config
         
-        mElevator_Master.config_kP(0, 10.0);
+        mElevator_Master.config_kP(0, 18.0);
         mElevator_Master.config_kI(0, 0);
-        mElevator_Master.config_kD(0, 20.0);
+        mElevator_Master.config_kD(0, 22.0);
 
     }
 
