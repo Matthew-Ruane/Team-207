@@ -9,16 +9,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import frc.robot.RobotMap;
 import edu.wpi.first.wpilibj.drive.*;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive.*;
 import frc.utility.DefaultDriveTalonSRX;
-import frc.utility.DefaultDriveTalonSRX;
-import frc.robot.OI;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
 
