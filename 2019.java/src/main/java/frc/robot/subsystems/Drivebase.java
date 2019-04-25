@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -35,7 +36,7 @@ public class Drivebase extends Subsystem {
   }
 
   public static final AHRS ahrs = new AHRS(I2C.Port.kMXP);
-  public static final ADXRS450_Gyro kGyro = new ADXRS450_Gyro();
+  public static final ADXRS450_Gyro kGyro = new ADXRS450_Gyro(Port.kMXP);
 
   private static final DefaultDriveTalonSRX mDrive_Left_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Left_A_ID);
   private static final DefaultDriveTalonSRX mDrive_Left_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Left_B_ID);

@@ -23,16 +23,17 @@ public class OI {
     public void registerControls() {
         //Driver methods to rapidly transition to collecting state for either game piece
         LeftStick.getButton5().whenPressed(new CollectCargoCommand());
-        RightStick.getButton4().whenPressed(new CollectHatchCommand());
+        LeftStick.getButton4().whenPressed(new CollectHatchCommand());
         //manual override of talon control
         LeftStick.getButton2().whenPressed(new TalonsReleaseCommand());
         LeftStick.getButton3().whenPressed(new TalonsHoldCommand());
         //cargo shooting control***May not stop shooting cargo when released, if not create stopshootcargo and implement on getButtonTrigger().whenReleased
-        RightStick.getButtonTrigger().whileHeld(new ShootCargoCommand());
+        RightStick.getButtonTrigger().whenPressed(new ShootCargoCommand());
         //gamepad methods to move elevator to different positions
         Gamepad.getButtonA().whenPressed(new RocketBottomCommand());
         Gamepad.getButtonB().whenPressed(new RocketMidCommand());
         Gamepad.getButtonY().whenPressed(new RocketTopCommand());
+        Gamepad.getButtonX().whenPressed(new CargoshipCommand());
         //Fallback Gamepad method to switch between ball and hatch mode
         Gamepad.getButtonBack().whenPressed(new CargoModeCommand());
         Gamepad.getButtonStart().whenPressed(new HatchModeCommand());

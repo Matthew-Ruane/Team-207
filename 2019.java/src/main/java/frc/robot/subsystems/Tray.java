@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -27,8 +28,8 @@ public class Tray extends Subsystem {
       return instance;
     }
     
-    private static final Solenoid mTray_Extend = new Solenoid(RobotMap.mPCM_A, RobotMap.mTray_Extend_ID);
-    private static final Solenoid mTray_Retract = new Solenoid(RobotMap.mPCM_B, RobotMap.mTray_Retract_ID);
+    private static final Solenoid mTray_Extend = new Solenoid(RobotMap.mPCM_B, RobotMap.mTray_Extend_ID);
+    private static final Solenoid mTray_Retract = new Solenoid(RobotMap.mPCM_A, RobotMap.mTray_Retract_ID);
     private static final Solenoid mTalons_Hold = new Solenoid(RobotMap.mPCM_A, RobotMap.mTalons_Hold_ID);
     private static final Solenoid mTalons_Release = new Solenoid(RobotMap.mPCM_B, RobotMap.mTalons_Release_ID);
     private static final TalonSRX mShooter = new TalonSRX(RobotMap.mShooter_ID);
@@ -60,6 +61,7 @@ public class Tray extends Subsystem {
 
     public static void ShootCargo() {
         mShooter.set(ControlMode.PercentOutput, 1.0);
+        SmartDashboard.putString("Shooting", "Ball");
     }
     public static void StopShootCargo() {
         mShooter.set(ControlMode.PercentOutput, 0.0);
@@ -81,14 +83,16 @@ public class Tray extends Subsystem {
         TRAY_STATE = TRAY_STATE_RETRACTED;
     }
     public static void TalonsHold() {
-        mTalons_Hold.set(RobotMap.On);
         mTalons_Release.set(RobotMap.Off);
+        mTalons_Hold.set(RobotMap.On);
         TALON_STATE = TALON_STATE_HOLDING;
+        SmartDashboard.putString("Talons holding", "");
     }
     public static void TalonsRelease() {
         mTalons_Hold.set(RobotMap.Off);
         mTalons_Release.set(RobotMap.On);
         TALON_STATE = TALON_STATE_RELEASED;
+        SmartDashboard.putString("Talons releasng", "");
     }
     public static void TalonsAutoGrab() {
         while (WantHatch == true) {

@@ -31,8 +31,8 @@ public class Robot extends TimedRobot {
 
   Elevator elevator = Elevator.getInstance();          //use subsystem.getInstance to call an instance of that subsystem in teleop/auto
   Drivebase drivebase = Drivebase.getInstance();
-  //Tray tray = Tray.getInstance();
-  //Rangefinder rangefinder = Rangefinder.getInstance();
+  Tray tray = Tray.getInstance();
+  Rangefinder rangefinder = Rangefinder.getInstance();
   
   
 
@@ -72,6 +72,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
+    Elevator.stopElevator();
   }
 
   @Override
@@ -132,7 +133,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     Drivebase.mDrive.arcadeDrive(OI.getThrottleInput(), OI.getSteeringInputInverted(), true);
-
     Scheduler.getInstance().run();
   }
 

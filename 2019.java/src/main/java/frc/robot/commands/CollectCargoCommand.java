@@ -22,22 +22,21 @@ public class CollectCargoCommand extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-      Tray.TalonsRelease();
-      Tray.WantHatch = false;
-      Tray.UpdateLoadState();
-      if (Tray.CARGO_STATE == Tray.CARGO_STATE_UNLOADED) {
-          Tray.ExtendTray();
-          Elevator.DesiredPosition = ElevatorPositions.COLLECT;
-          Elevator.Mode = ElevatorModes.CARGO;
-          Tray.IntakeCargo();
-          Elevator.SetElevatorPosition();
-      }
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-      Tray.UpdateLoadState();
+    Tray.TalonsRelease();
+    Tray.WantHatch = false;
+    Tray.UpdateLoadState();
+    if (Tray.CARGO_STATE == Tray.CARGO_STATE_UNLOADED) {
+        Tray.ExtendTray();
+        Elevator.DesiredPosition = ElevatorPositions.COLLECT;
+        Elevator.Mode = ElevatorModes.CARGO;
+        Tray.IntakeCargo();
+        Elevator.SetElevatorPosition();
+    }
   }
 
   // Make this return true when this Command no longer needs to run execute()

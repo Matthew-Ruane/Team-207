@@ -9,10 +9,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 
+import java.time.Duration;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXPIDSetConfiguration;
+
+import frc.robot.Constants;
 import frc.robot.RobotMap;
 
 /**
@@ -53,39 +58,42 @@ public class Elevator extends Subsystem {
 
     private static final TalonSRX mElevator_Master = new TalonSRX(RobotMap.mElevator_Master_ID);
     private static final TalonSRX mElevator_Slave = new TalonSRX(RobotMap.mElevator_Slave_ID);
+
+    public static TalonSRXPIDSetConfiguration pid = new TalonSRXPIDSetConfiguration();
     
-    public void Elevator() {
+    private void Elevator() {
 
       //Elevator Drive Motor Config
 
         mElevator_Master.setNeutralMode(NeutralMode.Coast);
         mElevator_Master.setSensorPhase(false);
+        mElevator_Master.enableCurrentLimit(true);
         mElevator_Master.configContinuousCurrentLimit(40);
         mElevator_Master.configPeakCurrentLimit(40);
         mElevator_Master.configPeakCurrentDuration(100);
-        mElevator_Master.enableCurrentLimit(true);
         mElevator_Master.setInverted(false);
-        mElevator_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+        mElevator_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, Constants.ElevatorSensorIdx, Constants.kTimeoutMs);
+        mElevator_Master.config_kP(Constants.ElevatorSensorIdx, Constants.kElevatorP, Constants.kTimeoutMs);
+        mElevator_Master.config_kI(Constants.ElevatorSensorIdx, Constants.kElevatorI, Constants.kTimeoutMs);
+        mElevator_Master.config_kD(Constants.ElevatorSensorIdx, Constants.kElevatorD, Constants.kTimeoutMs);
+        mElevator_Master.setSelectedSensorPosition(0, Constants.ElevatorSensorIdx, Constants.kTimeoutMs);
+        mElevator_Master.config_IntegralZone(Constants.ElevatorSensorIdx, 1000);
+        mElevator_Master.configClosedLoopPeakOutput(Constants.ElevatorSensorIdx, 1.0, Constants.kTimeoutMs);
         //Elevator Follower Motor Config
-        mElevator_Slave.set(ControlMode.Follower, RobotMap.mElevator_Master_ID);
         mElevator_Slave.setNeutralMode(NeutralMode.Coast);
+        mElevator_Master.enableCurrentLimit(true);
         mElevator_Slave.configContinuousCurrentLimit(40);
         mElevator_Slave.configPeakCurrentLimit(40);
         mElevator_Slave.configPeakCurrentDuration(100);
-        mElevator_Slave.enableCurrentLimit(true);
         mElevator_Slave.setInverted(false);
-        
-      //Elevator PID Config
-        
-        mElevator_Master.config_kP(0, 10.0);
-        mElevator_Master.config_kI(0, 0);
-        mElevator_Master.config_kD(0, 20.0);
+        mElevator_Master.set(ControlMode.PercentOutput, 0.0);
 
     }
 
     public static void SetElevatorPosition() {
         kPosition = kEncoderTicksPerInch*Elevator.getTargetHeight();
-        mElevator_Master.set(ControlMode.Position, kPosition);
+        mElevator_Slave.set(ControlMode.Follower, RobotMap.mElevator_Master_ID);
+        mElevator_Master.set(ControlMode.MotionMagic, kPosition);
     }
     public static void SetCargoMode() {
         Mode = ElevatorModes.CARGO;
@@ -93,8 +101,12 @@ public class Elevator extends Subsystem {
     public static void SetHatchMode() {
         Mode = ElevatorModes.HATCH;
     }
+  
     public static void zeroElevatorEncoder() {
         mElevator_Master.setSelectedSensorPosition(0);
+    }
+    public static void stopElevator() {
+      mElevator_Master.set(ControlMode.PercentOutput, 0.0);
     }
     public static double getEncoderValue() {
         return mElevator_Master.getSelectedSensorPosition(0);

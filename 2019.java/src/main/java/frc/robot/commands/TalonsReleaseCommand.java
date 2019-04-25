@@ -8,10 +8,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Tray;
 
 public class TalonsReleaseCommand extends Command {
   public TalonsReleaseCommand() {
+    setInterruptible(true);
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
   }
@@ -24,7 +26,7 @@ public class TalonsReleaseCommand extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-      Tray.TalonsRelease();
+    Tray.TalonsRelease();
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -36,6 +38,8 @@ public class TalonsReleaseCommand extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
+    SmartDashboard.putString("talons release cancelled", "");
+    cancel();
   }
 
   // Called when another command which requires one or more of the same
