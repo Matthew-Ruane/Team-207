@@ -7,12 +7,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.*;
+import com.kauailabs.navx.frc.*;
+import edu.wpi.first.wpilibj.drive.*;
 import frc.robot.OI;
 
 /**
@@ -28,8 +31,10 @@ public class Robot extends TimedRobot {
 
   Elevator elevator = Elevator.getInstance();          //use subsystem.getInstance to call an instance of that subsystem in teleop/auto
   Drivebase drivebase = Drivebase.getInstance();
-  Tray tray = Tray.getInstance();
-  Rangefinder rangefinder = Rangefinder.getInstance();
+  //Tray tray = Tray.getInstance();
+  //Rangefinder rangefinder = Rangefinder.getInstance();
+  
+  
 
   Command m_autonomousCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -40,7 +45,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    Drivebase.mDrive.arcadeDrive(OI.getThrottleInput(), OI.getSteeringInputInverted(), true);
     m_oi = new OI();
     m_oi.registerControls();
     //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
@@ -127,6 +131,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    Drivebase.mDrive.arcadeDrive(OI.getThrottleInput(), OI.getSteeringInputInverted(), true);
 
     Scheduler.getInstance().run();
   }

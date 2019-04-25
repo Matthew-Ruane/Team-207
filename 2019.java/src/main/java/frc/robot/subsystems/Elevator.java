@@ -77,9 +77,9 @@ public class Elevator extends Subsystem {
         
       //Elevator PID Config
         
-        mElevator_Master.config_kP(0, 18.0);
+        mElevator_Master.config_kP(0, 10.0);
         mElevator_Master.config_kI(0, 0);
-        mElevator_Master.config_kD(0, 22.0);
+        mElevator_Master.config_kD(0, 20.0);
 
     }
 
@@ -99,6 +99,8 @@ public class Elevator extends Subsystem {
     public static double getEncoderValue() {
         return mElevator_Master.getSelectedSensorPosition(0);
     }
+    //May not work, alternative approach found at following URL: https://github.com/Team254/FRC-2014/blob/master/src/com/team254/frc2014/subsystems/Pinniped.java
+    //Above approach implemented for tray
     public static double getTargetHeight() {
         switch (Mode) {
             case CARGO:
