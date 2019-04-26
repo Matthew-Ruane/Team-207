@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.time.Duration;
 
@@ -101,7 +102,6 @@ public class Elevator extends Subsystem {
     public static void SetHatchMode() {
         Mode = ElevatorModes.HATCH;
     }
-  
     public static void zeroElevatorEncoder() {
         mElevator_Master.setSelectedSensorPosition(0);
     }

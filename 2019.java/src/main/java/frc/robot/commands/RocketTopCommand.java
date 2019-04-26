@@ -31,7 +31,6 @@ public class RocketTopCommand extends Command {
   protected void execute() {
     Elevator.DesiredPosition = ElevatorPositions.ROCKET_TOP;
     Elevator.SetElevatorPosition();
-    SmartDashboard.putNumber("Elevator seeking position", Elevator.getTargetHeight());
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -43,6 +42,7 @@ public class RocketTopCommand extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
+    cancel();
   }
 
   // Called when another command which requires one or more of the same

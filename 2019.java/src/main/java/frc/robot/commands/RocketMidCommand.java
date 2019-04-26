@@ -31,7 +31,6 @@ public class RocketMidCommand extends Command {
   protected void execute() {
     Elevator.DesiredPosition = ElevatorPositions.ROCKET_MID;
     Elevator.SetElevatorPosition();
-    SmartDashboard.putNumber("Elevator seeking position", Elevator.getTargetHeight());
   }
 
   // Make this return true when this Command no longer needs to run execute()
