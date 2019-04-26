@@ -36,7 +36,7 @@ public class RobotMap {
     public static final int mTalons_Release_ID = 3;
 
     public static final int mCargo_Loaded_Sensor_ID = 9;
-    public static final int mHatch_Loaded_Sensor_ID = 2;
+    public static final int mHatch_Loaded_Sensor_ID = 0;
 
     public static final int mPCM_A = 2;
     public static final int mPCM_B = 1;

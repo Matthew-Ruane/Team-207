@@ -43,9 +43,9 @@ public class Elevator extends Subsystem {
     public static final double SHIP_HEIGHT_CARGO = 19.5;
     public static final double SHIP_HEIGHT_HATCH = 8.3;
     public static final double COLLECT_HATCH = 8.3;
-    public static final double ROCKET_BOTTOM_HEIGHT_HATCH = 8.3;
-    public static final double ROCKET_MID_HEIGHT_HATCH = 36.5;
-    public static final double ROCKET_TOP_HEIGHT_HATCH = 61.8;
+    public static final double ROCKET_BOTTOM_HEIGHT_HATCH = 4.3;
+    public static final double ROCKET_MID_HEIGHT_HATCH = 32.5;
+    public static final double ROCKET_TOP_HEIGHT_HATCH = 60.8;
 
     public static enum ElevatorPositions {
       ROCKET_BOTTOM, ROCKET_MID, ROCKET_TOP, CARGO_SHIP, COLLECT;

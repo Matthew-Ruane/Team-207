@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 public class LogitechAttack3Joystick extends Joystick {
 
     private final Button[] mButtons = {
+        new JoystickButton(this, 0),
         new JoystickButton(this, 1),
         new JoystickButton(this, 2),
         new JoystickButton(this, 3),
@@ -27,14 +28,12 @@ public class LogitechAttack3Joystick extends Joystick {
         new JoystickButton(this, 8),
         new JoystickButton(this, 9),
         new JoystickButton(this, 10),
-        new JoystickButton(this, 11)
+        new JoystickButton(this, 11),
     };
 
     public LogitechAttack3Joystick(int port) {
         super(port);
     }
-
-    //LogitechAttack3Joystick *NAME* = new LogitechAttack3Joystick(int);
 
     public Button getButtonTrigger() {
         return mButtons[1]; 
@@ -58,10 +57,10 @@ public class LogitechAttack3Joystick extends Joystick {
         return mButtons[7]; 
     } 
     public Button getButton8() { 
-        return mButtons[8]; 
+        return mButtons[8];
     } 
     public Button getButton9() { 
-        return mButtons[9]; 
+        return mButtons[9];
     } 
     public Button getButton10() { 
         return mButtons[10]; 

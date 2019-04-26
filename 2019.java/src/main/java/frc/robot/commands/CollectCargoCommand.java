@@ -46,6 +46,7 @@ public class CollectCargoCommand extends Command {
         Tray.StopIntakeCargo();
         Tray.RetractTray();
         Elevator.DesiredPosition = ElevatorPositions.ROCKET_BOTTOM;
+        Elevator.SetElevatorPosition();
         return true;
       }
       else {

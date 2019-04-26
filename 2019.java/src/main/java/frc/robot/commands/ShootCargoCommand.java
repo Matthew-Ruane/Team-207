@@ -7,11 +7,16 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Tray;
 
 public class ShootCargoCommand extends Command {
+
+  private static Timer shootTimer = new Timer();
+  private static boolean doneshooting = false;
+
+
   public ShootCargoCommand() {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
@@ -20,20 +25,34 @@ public class ShootCargoCommand extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
+    Tray.ShootCargo();
+    shootTimer.start();
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Tray.ShootCargo();
+    if (shootTimer.get() >= 1.0) {
+      shootTimer.stop();
+      shootTimer.reset();
+      Tray.StopShootCargo();
+      doneshooting = true;
+    }
+    else {
+      doneshooting = false;
+    }
   }
 
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    return false;
+    if (doneshooting == true) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
-
   // Called once after isFinished returns true
   @Override
   protected void end() {

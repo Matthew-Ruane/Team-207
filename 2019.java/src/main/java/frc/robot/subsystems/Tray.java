@@ -95,20 +95,22 @@ public class Tray extends Subsystem {
         SmartDashboard.putString("Talons releasng", "");
     }
     public static void TalonsAutoGrab() {
-        while (WantHatch == true) {
-            if (mHatch_Loaded_Sensor.get()) {
+            if (WantHatch == true && !mHatch_Loaded_Sensor.get()) {
                 TalonsHold();
                 WantHatch = false;
-                break;
             }
-        }
+            else if (WantHatch == true && mHatch_Loaded_Sensor.get()){
+                TalonsRelease();
+            }
     }
     public static void UpdateLoadState() {
-        if (mCargo_Loaded_Sensor.get()) {
+        if (!mCargo_Loaded_Sensor.get()) {
             CARGO_STATE = CARGO_STATE_LOADED;
+            SmartDashboard.putString("loaded", "");
         }
-        else {
+        else if (mCargo_Loaded_Sensor.get()) {
             CARGO_STATE = CARGO_STATE_UNLOADED;
+            SmartDashboard.putString("empty", "");
         }
     }
     

@@ -22,12 +22,7 @@ public class CollectHatchCommand extends Command {
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {
-  }
-
-  // Called repeatedly when this Command is scheduled to run
-  @Override
-  protected void execute() {
+  protected void initialize() {    
     Elevator.DesiredPosition = ElevatorPositions.COLLECT;
     Elevator.Mode = ElevatorModes.HATCH;
     Tray.StopIntakeCargo();
@@ -35,6 +30,11 @@ public class CollectHatchCommand extends Command {
     Tray.ExtendTray();
     Tray.WantHatch = true;
     Elevator.SetElevatorPosition();
+  }
+
+  // Called repeatedly when this Command is scheduled to run
+  @Override
+  protected void execute() {
     Tray.TalonsAutoGrab();
   }
 
