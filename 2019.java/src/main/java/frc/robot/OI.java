@@ -28,7 +28,7 @@ public class OI {
         LeftStick.getButton2().whenPressed(new TalonsReleaseCommand());
         LeftStick.getButton3().whenPressed(new TalonsHoldCommand());
         //cargo shooting control***May not stop shooting cargo when released, if not create stopshootcargo and implement on getButtonTrigger().whenReleased
-        RightStick.getButtonTrigger().whileHeld(new ShootCargoCommand());
+        RightStick.getButtonTrigger().whenPressed(new ShootCargoCommand());
         //gamepad methods to move elevator to different positions
         Gamepad.getButtonA().whenPressed(new RocketBottomCommand());
         Gamepad.getButtonB().whenPressed(new RocketMidCommand());

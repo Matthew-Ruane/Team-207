@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 public class LogitechF310 extends Joystick {
 
     private final Button[] mButtons = {
+        new JoystickButton(this, 0),
         new JoystickButton(this, 1), // A Button
         new JoystickButton(this, 2), // B Button
         new JoystickButton(this, 3), // X Button
