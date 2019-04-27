@@ -61,7 +61,6 @@ public class Tray extends Subsystem {
 
     public static void ShootCargo() {
         mShooter.set(ControlMode.PercentOutput, 1.0);
-        SmartDashboard.putString("Shooting", "Ball");
     }
     public static void StopShootCargo() {
         mShooter.set(ControlMode.PercentOutput, 0.0);
@@ -86,13 +85,11 @@ public class Tray extends Subsystem {
         mTalons_Release.set(RobotMap.Off);
         mTalons_Hold.set(RobotMap.On);
         TALON_STATE = TALON_STATE_HOLDING;
-        SmartDashboard.putString("Talons holding", "");
     }
     public static void TalonsRelease() {
         mTalons_Hold.set(RobotMap.Off);
         mTalons_Release.set(RobotMap.On);
         TALON_STATE = TALON_STATE_RELEASED;
-        SmartDashboard.putString("Talons releasng", "");
     }
     public static void TalonsAutoGrab() {
             if (WantHatch == true && !mHatch_Loaded_Sensor.get()) {
@@ -106,11 +103,9 @@ public class Tray extends Subsystem {
     public static void UpdateLoadState() {
         if (!mCargo_Loaded_Sensor.get()) {
             CARGO_STATE = CARGO_STATE_LOADED;
-            SmartDashboard.putString("loaded", "");
         }
         else if (mCargo_Loaded_Sensor.get()) {
             CARGO_STATE = CARGO_STATE_UNLOADED;
-            SmartDashboard.putString("empty", "");
         }
     }
     

@@ -111,8 +111,6 @@ public class Elevator extends Subsystem {
     public static double getEncoderValue() {
         return mElevator_Master.getSelectedSensorPosition(0);
     }
-    //May not work, alternative approach found at following URL: https://github.com/Team254/FRC-2014/blob/master/src/com/team254/frc2014/subsystems/Pinniped.java
-    //Above approach implemented for tray
     public static double getTargetHeight() {
         switch (Mode) {
             case CARGO:

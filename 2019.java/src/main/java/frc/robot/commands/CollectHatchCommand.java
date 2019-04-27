@@ -15,7 +15,10 @@ import frc.robot.subsystems.Elevator.ElevatorPositions;
 
 
 public class CollectHatchCommand extends Command {
+  private Elevator elevator = Elevator.getInstance();
   public CollectHatchCommand() {
+    isInterruptible();
+    requires(elevator);
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
   }
@@ -57,5 +60,7 @@ public class CollectHatchCommand extends Command {
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
+    Tray.WantHatch = false;
+    cancel();
   }
 }

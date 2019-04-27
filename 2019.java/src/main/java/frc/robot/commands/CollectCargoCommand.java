@@ -14,7 +14,10 @@ import frc.robot.subsystems.Elevator.ElevatorModes;
 import frc.robot.subsystems.Elevator.ElevatorPositions;
 
 public class CollectCargoCommand extends Command {
+  Elevator elevator = Elevator.getInstance();
   public CollectCargoCommand() {
+    requires(elevator);
+    isInterruptible();
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
   }
@@ -63,5 +66,7 @@ public class CollectCargoCommand extends Command {
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
+    cancel();
+    
   }
 }
