@@ -1,25 +1,31 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRXPIDSetConfiguration;
-
-/**
- * Add your docs here.
- */
 public class Constants {
-    public static final int ElevatorSensorIdx = 0;
-    public static final int kTimeoutMs = 10;
     
-    public static final double kElevatorP = 0.18;
-    public static final double kElevatorI = 0.0;
-    public static final double kElevatorD = 22.0;
+    public static final double kEncoderTicksPerInch = 574;
+    public static double kPosition = 0;
+    public static final double COLLECT_CARGO = 2.6;
+    public static final double ROCKET_BOTTOM_HEIGHT_CARGO = 5.23;
+    public static final double ROCKET_MID_HEIGHT_CARGO = 34.84;
+    public static final double ROCKET_TOP_HEIGHT_CARGO = 60.9;
+    public static final double SHIP_HEIGHT_CARGO = 19.5;
+    public static final double SHIP_HEIGHT_HATCH = 8.3;
+    public static final double COLLECT_HATCH = 8.3;
+    public static final double ROCKET_BOTTOM_HEIGHT_HATCH = 4.3;
+    public static final double ROCKET_MID_HEIGHT_HATCH = 32.5;
+    public static final double ROCKET_TOP_HEIGHT_HATCH = 60.8;
 
+    public static final int CARGO_STATE_LOADED = 0;
+    public static final int CARGO_STATE_UNLOADED = 1;
+    public static int CARGO_STATE = CARGO_STATE_UNLOADED;
 
+    public static final int TRAY_STATE_EXTENDED = 0;
+    public static final int TRAY_STATE_RETRACTED = 1;
+    public static int TRAY_STATE = TRAY_STATE_RETRACTED;
 
+    public static final int TALON_STATE_HOLDING = 0;
+    public static final int TALON_STATE_RELEASED = 1;
+    public static int TALON_STATE = TALON_STATE_HOLDING;
+
+    public static boolean WantHatch = false;
 }

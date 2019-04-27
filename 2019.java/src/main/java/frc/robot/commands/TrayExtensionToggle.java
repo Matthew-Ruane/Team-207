@@ -2,14 +2,20 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.subsystems.Tray;
+import frc.robot.Constants;
 
-public class TalonsReleaseCommand extends Command {
-  public TalonsReleaseCommand() {
+public class TrayExtensionToggle extends Command {
+  public TrayExtensionToggle() {
   }
 
   @Override
   protected void initialize() {
-    Tray.TalonsRelease();
+    if (Constants.TRAY_STATE == Constants.TRAY_STATE_EXTENDED) {
+      Tray.RetractTray();
+    }
+    else if (Constants.TRAY_STATE == Constants.TRAY_STATE_RETRACTED) {
+      Tray.ExtendTray();
+    }
   }
 
   @Override

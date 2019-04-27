@@ -1,17 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
+import frc.robot.Constants;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -37,20 +30,6 @@ public class Tray extends Subsystem {
     public static final DigitalInput mCargo_Loaded_Sensor = new DigitalInput(RobotMap.mCargo_Loaded_Sensor_ID);
     public static final DigitalInput mHatch_Loaded_Sensor = new DigitalInput(RobotMap.mHatch_Loaded_Sensor_ID);
 
-    public static final int CARGO_STATE_LOADED = 0;
-    public static final int CARGO_STATE_UNLOADED = 1;
-    public static int CARGO_STATE = CARGO_STATE_UNLOADED;
-
-    public static final int TRAY_STATE_EXTENDED = 0;
-    public static final int TRAY_STATE_RETRACTED = 1;
-    public static int TRAY_STATE = TRAY_STATE_RETRACTED;
-
-    public static final int TALON_STATE_HOLDING = 0;
-    public static final int TALON_STATE_RELEASED = 1;
-    public static int TALON_STATE = TALON_STATE_HOLDING;
-
-    public static boolean WantHatch = false;
-
     public void Tray() {
         mShooter.setNeutralMode(NeutralMode.Brake);
         mShooter.configContinuousCurrentLimit(30);
@@ -74,44 +53,42 @@ public class Tray extends Subsystem {
     public static void ExtendTray() {
         mTray_Extend.set(RobotMap.On);
         mTray_Retract.set(RobotMap.Off);
-        TRAY_STATE = TRAY_STATE_EXTENDED;
+        Constants.TRAY_STATE = Constants.TRAY_STATE_EXTENDED;
     }
     public static void RetractTray() {
         mTray_Extend.set(RobotMap.Off);
         mTray_Retract.set(RobotMap.On);
-        TRAY_STATE = TRAY_STATE_RETRACTED;
+        Constants.TRAY_STATE = Constants.TRAY_STATE_RETRACTED;
     }
     public static void TalonsHold() {
         mTalons_Release.set(RobotMap.Off);
         mTalons_Hold.set(RobotMap.On);
-        TALON_STATE = TALON_STATE_HOLDING;
+        Constants.TALON_STATE = Constants.TALON_STATE_HOLDING;
     }
     public static void TalonsRelease() {
         mTalons_Hold.set(RobotMap.Off);
         mTalons_Release.set(RobotMap.On);
-        TALON_STATE = TALON_STATE_RELEASED;
+        Constants.TALON_STATE = Constants.TALON_STATE_RELEASED;
     }
     public static void TalonsAutoGrab() {
-            if (WantHatch == true && !mHatch_Loaded_Sensor.get()) {
+            if (Constants.WantHatch == true && !mHatch_Loaded_Sensor.get()) {
                 TalonsHold();
-                WantHatch = false;
+                Constants.WantHatch = false;
             }
-            else if (WantHatch == true && mHatch_Loaded_Sensor.get()){
+            else if (Constants.WantHatch == true && mHatch_Loaded_Sensor.get()){
                 TalonsRelease();
             }
     }
     public static void UpdateLoadState() {
         if (!mCargo_Loaded_Sensor.get()) {
-            CARGO_STATE = CARGO_STATE_LOADED;
+            Constants.CARGO_STATE = Constants.CARGO_STATE_LOADED;
         }
         else if (mCargo_Loaded_Sensor.get()) {
-            CARGO_STATE = CARGO_STATE_UNLOADED;
+            Constants.CARGO_STATE = Constants.CARGO_STATE_UNLOADED;
         }
     }
     
     @Override
     public void initDefaultCommand() {
-      // Set the default command for a subsystem here.
-      //  setDefaultCommand(new MySpecialCommand());
     }
 }

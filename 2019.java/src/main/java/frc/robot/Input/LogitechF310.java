@@ -1,32 +1,23 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot.Input;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
-/**
- * Add your docs here.
- */
+
 public class LogitechF310 extends Joystick {
 
     private final Button[] mButtons = {
         new JoystickButton(this, 0),
-        new JoystickButton(this, 1), // A Button
-        new JoystickButton(this, 2), // B Button
-        new JoystickButton(this, 3), // X Button
-        new JoystickButton(this, 4), // Y Button
-        new JoystickButton(this, 5), // Left Bumper
-        new JoystickButton(this, 6), // Right Bumper
-        new JoystickButton(this, 7), // Back Button
-        new JoystickButton(this, 8), // Start Button
-        new JoystickButton(this, 9), // Left Stick Button
-        new JoystickButton(this, 10), // Right Stick Button
+        new JoystickButton(this, 1),
+        new JoystickButton(this, 2),
+        new JoystickButton(this, 3),
+        new JoystickButton(this, 4),
+        new JoystickButton(this, 5),
+        new JoystickButton(this, 6),
+        new JoystickButton(this, 7),
+        new JoystickButton(this, 8),
+        new JoystickButton(this, 9),
+        new JoystickButton(this, 10),
         new JoystickButton(this, 11),
         new JoystickButton(this, 12)
     };

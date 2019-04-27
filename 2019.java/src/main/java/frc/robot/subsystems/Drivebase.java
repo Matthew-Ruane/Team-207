@@ -1,25 +1,14 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import frc.robot.RobotMap;
 import edu.wpi.first.wpilibj.drive.*;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive.*;
 import frc.utility.DefaultDriveTalonSRX;
-import frc.utility.DefaultDriveTalonSRX;
-import frc.robot.OI;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
 
@@ -95,12 +84,7 @@ public class Drivebase extends Subsystem {
     return kGyro.getRate();
   }
 
-  // Put methods for controlling this subsystem
-  // here. Call these from Commands.
-
   @Override
   public void initDefaultCommand() {
-    // Set the default command for a subsystem here.
-    // setDefaultCommand(new MySpecialCommand());
   }
 }
