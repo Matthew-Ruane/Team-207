@@ -30,6 +30,7 @@ public class CollectCargoCommand extends Command {
 
   @Override
   protected void execute() {
+    Tray.UpdateLoadState();
     }
 
   @Override
