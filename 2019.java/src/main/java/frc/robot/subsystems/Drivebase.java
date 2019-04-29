@@ -38,19 +38,8 @@ public class Drivebase extends Subsystem {
   private static Solenoid mShifter_High = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_High_ID);
   private static Solenoid mShifter_Low = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_Low_ID);
 
-  private void Drivebase() {
-
-    mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
-    mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
-
-    mDrive_Left_B.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
-    mDrive_Left_C.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
-    mDrive_Right_B.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
-    mDrive_Right_C.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
-
-    mDrive.setRightSideInverted(false);
-    mShifter_High.set(RobotMap.On);
-    mShifter_Low.set(RobotMap.Off);
+  public void Drivebase() {
+    
   }
   
   public static void UpShift() {
@@ -67,6 +56,11 @@ public class Drivebase extends Subsystem {
     return Constants.CURRENT_GEAR;
   }
   public static void initDrive() {
+    mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
+    mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
+    mDrive.setRightSideInverted(false);
+    mShifter_High.set(RobotMap.On);
+    mShifter_Low.set(RobotMap.Off);
     mDrive_Left_B.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
     mDrive_Left_C.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
     mDrive_Right_B.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);

@@ -15,11 +15,11 @@ public class Robot extends TimedRobot {
   
   private static OI m_oi;
 
-  Elevator elevator = Elevator.getInstance();
-  Drivebase drivebase = Drivebase.getInstance();
-  Tray tray = Tray.getInstance();
-  Rangefinder rangefinder = Rangefinder.getInstance();
-  NavX navx = NavX.getInstance();
+  private Elevator elevator = Elevator.getInstance();
+  private Drivebase drivebase = Drivebase.getInstance();
+  private Tray tray = Tray.getInstance();
+  private Rangefinder rangefinder = Rangefinder.getInstance();
+  private NavX navx = NavX.getInstance();
   
 
   Command m_autonomousCommand;
