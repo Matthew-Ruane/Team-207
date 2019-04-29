@@ -27,5 +27,9 @@ public class Constants {
     public static final int TALON_STATE_RELEASED = 1;
     public static int TALON_STATE = TALON_STATE_HOLDING;
 
+    public static final int HIGH_GEAR = 0;
+    public static final int LOW_GEAR = 1;
+    public static int CURRENT_GEAR = HIGH_GEAR;
+
     public static boolean WantHatch = false;
 }

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.drive.*;
 import frc.utility.DefaultDriveTalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
+import frc.robot.Constants;
 
 
 /**
@@ -39,11 +40,7 @@ public class Drivebase extends Subsystem {
   private static Solenoid mShifter_High = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_High_ID);
   private static Solenoid mShifter_Low = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_Low_ID);
 
-  public static int HIGH_GEAR = 0;
-  public static int LOW_GEAR = 1;
-  public static int CURRENT_GEAR = HIGH_GEAR;
-
-  private static void Drivebase() {
+  private void Drivebase() {
 
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
     mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
@@ -61,15 +58,15 @@ public class Drivebase extends Subsystem {
   public static void UpShift() {
     mShifter_High.set(RobotMap.On);
     mShifter_Low.set(RobotMap.Off);
-    CURRENT_GEAR = HIGH_GEAR;
+    Constants.CURRENT_GEAR = Constants.HIGH_GEAR;
   }
   public static void DownShift() {
     mShifter_High.set(RobotMap.Off);
     mShifter_Low.set(RobotMap.On);
-    CURRENT_GEAR = LOW_GEAR;
+    Constants.CURRENT_GEAR = Constants.LOW_GEAR;
   }
   public static int getCurrentGear() {
-    return CURRENT_GEAR;
+    return Constants.CURRENT_GEAR;
   }
   public static void CalibrateGyro() {
     kGyro.calibrate();
