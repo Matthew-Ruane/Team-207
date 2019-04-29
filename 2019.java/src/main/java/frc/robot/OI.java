@@ -28,7 +28,8 @@ public class OI {
         Gamepad.getButtonStart().whenPressed(new HatchModeCommand());
         //Toggling extension of tray with left trigger
         LeftStick.getButtonTrigger().whenPressed(new TrayExtensionToggle());
-        //downshifting while holding down right stick, button 2
+        //zeroing Elevator encoder and NavX yaw gyro
+        LeftStick.getButton9().whenPressed(new ZeroGyro());
         }
 
         public static double getThrottleInput() {

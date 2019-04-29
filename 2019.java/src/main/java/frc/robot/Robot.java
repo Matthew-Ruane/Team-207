@@ -7,6 +7,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.subsystems.*;
 import frc.robot.OI;
 
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class Robot extends TimedRobot {
   
   private static OI m_oi;
@@ -15,7 +19,7 @@ public class Robot extends TimedRobot {
   Drivebase drivebase = Drivebase.getInstance();
   Tray tray = Tray.getInstance();
   Rangefinder rangefinder = Rangefinder.getInstance();
-  
+  NavX navx = NavX.getInstance();
   
 
   Command m_autonomousCommand;
@@ -29,6 +33,9 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_oi = new OI();
     m_oi.registerControls();
+    Elevator.zeroElevatorEncoder();
+    Drivebase.initDrive();
+    Elevator.initElevator();
     //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     //SmartDashboard.putData("Auto mode", m_chooser);
@@ -100,10 +107,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    NavX.zeroYaw();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
-    // this line or comment it out.
+    // this line or comment it out
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -115,6 +123,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     Drivebase.mDrive.arcadeDrive(OI.getThrottleInput(), OI.getSteeringInputInverted(), true);
+    NavX.ReportData();
     Scheduler.getInstance().run();
   }
 

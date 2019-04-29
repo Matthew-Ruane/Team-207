@@ -5,8 +5,8 @@ public class Constants {
     public static final double kEncoderTicksPerInch = 574;
     public static double kPosition = 0;
     public static final double COLLECT_CARGO = 1.0;
-    public static final double ROCKET_BOTTOM_HEIGHT_CARGO = 5.3;
-    public static final double ROCKET_MID_HEIGHT_CARGO = 33.5;
+    public static final double ROCKET_BOTTOM_HEIGHT_CARGO = 3.3;
+    public static final double ROCKET_MID_HEIGHT_CARGO = 31.5;
     public static final double ROCKET_TOP_HEIGHT_CARGO = 57.5;
     public static final double SHIP_HEIGHT_CARGO = 19.5;
     public static final double SHIP_HEIGHT_HATCH = 3.3;
@@ -32,4 +32,12 @@ public class Constants {
     public static int CURRENT_GEAR = HIGH_GEAR;
 
     public static boolean WantHatch = false;
+
+    public static final int ElevatorSlotIDx = 0;
+    public static final double Elevator_kP = 0.40;
+    public static final double Elevator_kI = 0.0;
+    public static final double Elevator_kD = 30.0;
+    public static final int Elevator_MotionAccel = 13000;
+    public static final int Elevator_MotionCruiseVelo = 15000;
+    public static final int kTimeoutms = 10;
 }

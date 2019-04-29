@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SPI.Port;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -10,8 +11,8 @@ import frc.robot.RobotMap;
 import edu.wpi.first.wpilibj.drive.*;
 import frc.utility.DefaultDriveTalonSRX;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 
 /**
@@ -24,9 +25,6 @@ public class Drivebase extends Subsystem {
   public static Drivebase getInstance() {
     return instance;
   }
-
-  public static final AHRS ahrs = new AHRS(I2C.Port.kMXP);
-  public static final ADXRS450_Gyro kGyro = new ADXRS450_Gyro(Port.kMXP);
 
   private static final DefaultDriveTalonSRX mDrive_Left_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Left_A_ID);
   private static final DefaultDriveTalonSRX mDrive_Left_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Left_B_ID);
@@ -68,17 +66,11 @@ public class Drivebase extends Subsystem {
   public static int getCurrentGear() {
     return Constants.CURRENT_GEAR;
   }
-  public static void CalibrateGyro() {
-    kGyro.calibrate();
-  }
-  public static void ResetGyro() {
-    kGyro.reset();
-  }
-  public static double getHeading() {
-    return kGyro.getAngle();
-  }
-  public static double getTurnRate() {
-    return kGyro.getRate();
+  public static void initDrive() {
+    mDrive_Left_B.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
+    mDrive_Left_C.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
+    mDrive_Right_B.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
+    mDrive_Right_C.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
   }
 
   @Override

@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -35,31 +36,35 @@ public class Elevator extends Subsystem {
     private static final TalonSRX mElevator_Slave = new TalonSRX(RobotMap.mElevator_Slave_ID);
     
     private void Elevator() {
+    }
+    public static void initElevator() {
+      mElevator_Master.setNeutralMode(NeutralMode.Coast);
+      mElevator_Master.setSensorPhase(false);
+      mElevator_Master.enableCurrentLimit(true);
+      mElevator_Master.configContinuousCurrentLimit(40);
+      mElevator_Master.configPeakCurrentLimit(40);
+      mElevator_Master.configPeakCurrentDuration(100);
+      mElevator_Master.setInverted(false);
+      mElevator_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+      mElevator_Master.config_kP(Constants.ElevatorSlotIDx, Constants.Elevator_kP, Constants.kTimeoutms);
+      mElevator_Master.config_kI(Constants.ElevatorSlotIDx, Constants.Elevator_kI, Constants.kTimeoutms);
+      mElevator_Master.config_kD(Constants.ElevatorSlotIDx, Constants.Elevator_kD, Constants.kTimeoutms);
+      mElevator_Master.configMotionAcceleration(Constants.Elevator_MotionAccel, Constants.kTimeoutms);
+      mElevator_Master.configMotionCruiseVelocity(Constants.Elevator_MotionCruiseVelo, Constants.kTimeoutms);
 
-      //Elevator Drive Motor Config
 
-        mElevator_Master.setNeutralMode(NeutralMode.Coast);
-        mElevator_Master.setSensorPhase(false);
-        mElevator_Master.enableCurrentLimit(true);
-        mElevator_Master.configContinuousCurrentLimit(40);
-        mElevator_Master.configPeakCurrentLimit(40);
-        mElevator_Master.configPeakCurrentDuration(100);
-        mElevator_Master.setInverted(false);
-        mElevator_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-        //Elevator Follower Motor Config
-        mElevator_Slave.setNeutralMode(NeutralMode.Coast);
-        mElevator_Master.enableCurrentLimit(true);
-        mElevator_Slave.configContinuousCurrentLimit(40);
-        mElevator_Slave.configPeakCurrentLimit(40);
-        mElevator_Slave.configPeakCurrentDuration(100);
-        mElevator_Slave.setInverted(false);
-        mElevator_Master.set(ControlMode.PercentOutput, 0.0);
+      mElevator_Slave.setNeutralMode(NeutralMode.Coast);
+      mElevator_Slave.enableCurrentLimit(true);
+      mElevator_Slave.configContinuousCurrentLimit(40);
+      mElevator_Slave.configPeakCurrentLimit(40);
+      mElevator_Slave.configPeakCurrentDuration(100);
+      mElevator_Slave.setInverted(false);
+      mElevator_Slave.set(ControlMode.Follower, RobotMap.mElevator_Master_ID);
+      mElevator_Master.set(ControlMode.PercentOutput, 0.0);
 
     }
-
     public static void SetElevatorPosition() {
         Constants.kPosition = Constants.kEncoderTicksPerInch*Elevator.getTargetHeight();
-        mElevator_Slave.set(ControlMode.Follower, RobotMap.mElevator_Master_ID);
         mElevator_Master.set(ControlMode.MotionMagic, Constants.kPosition);
     }
     public static void SetCargoMode() {
