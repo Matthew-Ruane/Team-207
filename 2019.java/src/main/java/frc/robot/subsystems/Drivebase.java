@@ -64,6 +64,10 @@ public class Drivebase extends Subsystem {
   public static double getrightEncoder() {
     return rightEncoder.getRaw();
   }
+  public static void resetEncoders() {
+    leftEncoder.reset();
+    rightEncoder.reset();
+  }
   public static void initDrive() {
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
     mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
