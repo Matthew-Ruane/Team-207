@@ -1,4 +1,4 @@
-package frc.robot.commands.drivecommands;
+package org.usfirst.frc330.commands.drivecommands;
 
 public class Waypoint {
 	

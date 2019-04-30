@@ -15,9 +15,6 @@ public class DoNothing extends BBCommandGroup {
 
 
     public DoNothing() {
-    	
-       addSequential(new IsFinishedFalse());
-       addParallel(new IsFinishedFalse());
        addParallel(new WaitCommand(1.0));
        
     }

@@ -1,6 +1,6 @@
 package frc.robot.commands.drivecommands;
 
-import org.usfirst.frc330.wpilibj.PIDGains;
+import frc.robot.utility.PIDGains;
 
 /**
  * @deprecated use PIDGains instead.

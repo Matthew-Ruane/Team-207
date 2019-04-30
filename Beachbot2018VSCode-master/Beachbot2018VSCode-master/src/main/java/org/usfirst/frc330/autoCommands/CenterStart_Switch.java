@@ -40,27 +40,13 @@ public class CenterStart_Switch extends BBCommandGroup {
     		wp3 = new Waypoint(58-12,99+12+18,0);
     	}
     	
-    	addSequential(new CloseClaw());
-    	addSequential(new Calibrate());
-    	addSequential(new ShiftHigh());
-    	addSequential(new Defense());
         addSequential(new DriveWaypoint(wp1, false, ChassisConst.defaultTolerance, 5, false, ChassisConst.DriveHigh, ChassisConst.GyroDriveHigh));
         
-        addSequential(new ShiftLow());
         
         addSequential(new TurnGyroWaypoint(wp2, invertX, ChassisConst.defaultTolerance, 5, ChassisConst.GyroTurnLow)); //(double x, double y, double tolerance, double timeout, PIDGains gains
-        addSequential(new ShiftHigh());
         addSequential(new DriveWaypoint(wp2, invertX, ChassisConst.defaultTolerance, 5, false, ChassisConst.DriveHigh, ChassisConst.GyroDriveHigh));
-
         
-        addSequential(new DropoffPositionSwitch());
-        addSequential(new ShiftLow());
-        
-        addSequential(new TurnGyroWaypoint(wp3, invertX, ChassisConst.defaultTolerance, 5, ChassisConst.GyroTurnLow)); //(double x, double y, double tolerance, double timeout, PIDGains gains
-        addSequential(new ShiftHigh());
         addSequential(new DriveWaypoint(wp3, invertX, ChassisConst.defaultTolerance, 2.0, true, ChassisConst.DriveHigh, ChassisConst.GyroDriveHigh));
-        
-        addSequential(new OpenClaw());
     	
        
     }

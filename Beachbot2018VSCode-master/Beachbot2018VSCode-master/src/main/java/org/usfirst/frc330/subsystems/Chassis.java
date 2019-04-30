@@ -413,16 +413,9 @@ public class Chassis extends Subsystem {
     }
     
     public void tankDrive(Joystick leftJoystick, Joystick rightJoystick) {
-    	if(Robot.getHeight() < 40) {
     		left = -leftJoystick.getY();
     		right = -rightJoystick.getY();
-    	}
-    	else {
-    		double scaleFactor = (1.10-0.64/68*Robot.getHeight());
-    		scaleFactor = Math.max(0.45, scaleFactor);
-    		left = -leftJoystick.getY() * scaleFactor;
-    		right = -rightJoystick.getY() *scaleFactor;
-    	}
+    	
     	
     }
         

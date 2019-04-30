@@ -94,130 +94,18 @@ public class OI {
 
         armGamePad = new Joystick(2);
         
-        lowerHand_10 = new JoystickButton(armGamePad, 10);
-        lowerHand_10.whenPressed(new LowerHand());
-        powerUpDropOff_9 = new JoystickButton(armGamePad, 9);
-        powerUpDropOff_9.whenPressed(new DropoffPowerUp());
-        killAll_8 = new JoystickButton(armGamePad, 8);
-        killAll_8.whenPressed(new KillAll());
-        sensorlessPickupUp_7 = new JoystickButton(armGamePad, 7);
-        sensorlessPickupUp_7.whenReleased(new SensorlessPickupUp());
-        sensorLessPickupDown_7 = new JoystickButton(armGamePad, 7);
-        sensorLessPickupDown_7.whileHeld(new SensorlessPickupDown());
-        scaleTallDropoff_4 = new JoystickButton(armGamePad, 4);
-        scaleTallDropoff_4.whenPressed(new dropoffPositionMax());
-        scaleDropoffRear_5 = new JoystickButton(armGamePad, 5);
-        scaleDropoffRear_5.whenPressed(new DropoffPositionRear());
-        scaleMidDropoff_6 = new JoystickButton(armGamePad, 6);
-        scaleMidDropoff_6.whenPressed(new dropoffPositionMed());
-        switchDropoff_3 = new JoystickButton(armGamePad, 3);
-        switchDropoff_3.whenPressed(new DropoffPositionSwitch());
-        switchShot_release_2 = new JoystickButton(armGamePad, 2);
-        switchShot_release_2.whenReleased(new SwitchPopShotPosition());
-        intakeCube_whileHeld_2 = new JoystickButton(armGamePad, 2);
-        intakeCube_whileHeld_2.whileHeld(new IntakeCube());
-        defense_release_1 = new JoystickButton(armGamePad, 1);
-        defense_release_1.whenReleased(new Defense());
-        intakeCube_whileHeld_1 = new JoystickButton(armGamePad, 1);
-        intakeCube_whileHeld_1.whileHeld(new IntakeCube());
         driverR = new Joystick(1);
         
-        climbReady_held_10 = new JoystickButton(driverR, 10);
-        climbReady_held_10.whileHeld(new ClimbReady());
-        alignReady_release_10 = new JoystickButton(driverR, 10);
-        alignReady_release_10.whenReleased(new AlignReady());
-        twoButtonPlatformDeploy_45 = new JoystickButton(driverR, 4);
-        twoButtonPlatformDeploy_45.whileHeld(new TwoButtonPlatformDeploy());
-        deployCube__2 = new JoystickButton(driverR, 2);
-        deployCube__2.whenPressed(new DeployCube());
-        shiftHigh_1 = new JoystickButton(driverR, 1);
-        shiftHigh_1.whenPressed(new ShiftHigh());
         driverL = new Joystick(0);
-        
-        openClaw_2 = new JoystickButton(driverL, 2);
-        openClaw_2.whenPressed(new OpenClaw());
-        shiftLow_1 = new JoystickButton(driverL, 1);
-        shiftLow_1.whenPressed(new ShiftLow());
 
 
         // SmartDashboard Buttons
-        SmartDashboard.putData("Autonomous Command", new AutonomousCommand());
-        SmartDashboard.putData("ShiftLow", new ShiftLow());
-        SmartDashboard.putData("ShiftHigh", new ShiftHigh());
-        SmartDashboard.putData("OpenClaw", new OpenClaw());
-        SmartDashboard.putData("CloseClaw", new CloseClaw());
-        SmartDashboard.putData("SensorCloseClaw", new SensorCloseClaw());
-        SmartDashboard.putData("ManualLift", new ManualLift());
-        SmartDashboard.putData("UnlockPlatforms", new UnlockPlatforms());
-        SmartDashboard.putData("ManualArm", new ManualArm());
-        SmartDashboard.putData("ManualWrist", new ManualWrist());
-        SmartDashboard.putData("RollerOn", new RollerOn());
-        SmartDashboard.putData("RollerOff", new RollerOff());
-        SmartDashboard.putData("RollerReverse", new RollerReverse());
-        SmartDashboard.putData("DeployCube", new DeployCube());
-        SmartDashboard.putData("IntakeCube", new IntakeCube());
-        SmartDashboard.putData("DropoffPositionSwitch", new DropoffPositionSwitch());
-        SmartDashboard.putData("dropoffPositionLow", new dropoffPositionLow());
-        SmartDashboard.putData("dropoffPositionMed", new dropoffPositionMed());
-        SmartDashboard.putData("dropoffPositionMax", new dropoffPositionMax());
-        SmartDashboard.putData("Defense", new Defense());
-        SmartDashboard.putData("ClimbReady", new ClimbReady());
-        SmartDashboard.putData("FlipWrist", new FlipWrist());
-        SmartDashboard.putData("HandLevel", new HandLevel());
-        SmartDashboard.putData("IntakePortal", new IntakePortal());
-        SmartDashboard.putData("UnlockRatchet", new UnlockRatchet());
-        SmartDashboard.putData("LockRatchet", new LockRatchet());
-        SmartDashboard.putData("LiftStepUp", new LiftStepUp());
-        SmartDashboard.putData("LiftStepDown", new LiftStepDown());
-        SmartDashboard.putData("DeployRollerCoaster", new DeployRollerCoaster());
-        SmartDashboard.putData("RetractRollerCoaster", new RetractRollerCoaster());
-        SmartDashboard.putData("Taller", new Taller());
-        SmartDashboard.putData("Shorter", new Shorter());
-        SmartDashboard.putData("DropoffPositionRear", new DropoffPositionRear());
-        SmartDashboard.putData("KillAll", new KillAll());
-        SmartDashboard.putData("ClimbDeploy", new ClimbDeploy());
-        SmartDashboard.putData("AlignReady", new AlignReady());
-        SmartDashboard.putData("DropoffPowerUp", new DropoffPowerUp());
-        SmartDashboard.putData("DropoffPositionMed90", new DropoffPositionMed90());
-        SmartDashboard.putData("TwoButtonPlatformDeploy", new TwoButtonPlatformDeploy());
-        SmartDashboard.putData("e_calibrate", new e_calibrate());
-        SmartDashboard.putData("SensorlessPickupDown", new SensorlessPickupDown());
-        SmartDashboard.putData("SensorlessPickupUp", new SensorlessPickupUp());
-        SmartDashboard.putData("LowerHand", new LowerHand());
-        SmartDashboard.putData("SwitchPopShotPosition", new SwitchPopShotPosition());
 
     // END AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=CONSTRUCTORS
-        SmartDashboard.putData("PushMe, I dare you", new Buzz());
         SmartDashboard.putData("ResetPosition", new ResetPosition());
-        SmartDashboard.putData("DashboardArmMove", new DashboardArmMove());
-        SmartDashboard.putNumber("DashboardArmMoveSetpoint", 0.0);
-        SmartDashboard.putData("DashboardHandMove", new DashboardHandMove());
-        SmartDashboard.putNumber("DashboardHandMoveSetpoint", 0.0);
-        SmartDashboard.putData("DashboardLiftMove", new DashboardLiftMove());
-        SmartDashboard.putNumber("DashboardLiftMoveSetpoint", 0.0);
-        SmartDashboard.putData("LockPlatforms", new LockPlatforms());
-        SmartDashboard.putData("dropoffPositionHigh", new dropoffPositionHigh());
-        SmartDashboard.putData("RollerUntilCube", new RollerUntilCube());
-        SmartDashboard.putData("ThrowCubeArm", new ThrowCubeArm());
         SmartDashboard.putData("TankDrive", new TankDrive());
         SmartDashboard.putData("CheesyDrive", new CheesyDrive());
         
-        //powerupDropoff1 = new POVButton(armGamePad, 0, 90); //right
-        //powerupDropoff2 = new POVButton(armGamePad, 0, 270); //left
-        
-        taller = new BBPOVButton(armGamePad, 0, 0);  //Up
-        shorter = new BBPOVButton(armGamePad, 0, 180); //Down
-        
-        taller.whenPressed(new Taller());
-        shorter.whenPressed(new Shorter());
-        
-        //powerupDropoff1.whenPressed(new DropoffPowerUp());
-        //powerupDropoff2.whenPressed(new DropoffPowerUp());
-        
-        //increaseSpeed = new POVButton(operator, 0, 90);  //right
-        //decreaseSpeed = new POVButton(operator, 0, 270);  // left
-        //increaseHood = new POVButton(operator, 0, 0);  //Up
-        //decreaseHood = new POVButton(operator, 0, 180); //Down
     }
 
     // BEGIN AUTOGENERATED CODE, SOURCE=ROBOTBUILDER ID=FUNCTIONS

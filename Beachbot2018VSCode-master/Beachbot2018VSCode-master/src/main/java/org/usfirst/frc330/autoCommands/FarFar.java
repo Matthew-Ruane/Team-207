@@ -27,53 +27,32 @@ public class FarFar extends BBCommandGroup {
     	
     	boolean invertX = (pos == StartingPosition.LEFT);
     	
-    	addSequential(new CloseClaw());
-    	addSequential(new Calibrate());
-    	addSequential(new ShiftHigh());
-    	addParallel(new Defense());
-    	
     	addSequential(new DriveWaypointBackward(wp1, invertX, ChassisConst.defaultTolerance, 5, false, ChassisConst.DriveHigh, ChassisConst.GyroDriveHigh));
 
     	
-    	addSequential(new ShiftLow());
     	addSequential(new TurnGyroWaypointBackward(wp2, invertX, ChassisConst.defaultTurnTolerance, 2, ChassisConst.GyroTurnLow));
-    	addSequential(new ShiftHigh());
     	addSequential(new DriveWaypointBackward(wp2, invertX, ChassisConst.defaultTolerance, 5, false, ChassisConst.DriveHigh, ChassisConst.GyroDriveHigh));
     	
-    	addSequential(new ShiftLow());
     	addSequential(new TurnGyroWaypointBackward(wp3, invertX, ChassisConst.defaultTurnTolerance, 2, ChassisConst.GyroTurnLow));
     	
-    	addSequential(new DropoffPositionRear());
-    	addSequential(new Taller());
-    	
-    	addSequential(new ShiftHigh());
     	addSequential(new DriveWaypointBackward(wp3, invertX, ChassisConst.defaultTolerance, 5, false, ChassisConst.DriveHigh, ChassisConst.GyroDriveHigh));
     	
-    	addSequential(new OpenClaw());
     	
-    	addSequential(new WaitCommand(0.5));
-    	addParallel(new IntakeCube()); //Doesn't return until is has a cube
+    	addSequential(new WaitCommand(0.5)); //Doesn't return until is has a cube
     	addSequential(new WaitCommand(0.5));
     	
     	addSequential(new Log("Before cube pickup"));
     	
-    	addSequential(new ShiftLow());
     	addSequential(new TurnGyroWaypoint(wp4, invertX, ChassisConst.defaultTurnTolerance, 2, ChassisConst.GyroTurnLow));
-    	addSequential(new ShiftHigh());
     	addSequential(new DriveWaypoint(wp4, invertX, ChassisConst.defaultTolerance, 5, true, ChassisConst.DriveHigh, ChassisConst.GyroDriveHigh));
     	
     	addSequential(new Log("Cube picked up"));
     	
     	addSequential(new WaitCommand(1.0));
-    	addSequential(new DropoffPositionSwitch());
-    	addSequential(new Taller());
     	
-    	addSequential(new ShiftLow());
     	addSequential(new TurnGyroWaypoint(wp5, invertX, ChassisConst.defaultTurnTolerance, 2, ChassisConst.GyroTurnLow));
-    	addSequential(new ShiftHigh());
     	addSequential(new DriveWaypoint(wp5, invertX, ChassisConst.defaultTolerance, 5, false, ChassisConst.DriveHigh, ChassisConst.GyroDriveHigh));
-    	
-    	addSequential(new OpenClaw());
+    
        
     }
 }
