@@ -16,6 +16,8 @@ import frc.robot.Robot;
 import frc.robot.commands.*;
 import frc.robot.commands.drivecommands.Waypoint;
 import frc.robot.constants.ChassisConst;
+import frc.robot.utility.DefaultDriveTalonSRX;
+
 import org.usfirst.frc330.util.CSVLoggable;
 import org.usfirst.frc330.util.CSVLogger;
 import org.usfirst.frc330.util.Logger;
@@ -63,13 +65,13 @@ public class Chassis extends Subsystem {
     private BBDoubleSolenoid shifters;
     private Encoder driveEncoderRight;
     private Encoder driveEncoderLeft;
-    private Spark leftDrive1;
-    private Spark leftDrive2;
-    private Spark leftDrive3;
+    private DefaultDriveTalonSRX leftDrive1;
+    private DefaultDriveTalonSRX leftDrive2;
+    private DefaultDriveTalonSRX leftDrive3;
     private SpeedControllerGroup leftDrive;
-    private Spark rightDrive1;
-    private Spark rightDrive2;
-    private Spark rightDrive3;
+    private DefaultDriveTalonSRX rightDrive1;
+    private DefaultDriveTalonSRX rightDrive2;
+    private DefaultDriveTalonSRX rightDrive3;
     private SpeedControllerGroup rightDrive;
     private AnalogInput pressureSensor;
 
@@ -85,10 +87,6 @@ public class Chassis extends Subsystem {
     
     public static final double kDefaultQuickStopThreshold = 0.2;
     public static final double kDefaultQuickStopAlpha = 0.1;
-    
-    private double m_quickStopThreshold = kDefaultQuickStopThreshold;
-    private double m_quickStopAlpha = kDefaultQuickStopAlpha;
-    private double m_quickStopAccumulator;
 
     public Chassis() {
     	
@@ -135,25 +133,25 @@ public class Chassis extends Subsystem {
         addChild(driveEncoderLeft);
         driveEncoderLeft.setDistancePerPulse(1.0);
         driveEncoderLeft.setPIDSourceType(PIDSourceType.kDisplacement);
-        leftDrive1 = new Spark(3);
+        leftDrive1 = new DefaultDriveTalonSRX(3);
         addChild(leftDrive1);
         leftDrive1.setInverted(true);
-        leftDrive2 = new Spark(4);
+        leftDrive2 = new DefaultDriveTalonSRX(5);
         addChild(leftDrive2);
         leftDrive2.setInverted(true);
-        leftDrive3 = new Spark(5);
+        leftDrive3 = new DefaultDriveTalonSRX(7);
         addChild(leftDrive3);
         leftDrive3.setInverted(true);
         leftDrive = new SpeedControllerGroup(leftDrive1, leftDrive2 , leftDrive3 );
         addChild(leftDrive);
         
-        rightDrive1 = new Spark(0);
+        rightDrive1 = new DefaultDriveTalonSRX(4);
         addChild(rightDrive1);
         rightDrive1.setInverted(true);
-        rightDrive2 = new Spark(1);
+        rightDrive2 = new DefaultDriveTalonSRX(6);
         addChild(rightDrive2);
         rightDrive2.setInverted(true);
-        rightDrive3 = new Spark(2);
+        rightDrive3 = new DefaultDriveTalonSRX(8);
         addChild(rightDrive3);
         rightDrive3.setInverted(true);
         rightDrive = new SpeedControllerGroup(rightDrive1, rightDrive2 , rightDrive3 );
@@ -174,9 +172,6 @@ public class Chassis extends Subsystem {
         SmartDashboard.putData("gyroPID", gyroPID);
         SmartDashboard.putData("leftDrivePID", leftDrivePID);
         SmartDashboard.putData("rightDrivePID", rightDrivePID);
-        
-        SmartDashboard.putNumber("QuickStopThreshold", this.kDefaultQuickStopThreshold);
-        SmartDashboard.putNumber("QuickStopAlpha", this.kDefaultQuickStopAlpha);
         
         LinearDigitalFilter.movingAverage(gyroSource, ChassisConst.gyroTolerancebuffer);
         
