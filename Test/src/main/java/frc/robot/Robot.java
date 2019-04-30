@@ -1,26 +1,30 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.subsystems.*;
-import frc.robot.OI;
-
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.ExampleSubsystem;
 
+/**
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as described in the TimedRobot
+ * documentation. If you change the name of this class or the package after
+ * creating this project, you must also update the build.gradle file in the
+ * project.
+ */
 public class Robot extends TimedRobot {
-  
-  private static OI m_oi;
-
-  private Elevator elevator = Elevator.getInstance();
-  private Drivebase drivebase = Drivebase.getInstance();
-  private Tray tray = Tray.getInstance();
-  //private Rangefinder rangefinder = Rangefinder.getInstance();
-  private NavX navx = NavX.getInstance();
-  
+  public static ExampleSubsystem m_subsystem = new ExampleSubsystem();
+  public static OI m_oi;
 
   Command m_autonomousCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -32,13 +36,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_oi = new OI();
-    m_oi.registerControls();
-    Elevator.zeroElevatorEncoder();
-    Drivebase.initDrive();
-    Elevator.initElevator();
-    //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
+    m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
-    //SmartDashboard.putData("Auto mode", m_chooser);
+    SmartDashboard.putData("Auto mode", m_chooser);
   }
 
   /**
@@ -51,7 +51,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
   }
 
   /**
@@ -61,7 +60,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
-    Elevator.stopElevator();
   }
 
   @Override
@@ -107,11 +105,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    NavX.zeroYaw();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
-    // this line or comment it out
+    // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -122,10 +119,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    Drivebase.mDrive.arcadeDrive(OI.getThrottleInput(), OI.getSteeringInputInverted(), true);
-    NavX.ReportData();
-    SmartDashboard.putNumber("Left encoder", Drivebase.getleftEncoder());
-    SmartDashboard.putNumber("right encoder", Drivebase.getrightEncoder());
     Scheduler.getInstance().run();
   }
 

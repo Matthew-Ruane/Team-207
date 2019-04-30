@@ -1,7 +1,9 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -12,7 +14,6 @@ import edu.wpi.first.wpilibj.drive.*;
 import frc.utility.DefaultDriveTalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Constants;
-
 
 /**
  * Author Matt Ruane (207)
@@ -34,8 +35,11 @@ public class Drivebase extends Subsystem {
 
   public static DifferentialDrive mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
 
-  private static Solenoid mShifter_High = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_High_ID);
-  private static Solenoid mShifter_Low = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_Low_ID);
+  private static Solenoid mShifter_High = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_High_ID);
+  private static Solenoid mShifter_Low = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_Low_ID);
+
+  public static final Encoder rightEncoder = new Encoder(1, 2, false, EncodingType.k4X);
+  public static final Encoder leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
 
   public void Drivebase() {
     
@@ -54,10 +58,16 @@ public class Drivebase extends Subsystem {
   public static int getCurrentGear() {
     return Constants.CURRENT_GEAR;
   }
+  public static double getleftEncoder() {
+    return leftEncoder.getRaw();
+  }
+  public static double getrightEncoder() {
+    return rightEncoder.getRaw();
+  }
   public static void initDrive() {
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
     mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
-    mDrive.setRightSideInverted(false);
+    mDrive.setRightSideInverted(true);
     mShifter_High.set(RobotMap.On);
     mShifter_Low.set(RobotMap.Off);
     mDrive_Left_B.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
