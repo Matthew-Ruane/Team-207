@@ -52,7 +52,6 @@ public class Elevator extends Subsystem {
       mElevator_Master.configMotionAcceleration(Constants.Elevator_MotionAccel, Constants.kTimeoutms);
       mElevator_Master.configMotionCruiseVelocity(Constants.Elevator_MotionCruiseVelo, Constants.kTimeoutms);
 
-
       mElevator_Slave.setNeutralMode(NeutralMode.Coast);
       mElevator_Slave.enableCurrentLimit(true);
       mElevator_Slave.configContinuousCurrentLimit(40);

@@ -78,20 +78,22 @@ public class Drivebase extends Subsystem {
     leftEncoder.reset();
     rightEncoder.reset();
   }
+  public static void configEncoders() {
+    leftEncoder.setDistancePerPulse(Constants.getWheelCircumference()/(4096*Constants.kEncoderDriveRatio));
+    rightEncoder.setDistancePerPulse(Constants.getWheelCircumference()/(4096*Constants.kEncoderDriveRatio));
+  }
   public static double getLeftPosition() {
 		return MotionUtils.rotationsToDistance(MotionUtils.ticksToRotations(leftEncoder.getRaw(), 4096, Constants.kEncoderDriveRatio), Constants.getWheelCircumference());
 	}
-	
 	public static double getRightPosition() {
 		return MotionUtils.rotationsToDistance(MotionUtils.ticksToRotations(rightEncoder.getRaw(), 4096, Constants.kEncoderDriveRatio), Constants.getWheelCircumference());
   }
-  
   public static double getLeftVelocity() {
-		return leftEncoder.getRate() / 4096.0 * 10.0 * Constants.getWheelCircumference();
+		return leftEncoder.getRate();
 	}
 	
 	public static double getRightVelocity() {
-		return rightEncoder.getRate() / 4096.0 * 10.0 * Constants.getWheelCircumference();
+		return rightEncoder.getRate();
 	}
   public static void initDrive() {
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 100);
@@ -103,6 +105,8 @@ public class Drivebase extends Subsystem {
     mDrive_Left_C.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
     mDrive_Right_B.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
     mDrive_Right_C.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
+    resetEncoders();
+    configEncoders();
   }
 
   @Override
