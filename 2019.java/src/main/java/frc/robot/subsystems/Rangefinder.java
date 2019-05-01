@@ -17,13 +17,14 @@ public class Rangefinder extends Subsystem {
     return instance;
   }
 
-  public static final Ultrasonic mRangefinder = new Ultrasonic(RobotMap.mUltrasonic_Ping_ID, RobotMap.mUltrasonic_Echo_ID, Unit.kInches);
-  public static double kDistance = mRangefinder.getRangeInches();
+  public static Ultrasonic mRangefinder;
+  public static double kDistance;
   public static SendableBuilder RangefinderDisplay;
 
-  public void Rangefinder() {
+  public Rangefinder() {
+    mRangefinder = new Ultrasonic(RobotMap.mUltrasonic_Ping_ID, RobotMap.mUltrasonic_Echo_ID, Unit.kInches);
     mRangefinder.setEnabled(true);
-    mRangefinder.initSendable(RangefinderDisplay);
+    kDistance = mRangefinder.getRangeInches();
   }
 
   public static double getDistance() {

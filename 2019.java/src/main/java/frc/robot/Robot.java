@@ -6,20 +6,16 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.subsystems.*;
 import frc.robot.OI;
-
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
   
   private static OI m_oi;
-
-  private Elevator elevator = Elevator.getInstance();
-  private Drivebase drivebase = Drivebase.getInstance();
-  private Tray tray = Tray.getInstance();
-  //private Rangefinder rangefinder = Rangefinder.getInstance();
-  private NavX navx = NavX.getInstance();
+  Drivebase drive = Drivebase.getInstance();
+  Elevator elevator = Elevator.getInstance();
+  Tray tray = Tray.getInstance();
+  Rangefinder rangefinder = Rangefinder.getInstance();
+  NavX navx = NavX.getInstance();
   
 
   Command m_autonomousCommand;
@@ -34,8 +30,7 @@ public class Robot extends TimedRobot {
     m_oi = new OI();
     m_oi.registerControls();
     Elevator.zeroElevatorEncoder();
-    Drivebase.initDrive();
-    Elevator.initElevator();
+    NavX.zeroYaw();
     //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     //SmartDashboard.putData("Auto mode", m_chooser);
@@ -125,9 +120,12 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     Drivebase.arcade();
     NavX.ReportData();
+    Scheduler.getInstance().run();
+    
     SmartDashboard.putNumber("Left encoder", Drivebase.getleftEncoder());
     SmartDashboard.putNumber("right encoder", Drivebase.getrightEncoder());
-    Scheduler.getInstance().run();
+    SmartDashboard.putNumber("Left encoder rate", Drivebase.leftEncoder.getRate());
+    SmartDashboard.putNumber("right encoder rate", Drivebase.rightEncoder.getRate());
   }
 
   /**

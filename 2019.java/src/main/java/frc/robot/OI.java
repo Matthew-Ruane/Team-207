@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.robot.Input.*;
 import frc.robot.commands.*;
+import frc.robot.commands.Autos.*;
 
 public class OI {
 
@@ -30,6 +31,7 @@ public class OI {
         LeftStick.getButtonTrigger().whenPressed(new TrayExtensionToggle());
         //zeroing Elevator encoder and NavX yaw gyro
         LeftStick.getButton9().whenPressed(new ZeroGyro());
+        LeftStick.getButton7().whenPressed(new TrajectoryCommandTest());
         }
 
         public static double getThrottleInput() {

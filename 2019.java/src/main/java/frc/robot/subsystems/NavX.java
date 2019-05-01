@@ -24,21 +24,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * Add your docs here.
  */
 public class NavX {
-    public static final AHRS ahrs = new AHRS(SerialPort.Port.kMXP);
+    public static AHRS ahrs;
 
     private static final NavX instance = new NavX();
 
     public static NavX getInstance() {
       return instance;
     }
-    private void NavX() {
+    public NavX() {
+      ahrs = new AHRS(SerialPort.Port.kMXP);
     }
 
     public static void zeroYaw() {
       ahrs.zeroYaw();
     }
-    public static double getAngle() {
-      return ahrs.getAngle();
+    public static double getYaw() {
+      return ahrs.getYaw();
     }
     public static void ReportData() {
       SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());

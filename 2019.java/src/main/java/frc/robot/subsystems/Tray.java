@@ -22,21 +22,25 @@ public class Tray extends Subsystem {
       return instance;
     }
     
-    private static final Solenoid mTray_Extend = new Solenoid(RobotMap.mPCM_B, RobotMap.mTray_Extend_ID);
-    private static final Solenoid mTray_Retract = new Solenoid(RobotMap.mPCM_A, RobotMap.mTray_Retract_ID);
-    private static final Solenoid mTalons_Hold = new Solenoid(RobotMap.mPCM_A, RobotMap.mTalons_Hold_ID);
-    private static final Solenoid mTalons_Release = new Solenoid(RobotMap.mPCM_B, RobotMap.mTalons_Release_ID);
-    private static final TalonSRX mShooter = new TalonSRX(RobotMap.mShooter_ID);
+    public static Solenoid mTray_Extend, mTray_Retract, mTalons_Hold, mTalons_Release;
+    public static TalonSRX mShooter;
+    public static DigitalInput mCargo_Loaded_Sensor, mHatch_Loaded_Sensor;
 
-    public static final DigitalInput mCargo_Loaded_Sensor = new DigitalInput(RobotMap.mCargo_Loaded_Sensor_ID);
-    public static final DigitalInput mHatch_Loaded_Sensor = new DigitalInput(RobotMap.mHatch_Loaded_Sensor_ID);
+    public Tray() {
+        mTray_Extend = new Solenoid(RobotMap.mPCM_B, RobotMap.mTray_Extend_ID);
+        mTray_Retract = new Solenoid(RobotMap.mPCM_A, RobotMap.mTray_Retract_ID);
+        mTalons_Hold = new Solenoid(RobotMap.mPCM_A, RobotMap.mTalons_Hold_ID);
+        mTalons_Release = new Solenoid(RobotMap.mPCM_B, RobotMap.mTalons_Release_ID);
+        mShooter = new TalonSRX(RobotMap.mShooter_ID);
 
-    public void Tray() {
         mShooter.setNeutralMode(NeutralMode.Brake);
         mShooter.configContinuousCurrentLimit(30);
         mShooter.configPeakCurrentLimit(0);
         mShooter.enableCurrentLimit(true);
         mShooter.setInverted(false);
+
+        mCargo_Loaded_Sensor = new DigitalInput(RobotMap.mCargo_Loaded_Sensor_ID);
+        mHatch_Loaded_Sensor = new DigitalInput(RobotMap.mHatch_Loaded_Sensor_ID);
     }
 
     public static void ShootCargo() {

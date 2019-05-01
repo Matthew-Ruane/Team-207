@@ -30,8 +30,8 @@ public class RobotMap {
     public static final int RightStickPort = 1;
     public static final int GamepadPort = 2;
 
-    public static final int mUltrasonic_Ping_ID = 3;
-    public static final int mUltrasonic_Echo_ID = 4;
+    public static final int mUltrasonic_Ping_ID = 5;
+    public static final int mUltrasonic_Echo_ID = 6;
 
     public static final boolean On = true;
     public static final boolean Off = false;

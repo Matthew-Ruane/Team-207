@@ -32,12 +32,11 @@ public class Elevator extends Subsystem {
     public static ElevatorModes Mode = ElevatorModes.CARGO;
     public static ElevatorPositions DesiredPosition = ElevatorPositions.ROCKET_BOTTOM;
 
-    private static final TalonSRX mElevator_Master = new TalonSRX(RobotMap.mElevator_Master_ID);
-    private static final TalonSRX mElevator_Slave = new TalonSRX(RobotMap.mElevator_Slave_ID);
+    public static TalonSRX mElevator_Master, mElevator_Slave;
     
-    private void Elevator() {
-    }
-    public static void initElevator() {
+    public Elevator() {
+      mElevator_Master = new TalonSRX(RobotMap.mElevator_Master_ID);
+      mElevator_Slave = new TalonSRX(RobotMap.mElevator_Slave_ID);
       mElevator_Master.setNeutralMode(NeutralMode.Coast);
       mElevator_Master.setSensorPhase(false);
       mElevator_Master.enableCurrentLimit(true);
@@ -59,8 +58,6 @@ public class Elevator extends Subsystem {
       mElevator_Slave.configPeakCurrentDuration(100);
       mElevator_Slave.setInverted(false);
       mElevator_Slave.set(ControlMode.Follower, RobotMap.mElevator_Master_ID);
-      mElevator_Master.set(ControlMode.PercentOutput, 0.0);
-
     }
     public static void SetElevatorPosition() {
         Constants.kPosition = Constants.kEncoderTicksPerInch*Elevator.getTargetHeight();
