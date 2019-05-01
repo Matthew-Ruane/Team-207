@@ -1,0 +1,207 @@
+plugins {
+    id 'com.gradle.build-scan' version '2.0.2'
+    id 'org.ysb33r.doxygen' version '0.5' apply false
+    id 'edu.wpi.first.Toolchain' version '2019.1.1-beta-3-pre4' apply false
+}
+
+import org.gradle.internal.os.OperatingSystem
+import edu.wpi.first.toolchain.NativePlatforms
+
+task subclean();
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'maven-publish'
+
+    project.group = "grpl.pathfinder"
+    project.version = "2.0.0-prealpha"
+
+    plugins.withType(CppPlugin).whenPluginAdded {
+        project.apply plugin: "visual-studio"
+        project.apply plugin: "org.ysb33r.doxygen"
+        project.apply plugin: 'edu.wpi.first.Toolchain'
+        
+        toolchainsPlugin.withRaspbian()
+        toolchainsPlugin.withRoboRIO()
+
+        toolchainsPlugin.getByName('roboRio').optional = true
+
+        rootProject.tasks.subclean.dependsOn tasks.clean
+
+        ext.is64 = NativePlatforms.desktopArch() == "x86-64"
+        ext.desktop32Classifier = NativePlatforms.desktopOS() + "x86"
+
+        project.model {
+            buildTypes {
+                release
+                debug
+            }
+            platforms {
+                // If we're on x86 64-bit, also compile for x86 32-bit
+                if (is64) {
+                    "${desktop32Classifier}" {
+                        architecture 'x86'
+                    }
+                }
+            }
+            toolChains {
+                def ci = System.getenv("CI_COMPILER")
+                if (ci != null) {
+                    if (ci == "GCC")
+                        gcc(Gcc)
+                    else if (ci == "MSVC")
+                        msvc(VisualCpp)
+                    else if (ci == "CLANG")
+                        clang(Clang)
+                    else if (ci == "ROBORIO")
+                        roborio(edu.wpi.first.toolchain.roborio.RoboRioGcc)
+                    else if (ci == "RASPBIAN")
+                        raspbian(edu.wpi.first.toolchain.raspbian.RaspbianGcc)
+                } else {
+                    msvc(VisualCpp)
+                    // Define Clang first - for ASAN (Default)
+                    clang(Clang)
+                    gcc(Gcc)
+                    roborio(edu.wpi.first.toolchain.roborio.RoboRioGcc)
+                    raspbian(edu.wpi.first.toolchain.raspbian.RaspbianGcc)
+                }
+            }
+            components {
+                withType(TargetedNativeComponent) {
+                    targetPlatform NativePlatforms.desktop
+                    targetPlatform NativePlatforms.raspbian
+                    targetPlatform NativePlatforms.roborio
+
+                    if (is64)
+                        targetPlatform ext.desktop32Classifier
+                }
+            }
+            binaries {
+                withType(NativeBinarySpec) {
+                    if (toolChain instanceof GccCompatibleToolChain) {
+                        cppCompiler.args << '-std=c++14' << '-O2' << '-Werror'
+
+                        if (buildType == buildTypes.debug) {
+                            cppCompiler.args "-g"
+                        }
+                    } else {
+                        // MSVC
+                        cppCompiler.args << '/std:c++14' << '/O2'
+
+                        if (buildType == buildTypes.debug) {
+                            cppCompiler.args << '/Zi' << '/FS'
+                            cppCompiler.define 'DEBUG'
+                            linker.args '/DEBUG'
+                        } 
+                    }
+                }
+            }
+        }
+        
+        // ext.binaryDists = []
+        // ext.binaryArtifacts = { scope, name, jar ->
+        //     binaryDists.each { z -> 
+        //         if (z.binary.component.name == name) {
+        //             scope.artifact(jar ? z.jartask : z.ziptask) {
+        //                 classifier z.binary.targetPlatform.name
+        //             }
+        //         }
+        //     }
+        // }
+        ext.binaryPublishers = [:]
+        ext.binaryArtifacts = { scope, name, jar ->
+            binaryPublishers[name] = [scope: scope, jar: jar]
+        }
+
+        project.model {
+            binaries {
+                withType(NativeBinarySpec) {
+                    def bin = it
+                    if (buildType.name == "release" && !(it instanceof StaticLibraryBinary) && it.buildable) {
+                        def taskSuffix = "${component.name}${targetPlatform.name}"
+                        def source = (bin instanceof SharedLibraryBinary ? bin.sharedLibraryFile : bin.executable.file)
+                        
+                        def ziptask = task "zip${taskSuffix}"(type: Zip) {
+                            from(source)
+                            into(targetPlatform.name)
+
+                            baseName = component.name
+                            classifier = targetPlatform.name
+
+                            dependsOn bin.tasks.withType(AbstractLinkTask)
+                        }
+
+                        def jartask = task "jar${taskSuffix}"(type: Jar) {
+                            from(source)
+                            into(targetPlatform.name)
+
+                            baseName = component.name
+                            classifier = targetPlatform.name
+
+                            dependsOn bin.tasks.withType(AbstractLinkTask)
+                        }
+
+                        if (binaryPublishers[bin.component.name] != null) {
+                            def entry = binaryPublishers[bin.component.name]
+                            entry.scope.artifact(entry.jar ? jartask : ziptask) {
+                                classifier targetPlatform.name
+                            }
+                        }
+                        // println "Bin: ${bin}"
+                        // binaryDists << [ binary: bin, jartask: jartask, ziptask: ziptask ]
+                    }
+                }
+            }
+        }
+    }
+    plugins.withType(GoogleTestPlugin).whenPluginAdded {
+        model {
+            binaries {
+                withType(GoogleTestTestSuiteBinarySpec) {
+                    lib project: ":libs", library: "googleTest", linkage: "static"
+
+                    boolean applies = false
+                    if (targetPlatform.name == edu.wpi.first.toolchain.NativePlatforms.desktop)
+                        applies = true
+                    if (ext.is64 && targetPlatform.name == ext.desktop32Classifier)
+                        applies = true
+
+                    if (!applies) {
+                        tasks.withType(RunTestExecutable) { RunTestExecutable task ->
+                            task.enabled = false
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    publishing {
+        repositories {
+            maven {
+                name = "distLocal"
+                url = "${rootProject.buildDir}/mvnDistRepo"
+            }
+        }
+        publications.all {
+            groupId 'grpl.pathfinder'
+        }
+    }
+}
+
+apply from: 'vendordeps.gradle'
+
+task cleanMaven(type: Delete) {
+    delete "$buildDir/mvnDistRepo"
+}
+
+task clean(dependsOn: cleanMaven)
+
+buildScan { 
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service';
+    termsOfServiceAgree = 'yes'
+}
+
+wrapper {
+    gradleVersion = '5.0'
+}

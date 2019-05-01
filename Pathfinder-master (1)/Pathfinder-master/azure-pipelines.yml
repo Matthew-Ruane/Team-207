@@ -1,0 +1,91 @@
+resources:
+  containers:
+  - container: linux
+    image: jaci/azure-native-linux:2018.12.06
+    options: --cap-add SYS_PTRACE
+# ^ Need SYS_PTRACE for Clang ASAN
+
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'VS2017-Win2016'
+  variables:
+    PlatformName: "win"
+  steps:
+  - template: azure-init.yml
+  - template: azure-steps.yml
+    parameters:
+      env: { }
+
+- job: macOS
+  pool:
+    vmImage: 'macOS-10.13'
+  variables:
+    PlatformName: "mac"
+  steps:
+  - template: azure-init.yml
+  - template: azure-steps.yml
+    parameters:
+      env: { }
+
+- job: LinuxGCC
+  pool: 
+    vmImage: 'Ubuntu-16.04'
+  container: linux
+  variables:
+    PlatformName: "linuxGCC"
+  steps:
+  - template: azure-steps.yml
+    parameters:
+      env: { "CI_COMPILER": "GCC" }
+
+- job: LinuxClang
+  pool: 
+    vmImage: 'Ubuntu-16.04'
+  container: linux
+  variables:
+    PlatformName: "linuxClang"
+  steps:
+  - template: azure-steps.yml
+    parameters:
+      env: { "CI_COMPILER": "CLANG" }
+
+- job: LinuxRoboRIO
+  pool: 
+    vmImage: 'Ubuntu-16.04'
+  container: linux
+  variables:
+    PlatformName: "roborio"
+  steps:
+  - task: Gradle@2
+    inputs:
+      workingDirectory: ''
+      gradleWrapperFile: 'gradlew'
+      tasks: 'installRoboRioToolchain'
+      options: '--scan --stacktrace'
+  - bash: git apply ../bench-athena.patch
+    workingDirectory: libs/googlebench
+  - template: azure-steps.yml
+    parameters:
+      env: { "CI_COMPILER": "ROBORIO" }
+      args: '-xcheck'
+      has_tests: false
+
+- job: LinuxRaspbian
+  pool: 
+    vmImage: 'Ubuntu-16.04'
+  container: linux
+  variables:
+    PlatformName: "raspbian"
+  steps:
+  - task: Gradle@2
+    inputs:
+      workingDirectory: ''
+      gradleWrapperFile: 'gradlew'
+      tasks: 'installRaspbianToolchain'
+      options: '--scan --stacktrace'
+  - template: azure-steps.yml
+    parameters:
+      env: { "CI_COMPILER": "RASPBIAN" }
+      args: '-xcheck'
+      has_tests: false

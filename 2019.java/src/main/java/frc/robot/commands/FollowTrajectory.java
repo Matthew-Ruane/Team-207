@@ -1,0 +1,250 @@
+package frc.robot.commands;
+
+import java.util.function.Supplier;
+
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+
+import jaci.pathfinder.Pathfinder;
+import jaci.pathfinder.Trajectory;
+import jaci.pathfinder.modifiers.TankModifier;
+
+import frc.robot.subsystems.Drivebase;
+import frc.robot.subsystems.NavX;
+
+import frc.utility.PathFollower;
+import frc.robot.Constants;
+import frc.robot.Robot;
+
+public class FollowTrajectory extends Command implements Sendable  {
+	PathFollower leftFollower;
+	PathFollower rightFollower;
+	Supplier<Trajectory> trajectorySupplier;
+	Trajectory trajectory;
+	TankModifier modifier;
+	double angleDifference;
+	boolean backwards;
+	double startingAngle;
+	
+	double leftOutput;
+	double rightOutput;
+	
+	double followerLoopTime;
+    double followerdt;
+    
+    Drivebase drivebase;
+	
+	
+	double lastTime;
+	private Notifier notifier;
+	
+	public class DebugInfo {
+		//public double leftPosition;
+		//public double leftVelocity;
+		public double leftPositionError;
+		public double leftVelocityError;
+		public double leftOutput;
+		public double leftTargetVelocity;
+		public double leftTargetAcceleration;
+		
+		//public double rightPosition;
+		//public double rightVelocity;
+		public double rightPositionError;
+		public double rightVelocityError;
+		public double rightOutput;
+		public double rightTargetVelocity;
+		public double rightTargetAcceleration;
+		
+		public double dt;
+		public double loopTime;
+	}
+
+	
+	public FollowTrajectory(Supplier<Trajectory> trajectorySupplier) {
+		this(trajectorySupplier, false, 0);
+	}
+	
+	public FollowTrajectory(Trajectory trajectory) {
+		this(() -> trajectory, false, 0);
+	}
+	
+	public FollowTrajectory(Trajectory trajectory, boolean backwards) {
+		this(() -> trajectory, backwards, 0);
+	}
+	
+	public FollowTrajectory(Supplier<Trajectory> trajectorySupplier, double startingAngle) {
+		this(trajectorySupplier, false, startingAngle);
+	}
+	
+	public FollowTrajectory(Trajectory trajectory, double startingAngle) {
+		this(() -> trajectory, false, startingAngle);
+	}
+	
+	public FollowTrajectory(Trajectory trajectory, boolean backwards, double startingAngle) {
+		this(() -> trajectory, backwards, startingAngle);
+	}
+	 
+	/**
+	 * 
+	 * @param trajectorySupplier
+	 * @param backwards
+	 * @param startingAngle RADIANS!
+	 */
+	public FollowTrajectory(Supplier<Trajectory> trajectorySupplier, boolean backwards, double startingAngle) {
+		super("Follow Trajectory");
+
+		this.trajectorySupplier = trajectorySupplier;
+		this.backwards = backwards;
+		this.startingAngle = startingAngle;
+		
+		requires(drivebase);
+		
+		
+	}
+
+	@Override
+	protected void initialize() {
+		notifier = new Notifier(this::notifierExecute);
+		this.trajectory = trajectorySupplier.get();
+		this.modifier = new TankModifier(trajectory).modify(Constants.kDrive_Motion_trackwidth);
+		modifier.modify(Constants.kDrive_Motion_trackwidth);
+		
+		leftFollower = new PathFollower(modifier.getLeftTrajectory());
+		rightFollower = new PathFollower(modifier.getRightTrajectory());
+		
+		leftFollower.configurePIDVA(Constants.kDrive_Motion_P,
+				0.0,
+				Constants.kDrive_Motion_D,
+				Constants.kDrive_Motion_V,
+				Constants.kDrive_Motion_A);
+
+		rightFollower.configurePIDVA(Constants.kDrive_Motion_P,
+				0.0,
+				Constants.kDrive_Motion_D,
+				Constants.kDrive_Motion_V,
+				Constants.kDrive_Motion_A);
+
+		leftFollower.reset();
+		rightFollower.reset();
+		Drivebase.resetEncoders();
+    	NavX.zeroYaw();
+    	
+    	leftOutput = 0;
+    	rightOutput = 0;
+    	lastTime = Timer.getFPGATimestamp();
+    	
+    	followerLoopTime = 0;
+    	followerdt = 0;
+    	
+    	notifier.startPeriodic(0.01);
+	}
+	
+	@Override
+	protected void execute() {		
+		SmartDashboard.putNumber("MP Left Position Error (ft)", leftFollower.getError());
+		SmartDashboard.putNumber("MP Right Position Error (ft)", rightFollower.getError());
+		
+		if(!backwards) {
+			SmartDashboard.putNumber("MP Left Output (%)", leftOutput);
+			SmartDashboard.putNumber("MP Right Output (%)", rightOutput);
+		} else {
+			SmartDashboard.putNumber("MP Left Output (%)", -rightOutput);
+			SmartDashboard.putNumber("MP Right Output (%)", -leftOutput);
+		}
+		
+		SmartDashboard.putNumber("MP Target Vel (ft-s)", leftFollower.getSegment().velocity);
+		SmartDashboard.putNumber("MP Target Accel (ft-ss)", leftFollower.getSegment().acceleration);
+		
+		SmartDashboard.putNumber("follower dt", followerdt);
+		SmartDashboard.putNumber("follower looptime", followerLoopTime);
+		
+	}
+
+	private void notifierExecute() {
+		double time = Timer.getFPGATimestamp();
+		followerdt = (time - lastTime);
+		lastTime = time;
+		
+		double gyro_heading = -NavX.getAngle(); //axis is the same
+		
+		double desired_heading = Pathfinder.r2d(leftFollower.getHeading() - startingAngle);  // Should also be in degrees, make sure its in phase
+		
+		angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);
+		
+		double turn = Constants.kDrive_Motion_turnP * angleDifference;
+
+		/*
+		 * untested safety code. test on practice field b
+		if (Math.abs(angleDifference) >= Constants.kAutoSafety_MaxGyroError ||
+			Math.abs(leftFollower.getError()) >= Constants.kAutoSafety_MaxEncoderError ||
+			Math.abs(rightFollower.getError()) >= Constants.kAutoSafety_MaxEncoderError) {
+			System.out.println("!!!!!!!! AUTO FAILED !!!!!!!!");
+		}
+		
+		*/
+		
+		
+		if (!this.isFinished()) {
+			
+			//forwards
+			if (!backwards) {
+                leftOutput = leftFollower.calculate(Drivebase.getLeftPosition());
+                rightOutput = rightFollower.calculate(Drivebase.getRightPosition());
+			} else {
+				//backwards
+				leftOutput = leftFollower.calculate(-Drivebase.getRightPosition()); //left = -right
+				rightOutput = rightFollower.calculate(-Drivebase.getLeftPosition()); //right = -left
+			}
+			
+			if (!backwards) {
+				Drivebase.tank(leftOutput - turn, rightOutput + turn);
+			} else {
+				//backwards
+				/*.tank is forwards, so (fwd_left, fwd_right)
+				 * back_left = -fwd_right
+				 * 	so fwd_right = -back_left
+				 * back_right = -fwd_left
+				 * 	so fwd_left = -back_right
+				 * 
+				 * turn input is relative to true (fwd) drivetrain output, not the actual direction
+				 * so fwd_left(back_right) has to be less negative (going slower) then fwd_right(back_left), when turning right (negative turn)
+				 */
+				Drivebase.tank(-rightOutput - turn, -leftOutput + turn);
+			}
+		}
+		followerLoopTime = (Timer.getFPGATimestamp() - time);
+	}
+
+	@Override
+	protected boolean isFinished() {
+		return leftFollower.isFinished() && rightFollower.isFinished();
+	}
+
+	@Override
+	protected void end() {
+		System.out.println("pathDone");
+		notifier.stop();
+		
+		Drivebase.tank(0, 0);
+    	
+    	leftOutput = 0;
+    	rightOutput = 0;
+		
+    	
+		leftFollower.reset();
+		rightFollower.reset();
+    	NavX.zeroYaw();
+    	Drivebase.resetEncoders();
+
+    	notifier.stop();
+	}
+
+	@Override
+	protected void interrupted() {
+		end();
+	}
+}

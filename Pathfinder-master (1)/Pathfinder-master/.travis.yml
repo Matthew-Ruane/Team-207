@@ -1,0 +1,48 @@
+language: cpp
+
+jdk:
+- oraclejdk8
+
+os: linux
+dist: trusty
+
+matrix:
+  include:
+    - env: CI_COMPILER=CLANG
+      sudo: required  # Clang requires sudo for ptrace with address sanitizer
+      addons:
+        apt: 
+          packages:
+            - clang-3.8
+            - g++-5
+            - g++-5-multilib
+            - gcc-5-multilib
+            - gcc-multilib
+            - gnuplot
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+
+    - env: CI_COMPILER=GCC
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - g++-5-multilib
+            - gcc-5-multilib
+            - gcc-multilib
+            - gnuplot
+          sources:
+            - ubuntu-toolchain-r-test
+
+install:
+- sudo update-alternatives --remove-all gcc || true
+- sudo update-alternatives --remove-all g++ || true
+- sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 10 || true
+- sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 10 || true
+
+script:
+- ./gradlew build --stacktrace --console=plain -PwithBench
+
+notifications:
+  email: false

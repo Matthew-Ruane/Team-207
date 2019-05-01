@@ -37,6 +37,9 @@ public class NavX {
     public static void zeroYaw() {
       ahrs.zeroYaw();
     }
+    public static double getAngle() {
+      return ahrs.getAngle();
+    }
     public static void ReportData() {
       SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
       SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());

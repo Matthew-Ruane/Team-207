@@ -1,0 +1,150 @@
+plugins {
+    id 'cpp'
+    id 'google-test-test-suite'
+}
+
+apply from: 'plot.gradle'
+
+model {
+    binaries {
+        all {
+            if (!(toolChain instanceof Clang) && targetPlatform.name == edu.wpi.first.toolchain.NativePlatforms.desktop)
+                println "WARNING: Not using Clang. Additional warnings and sanitation may be missing."
+        }
+    }
+    components {
+        pathfinder(NativeLibrarySpec) {
+            sources.cpp {
+                source {
+                    srcDir 'src/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDir 'src/include'
+                    include '**/*.h'
+                }
+                lib project: ':libs', library: "eigen", linkage: "api"
+            }
+        }
+    }
+    testSuites {
+        pathfinderBench(GoogleTestTestSuiteSpec) {
+            testing $.components.pathfinder 
+
+            binaries.all {
+                if (toolChain instanceof GccCompatibleToolChain) {
+                    linker.args << '-pthread'
+                } else {
+                    // MSVC
+                    linker.args << 'shlwapi.lib'
+                }
+                if (!project.hasProperty("withBench"))
+                    tasks.withType(RunTestExecutable) { RunTestExecutable task -> 
+                        task.enabled = false
+                    }
+            }
+
+            sources.cpp {
+                source {
+                    srcDir 'src/bench'
+                    include '**/*.cpp'
+                }
+                lib project: ':libs', library: 'googleBench', linkage: 'static'
+                lib project: ':libs', library: 'eigen', linkage: 'api'
+            }
+        }
+
+        pathfinderTest(GoogleTestTestSuiteSpec) {
+            testing $.components.pathfinder
+            
+            binaries.all {
+                cppCompiler.define 'EIGEN_RUNTIME_NO_MALLOC'
+                if (toolChain instanceof GccCompatibleToolChain) {
+                    linker.args << '-pthread'
+
+                    if (toolChain instanceof Clang && targetPlatform.name == edu.wpi.first.toolchain.NativePlatforms.desktop) {
+                        cppCompiler.args << '-fsanitize=address'
+                        linker.args << '-fsanitize=address'
+                    }
+                } else {
+                    // Windows breaks Eigen's static alignment. Seems to be a compiler bug.
+                    // https://forum.kde.org/viewtopic.php?f=74&t=97995&sid=cd769a78f5b8b159239b9f032e2b7432
+                    cppCompiler.define 'EIGEN_DONT_ALIGN_STATICALLY'
+                }
+            }
+
+            sources.cpp {
+                source {
+                    srcDir 'src/test'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDir 'src/test'
+                    include '**/*.h'
+                }
+                lib project: ':libs', library: "eigen", linkage: "api"
+            }
+        }
+    }
+}
+
+doxygen {
+    executables {
+        doxygen version : '1.8.13'
+    }
+
+    generate_html true
+    javadoc_autobrief true
+    source project.file('src/include')
+}
+
+task zipHeaders(type: Zip) {
+    from fileTree('src/include')
+
+    baseName = "Pathfinder"
+    classifier = "headers"
+}
+
+task zipDoxygen(type: Zip) {
+    from doxygen
+    baseName = "Pathfinder"
+    classifier = "doxygen"
+}
+
+publishing {
+    publications {
+        pathfinder(MavenPublication) {
+            artifactId 'Pathfinder'
+
+            artifact zipHeaders {
+                classifier 'headers'
+            }
+
+            artifact zipDoxygen {
+                classifier 'doxygen'
+            }
+        }
+        pathfinderTest(MavenPublication) {
+            groupId += ".testing"
+            artifactId 'Pathfinder-Test'
+
+            binaryArtifacts(it, "pathfinderTest", false)
+        }
+        pathfinderBench(MavenPublication) {
+            groupId += ".testing"
+            artifactId 'Pathfinder-Bench'
+
+            binaryArtifacts(it, "pathfinderBench", false)
+        }
+    }
+}
+
+task cleanTest() {
+    doLast {
+        delete {
+            delete fileTree(dir: new File(project.buildDir, "test-results"), include: ["**/*.png", "**/*.csv"])
+        }
+    }
+}
+
+check.finalizedBy plot

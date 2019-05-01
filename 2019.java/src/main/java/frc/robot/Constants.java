@@ -40,4 +40,28 @@ public class Constants {
     public static final int Elevator_MotionAccel = 13000;
     public static final int Elevator_MotionCruiseVelo = 15000;
     public static final int kTimeoutms = 10;
+
+    public static double kDrive_Motion_P = 1.4;				// %/ft
+	public static double kDrive_Motion_D = 0.0;				// %/(ft/s)
+	public static double kDrive_Motion_V = 0.058;			// %/(ft/s) max turn speed
+	public static double kDrive_Motion_A = 0.0;	
+
+    public static double kDrive_Motion_turnP = 0.75;
+    public static double kDrive_Motion_turnI = 0.5;
+    public static double kDrive_Motion_turnD = 0.2;
+
+    public static final double kGearRatio = 4.8;
+    public static final double kEncoderDriveRatio = 5.4;
+    public static double kDrive_Motion_trackwidth = 2.72;
+	public static double kDrive_WheelDiameterInch = 3.875;
+    
+    public static double getWheelCircumference() { 
+        return (kDrive_WheelDiameterInch*Math.PI)/12.0; 
+    }
+    public static double getTicksPerWheelRotation() {
+        return (kGearRatio*4096);
+    }
+    public static double getDistancePerTick() {
+        return (getWheelCircumference()/getTicksPerWheelRotation());
+    }
 }

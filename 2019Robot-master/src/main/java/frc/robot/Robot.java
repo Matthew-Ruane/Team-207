@@ -1,28 +1,34 @@
 package frc.robot;
 
+import frc.robot.HAL;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.subsystems.*;
-import frc.robot.OI;
-
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.DriveCommand;
+import frc.robot.subsystems.Elevator;
+import frc.robot.Autos.*;
+
+
+/**
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as described in the TimedRobot
+ * documentation. If you change the name of this class or the package after
+ * creating this project, you must also update the build.gradle file in the
+ * project.
+ */
 
 public class Robot extends TimedRobot {
-  
-  private static OI m_oi;
 
-  private Elevator elevator = Elevator.getInstance();
-  private Drivebase drivebase = Drivebase.getInstance();
-  private Tray tray = Tray.getInstance();
-  //private Rangefinder rangefinder = Rangefinder.getInstance();
-  private NavX navx = NavX.getInstance();
-  
+  public static OI m_oi;
 
-  Command m_autonomousCommand;
+  Command autoCommand;
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   /**
@@ -31,14 +37,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    
     m_oi = new OI();
-    m_oi.registerControls();
-    Elevator.zeroElevatorEncoder();
-    Drivebase.initDrive();
-    Elevator.initElevator();
-    //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
-    // chooser.addOption("My Auto", new MyAutoCommand());
-    //SmartDashboard.putData("Auto mode", m_chooser);
+    m_chooser = new SendableChooser<Command>();
+    //m_chooser.addObject("Test", new TestSandstormExample(false));
+    // m_chooser.addObject("Left Side Rocket Hatch", new LeftSideRocketHatch(false));
+    // m_chooser.addObject("Right Side Rocket Hatch", new RightSideRocketHatch(false));
+    // m_chooser.addObject("Front Cargo Hatch", new FrontCargoHatch(false));
+    m_chooser.addObject("TestSandstormExample", new TestSandstormExample(false));
+    m_chooser.setDefaultOption("Default Auto", new DriveCommand(OI.throttle, OI.turn));
+    SmartDashboard.putData("Auto mode", m_chooser);
   }
 
   /**
@@ -51,7 +59,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
   }
 
   /**
@@ -61,8 +68,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
-    Elevator.stopElevator();
-    Drivebase.resetEncoders();
+    Scheduler.getInstance().removeAll();
+    HAL.drive.setBrake(false);
   }
 
   @Override
@@ -81,9 +88,10 @@ public class Robot extends TimedRobot {
    * chooser code above (like the commented example) or additional comparisons
    * to the switch structure below with additional strings & commands.
    */
+  
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_chooser.getSelected();
+    //m_autonomousCommand = new SetTurret();
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -93,9 +101,14 @@ public class Robot extends TimedRobot {
      */
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.start();
-    }
+    
+    HAL.drive.setBrake(true);
+    autoCommand = m_chooser.getSelected();
+		autoCommand = (Command) m_chooser.getSelected();
+		
+		if (autoCommand != null) {
+			autoCommand.start();
+		}
   }
 
   /**
@@ -108,31 +121,27 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    NavX.zeroYaw();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
-    // this line or comment it out
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    // this line or comment it out.
+
+    if (autoCommand != null) {
+      autoCommand.cancel();
     }
+    HAL.drive.setBrake(true);
   }
 
-  /**
-   * This function is called periodically during operator control.
-   */
+  
   @Override
-  public void teleopPeriodic() {
-    Drivebase.arcade();
-    NavX.ReportData();
-    SmartDashboard.putNumber("Left encoder", Drivebase.getleftEncoder());
-    SmartDashboard.putNumber("right encoder", Drivebase.getrightEncoder());
+  public void teleopPeriodic() {  
     Scheduler.getInstance().run();
   }
 
   /**
    * This function is called periodically during test mode.
    */
+  
   @Override
   public void testPeriodic() {
   }

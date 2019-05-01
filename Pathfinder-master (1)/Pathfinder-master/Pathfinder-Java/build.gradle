@@ -1,0 +1,108 @@
+plugins {
+    id 'cpp'
+    id 'java'
+    id 'edu.wpi.first.GradleJni' version '0.3.0'
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories { 
+    mavenCentral()
+}
+
+model {
+    components {
+        pathfinderjni(JniNativeLibrarySpec) {
+            enableCheckTask true
+            javaCompileTasks << compileJava
+
+            sources {
+                cpp {
+                    source {
+                        srcDir 'src/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/native/include'
+                    }
+                    lib project: ':Pathfinder', library: 'pathfinder', linkage: 'static'
+                    lib project: ':libs', library: 'eigen', linkage: 'api'
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    testImplementation(
+        'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    )
+    testRuntimeOnly(
+        'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+    )
+}
+
+doxygen {
+    executables {
+        doxygen version : '1.8.13'
+    }
+
+    generate_html true
+    javadoc_autobrief true
+    source project.file('src/main/java')
+}
+
+task sourcesJar(type: Jar) {
+    dependsOn classes
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    dependsOn javadoc
+    from javadoc.destinationDir
+}
+
+task zipDoxygen(type: Zip) {
+    from doxygen
+    baseName = "Pathfinder"
+    classifier = "doxygen"
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            pathfinderJava(MavenPublication) {
+                artifactId 'Pathfinder-Java'
+
+                artifact jar
+                artifact sourcesJar {
+                    classifier 'sources'
+                }
+                artifact javadocJar {
+                    classifier 'javadoc'
+                }
+                artifact zipDoxygen {
+                    classifier 'doxygen'
+                }
+            }
+            pathfinderJni(MavenPublication) {
+                artifactId 'Pathfinder-JNI'
+
+                binaryArtifacts(it, "pathfinderjni", true)
+            }
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+    // TODO: make this not-shit
+    def libPath = new File(project.buildDir, "libs/pathfinderjni/shared/${edu.wpi.first.toolchain.NativePlatforms.desktop}/debug").absolutePath
+    systemProperties.put("java.library.path", libPath)
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+test.dependsOn assemble

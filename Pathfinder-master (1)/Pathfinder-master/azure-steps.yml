@@ -1,0 +1,39 @@
+parameters: 
+  env: {}
+  args: ''
+  has_tests: true
+
+steps:
+- task: Gradle@2
+  inputs:
+    workingDirectory: ''
+    gradleWrapperFile: 'gradlew'
+    gradleOptions: '-Xmx3072m'
+    publishJUnitResults: false
+    testResultsFiles: '**/TEST-*.xml'
+    tasks: 'clean build doxygen javadoc publish'
+    options: ${{ parameters.args }} -PwithBench --scan --stacktrace
+  env: ${{ parameters.env }}
+  
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: 'Pathfinder/build'
+    contents: '**/*'
+    targetFolder: $(Build.ArtifactStagingDirectory)/build/pf
+
+- ${{ if eq(parameters.has_tests, 'true') }}:
+  - task: PublishBuildArtifacts@1
+    inputs:
+      artifactName: 'test-results/$(PlatformName)'
+      pathtoPublish: $(Build.ArtifactStagingDirectory)/build/pf/test-results
+
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: 'build/mvnDistRepo'
+    contents: '**/*'
+    targetFolder: $(Build.ArtifactStagingDirectory)/mvnDistRepo
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    artifactName: 'maven'
+    pathtoPublish: $(Build.ArtifactStagingDirectory)/mvnDistRepo
