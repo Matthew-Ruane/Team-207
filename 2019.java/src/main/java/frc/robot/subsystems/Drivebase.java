@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -34,6 +36,9 @@ public class Drivebase extends Subsystem {
 
   public static Encoder rightEncoder;
   public static Encoder leftEncoder;
+
+  public static int leftEncoderZero = 0;
+  public static int rightEncoderZero = 0;
 
 
   public Drivebase() {
@@ -107,10 +112,77 @@ public class Drivebase extends Subsystem {
 	
 	public static double getRightVelocity() {
 		return rightEncoder.getRate();
-	}
-  //public static void initDrive() {
-  //}
+  }
 
+  	/**
+	 * Zeros the left encoder position in software
+	 */
+	public static void zeroLeftEncoder() {
+    leftEncoderZero = leftEncoder.get();
+	}
+
+	/**
+	 * Zeros the right encoder position in software
+	 */
+	public static void zeroRightEncoder() {
+		rightEncoderZero = rightEncoder.get();
+	}
+
+	/**
+	 * Get the position of the left encoder, in encoder ticks since last zeroLeftEncoder()
+	 * 
+	 * @return encoder position, in ticks
+	 */
+	public static int getLeftEncoderTicks() {
+		return leftEncoder.get() - leftEncoderZero;
+	}
+
+	/**
+	 * Get the position of the right encoder, in encoder ticks since last zeroRightEncoder()
+	 * 
+	 * @return encoder position, in ticks
+	 */
+	public static int getRightEncoderTicks() {
+		return rightEncoder.get() + rightEncoderZero;
+	}
+
+	/**
+	 * Get the distance traveled by left wheel, in inches since last zeroLeftEncoder()
+	 * 
+	 * @return distance traveled, in inches
+	 */
+	public static double getLeftDistance() {
+		return getLeftEncoderTicks()*RobotMap.wheel_distance_in_per_tick;
+	}
+
+	/**
+	 * Get the distance traveled by right wheel, in inches ticks since last zeroRightEncoder()
+	 * 
+	 * @return distance traveled, in inches
+	 */
+	public static double getRightDistance() {
+		return getRightEncoderTicks()*RobotMap.wheel_distance_in_per_tick;
+	}
+  	/**
+	 * Set the percent output of the left motor.
+	 * 
+	 * @param powerPct Percent of power -1.0 (reverse) to 1.0 (forward)
+	 */
+	public static void setLeftMotors(double powerPct) {
+		//TODO check if direction forward/backward is correct
+		mDrive_Left.set(-powerPct);
+  }
+  
+	/**
+	 * Set the percent output of the right motor.
+	 * 
+	 * @param powerPct Percent of power -1.0 (reverse) to 1.0 (forward)
+	 */
+	public static void setRightMotors(double powerPct) {
+		//TODO check if direction forward/backward is correct
+		mDrive_Right.set(powerPct);
+	}
+  
   @Override
   public void initDefaultCommand() {
   }
