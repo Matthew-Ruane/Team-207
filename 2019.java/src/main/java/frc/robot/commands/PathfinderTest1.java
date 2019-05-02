@@ -43,18 +43,11 @@ public class PathfinderTest1 extends Command {
       RobotMap.max_acceleration_ipsps, RobotMap.max_jerk_ipspsps);
     Waypoint[] points = new Waypoint[] {
       new Waypoint(0, 0, Pathfinder.d2r(90)),
-      // new Waypoint(0, 200, Pathfinder.d2r(90))
-      new Waypoint(24, 54, Pathfinder.d2r(60)),
-      new Waypoint(36, 108, Pathfinder.d2r(90)),
-      new Waypoint(24, 162, Pathfinder.d2r(120)),
-      new Waypoint(0, 216, Pathfinder.d2r(90))
+      new Waypoint(200, 400, Pathfinder.d2r(90)),
+
     };
 
     Trajectory trajectory = Pathfinder.generate(points, config);
-
-    // Save main trajectory for reference
-    File saveFile = new File("/home/lvuser/trajectory.csv");
-    Pathfinder.writeToCSV(saveFile, trajectory);
 
     // Wheelbase Width
     TankModifier modifier = new TankModifier(trajectory).modify(RobotMap.wheelbase_in);
@@ -64,8 +57,8 @@ public class PathfinderTest1 extends Command {
     dfRight = new DistanceFollower(modifier.getRightTrajectory());
     // dfLeft.configureEncoder(Robot.drivetrain.getLeftEncoderTicks(), RobotMap.encoderTicksPerRevolution, RobotMap.wheel_diameter_m);
     // dfRight.configureEncoder(Robot.drivetrain.getRightEncoderTicks(), RobotMap.encoderTicksPerRevolution, RobotMap.wheel_diameter_m);
-    dfLeft.configurePIDVA(0.02, 0.0, 0.0, 1 / RobotMap.max_velocity_ips, 0.0025);
-    dfRight.configurePIDVA(0.02, 0.0, 0.0, 1 / RobotMap.max_velocity_ips, 0.0025);
+    dfLeft.configurePIDVA(0.2, 0.0, 0.0, 1 / RobotMap.max_velocity_ips, 0);
+    dfRight.configurePIDVA(0.2, 0.0, 0.0, 1 / RobotMap.max_velocity_ips, 0);
     dfLeft.reset();
     dfRight.reset();
   }
@@ -80,7 +73,7 @@ public class PathfinderTest1 extends Command {
     double desired_heading = Pathfinder.r2d(dfLeft.getHeading());  // Should also be in degrees
 
     double angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);
-    double turn = -0.016 * angleDifference;
+    double turn = -0.05 * angleDifference;
     
     Drivebase.setLeftMotors(l + turn);
     Drivebase.setRightMotors(r - turn);
