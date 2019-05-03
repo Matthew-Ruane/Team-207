@@ -16,6 +16,7 @@ import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SerialPort;
+import frc.utility.DummyPIDOutput;
 
 /**
  * Author Matt Ruane (207)
@@ -45,18 +46,20 @@ public class Drivebase extends Subsystem {
 
   //private PIDController PIDturn, PIDleft, PIDright;
 
-  private DummyPIDOutput PIDturnOutput;
+  private static DummyPIDOutput PIDturnOutput, PIDleftOutput, PIDrightOutput;
 
   public static int leftEncoderZero = 0;
   public static int rightEncoderZero = 0;
 
-  private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, prevRightEncoderDistance, gyroAngle;
+  private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks;
   private static double setAngle = 0;
+  private static double desiredAngle = 0;
+
 
   private static double yawZero = 0;
   public static AHRS ahrs;
 
-  private PIDController PIDturn, PIDleft, PIDright;
+  private static PIDController PIDturn, PIDleft, PIDright;
 
   public Drivebase() {
     mDrive_Left_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Left_A_ID);
@@ -86,12 +89,27 @@ public class Drivebase extends Subsystem {
     ahrs = new AHRS(SerialPort.Port.kMXP);
 
     PIDturnOutput = new DummyPIDOutput();
+    PIDleftOutput =  new DummyPIDOutput();
+    PIDrightOutput = new DummyPIDOutput();
+
     PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, ahrs, PIDturnOutput);
+    PIDleft = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, leftEncoder, PIDleftOutput);
+    PIDright = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, rightEncoder, PIDrightOutput);
 
     PIDturn.setInputRange(-180.0f,  180.0f);
-    PIDturn.setOutputRange(-1.0, 1.0);
+    PIDturn.setOutputRange(-0.6, 0.6);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
     PIDturn.setContinuous(true);
+
+    PIDleft.setAbsoluteTolerance(Constants.kToleranceDistance);
+    PIDleft.setInputRange(-1.0, 1.0);
+    PIDleft.setOutputRange(-1.0, 1.0);
+    PIDleft.setContinuous(true);
+
+    PIDright.setAbsoluteTolerance(Constants.kToleranceDistance);
+    PIDright.setInputRange(-1.0, 1.0);
+    PIDright.setOutputRange(-1.0, 1.0);
+    PIDright.setContinuous(true);
   }
   
   public static void UpShift() {
@@ -146,14 +164,24 @@ public class Drivebase extends Subsystem {
     angle = (angle > 180) ? (angle - 360) : angle;
     return angle;
   }
-  public void RotateToAngle() {
-    PIDturn.setSetpoint(setAngle);
-    tank(PIDturnOutput.getOutput(), -PIDturnOutput.getOutput());
+  public static void RotateToAngle(double desiredAngle) {
+    PIDturn.setSetpoint(desiredAngle);
+    tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
     PIDturn.enable();
   }
   public void StopRotateToAngle() {
     PIDturn.disable();
     setAngle = 0;
+  }
+  public static void pidDrive(double desiredDistanceInches, double desiredAngle) {
+    desiredDistanceTicks = desiredDistanceInches*347.22;
+    PIDturn.enable();
+    PIDleft.enable();
+    PIDright.enable();
+    PIDturn.setSetpoint(desiredAngle);
+    PIDleft.setSetpoint(desiredDistanceTicks);
+    PIDright.setSetpoint(desiredDistanceTicks);
+    tank(-PIDleftOutput.getOutput()-PIDturnOutput.getOutput(), -PIDrightOutput.getOutput()+PIDturnOutput.getOutput());
   }
   public static void ReportData() {
     SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
@@ -246,7 +274,7 @@ public class Drivebase extends Subsystem {
 	 * @return distance traveled, in inches
 	 */
 	public static double getLeftDistance() {
-		return getLeftEncoderTicks()*Constants.wheel_distance_in_per_tick;
+		return getLeftEncoderTicks()*Constants.encoderTicksPerInch;
 	}
 	/**
 	 * Get the distance traveled by right wheel, in inches ticks since last zeroRightEncoder()
@@ -254,7 +282,7 @@ public class Drivebase extends Subsystem {
 	 * @return distance traveled, in inches
 	 */
 	public static double getRightDistance() {
-		return getRightEncoderTicks()*Constants.wheel_distance_in_per_tick;
+		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
 	}
   	/**
 	 * Set the percent output of the left motor.
@@ -271,7 +299,8 @@ public class Drivebase extends Subsystem {
 	 */
 	public static void setRightMotors(double powerPct) {
 		mDrive_Right.set(powerPct);
-	}
+  }
+
   
   @Override
   public void initDefaultCommand() {
