@@ -41,16 +41,17 @@ public class Constants {
     public static final int Elevator_MotionCruiseVelo = 15000;
     public static final int kTimeoutms = 10;
 
-    public static double Drive_kP = 1.0;
+    public static double Drive_kP = 0.5;
     public static double Drive_kI = 0.0;
     public static double Drive_kD = 0.0;
     public static double Drive_kF = 0.0;
     public static double kToleranceDistance = 347;
+    public static double TurnOutputMin = 0.2;
 
-    public static double kToleranceDegrees = 0.5;
-    public static double Turn_kP = 0.07;
+    public static double kToleranceDegrees = 2;
+    public static double Turn_kP = 0.15;
     public static double Turn_kI = 0.0;
-    public static double Turn_kD = 0.1;
+    public static double Turn_kD = 0.0;
     public static double Turn_kF = 0.0;
 
 

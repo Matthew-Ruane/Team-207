@@ -51,7 +51,9 @@ public class Drivebase extends Subsystem {
   public static int leftEncoderZero = 0;
   public static int rightEncoderZero = 0;
 
-  private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks;
+  private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, 
+                        prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks,
+                        PIDturnOutputScaled;
   private static double setAngle = 0;
   private static double desiredAngle = 0;
 
@@ -59,7 +61,8 @@ public class Drivebase extends Subsystem {
   private static double yawZero = 0;
   public static AHRS ahrs;
 
-  private static PIDController PIDturn, PIDleft, PIDright;
+  public static PIDController PIDturn, PIDleft, PIDright;
+
 
   public Drivebase() {
     mDrive_Left_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Left_A_ID);
@@ -96,8 +99,8 @@ public class Drivebase extends Subsystem {
     PIDleft = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, leftEncoder, PIDleftOutput);
     PIDright = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, rightEncoder, PIDrightOutput);
 
-    PIDturn.setInputRange(-180.0f,  180.0f);
-    PIDturn.setOutputRange(-0.6, 0.6);
+    PIDturn.setInputRange(-180.0,  180.0);
+    PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
     PIDturn.setContinuous(true);
 
@@ -167,21 +170,28 @@ public class Drivebase extends Subsystem {
   public static void RotateToAngle(double desiredAngle) {
     PIDturn.setSetpoint(desiredAngle);
     tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
-    PIDturn.enable();
+    // remember to use PIDturn.enable() to activate or PIDturn.disable() to stop
+    // use PIDturn.setSetpoint(desiredAngle) to set angle
   }
   public void StopRotateToAngle() {
     PIDturn.disable();
-    setAngle = 0;
   }
-  public static void pidDrive(double desiredDistanceInches, double desiredAngle) {
+  public static void pidDrive() {
+    mDrive_Left.set(-PIDleftOutput.getOutput()-PIDturnOutput.getOutput());
+    mDrive_Right.set(-PIDrightOutput.getOutput()+PIDturnOutput.getOutput());
+  }
+  public static void setDriveDistance (double desiredDistanceInches) {
     desiredDistanceTicks = desiredDistanceInches*347.22;
-    PIDturn.enable();
+    PIDleft.setSetpoint(getLeftEncoderTicks()+desiredDistanceTicks);
+    PIDright.setSetpoint(getRightEncoderTicks()+desiredDistanceTicks);
+  }
+  public static void pidDrive_Disable() {
+    PIDleft.disable();
+    PIDright.disable();
+  }
+  public static void pidDrive_Enable() {
     PIDleft.enable();
     PIDright.enable();
-    PIDturn.setSetpoint(desiredAngle);
-    PIDleft.setSetpoint(desiredDistanceTicks);
-    PIDright.setSetpoint(desiredDistanceTicks);
-    tank(-PIDleftOutput.getOutput()-PIDturnOutput.getOutput(), -PIDrightOutput.getOutput()+PIDturnOutput.getOutput());
   }
   public static void ReportData() {
     SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
