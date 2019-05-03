@@ -31,6 +31,7 @@ public class OI {
         //zeroing Elevator encoder and NavX yaw gyro
         LeftStick.getButton9().whenPressed(new ZeroGyro());
         LeftStick.getButton7().whenPressed(new PathfinderTest1());
+        
         }
 
         public static double getThrottleInput() {
