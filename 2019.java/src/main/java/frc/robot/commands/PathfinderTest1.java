@@ -18,7 +18,6 @@ import jaci.pathfinder.Waypoint;
 import jaci.pathfinder.followers.DistanceFollower;
 import jaci.pathfinder.modifiers.TankModifier;
 import frc.robot.subsystems.Drivebase;
-import frc.robot.subsystems.NavX;
 import frc.robot.Constants;
     
 public class PathfinderTest1 extends Command {
@@ -35,7 +34,7 @@ public class PathfinderTest1 extends Command {
   protected void initialize() {
     Drivebase.zeroLeftEncoder();
     Drivebase.zeroRightEncoder();
-    NavX.setGyroRotation(90.0);   // gyro initial angle (starting robot heading)
+    Drivebase.setGyroRotation(90.0);   // gyro initial angle (starting robot heading)
 
     double maxVelocityPercentLimit = 1.0;       // Limit max velocity to 0.4 of real max velocity (for safety and to obsereve)
     Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, 
@@ -67,7 +66,7 @@ public class PathfinderTest1 extends Command {
     double l = dfLeft.calculate(Drivebase.getLeftDistance());
     double r = dfRight.calculate(Drivebase.getRightDistance());
 
-    double gyro_heading = NavX.getGyroRotation();    // Assuming the gyro is giving a value in degrees
+    double gyro_heading = Drivebase.getGyroRotation();    // Assuming the gyro is giving a value in degrees
     double desired_heading = Pathfinder.r2d(dfLeft.getHeading());  // Should also be in degrees
 
     double angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);

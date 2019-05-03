@@ -43,18 +43,20 @@ public class Drivebase extends Subsystem {
   public static Encoder rightEncoder;
   public static Encoder leftEncoder;
 
-  private PIDController PIDturn, PIDleft, PIDright;
+  //private PIDController PIDturn, PIDleft, PIDright;
 
   private DummyPIDOutput PIDturnOutput;
 
   public static int leftEncoderZero = 0;
   public static int rightEncoderZero = 0;
 
-  private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, 
-                  rightEncoderDistance, prevRightEncoderDistance, gyroAngle;
+  private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, prevRightEncoderDistance, gyroAngle;
+  private static double setAngle = 0;
 
   private static double yawZero = 0;
   public static AHRS ahrs;
+
+  private PIDController PIDturn, PIDleft, PIDright;
 
   public Drivebase() {
     mDrive_Left_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Left_A_ID);
@@ -68,8 +70,8 @@ public class Drivebase extends Subsystem {
     
     mDrive = new DifferentialDrive(mDrive_Left, mDrive_Right);
     mDrive.setSafetyEnabled(false);
-    leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
-    rightEncoder = new Encoder(1, 2, false, EncodingType.k4X);
+    leftEncoder = new Encoder(3, 4, false, EncodingType.k1X);
+    rightEncoder = new Encoder(1, 2, false, EncodingType.k1X);
     leftEncoder.setReverseDirection(true);
     rightEncoder.setReverseDirection(false);
     resetEncoders();
@@ -83,7 +85,9 @@ public class Drivebase extends Subsystem {
 
     ahrs = new AHRS(SerialPort.Port.kMXP);
 
+    PIDturnOutput = new DummyPIDOutput();
     PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, ahrs, PIDturnOutput);
+
     PIDturn.setInputRange(-180.0f,  180.0f);
     PIDturn.setOutputRange(-1.0, 1.0);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
@@ -142,6 +146,15 @@ public class Drivebase extends Subsystem {
     angle = (angle > 180) ? (angle - 360) : angle;
     return angle;
   }
+  public void RotateToAngle() {
+    PIDturn.setSetpoint(setAngle);
+    tank(PIDturnOutput.getOutput(), -PIDturnOutput.getOutput());
+    PIDturn.enable();
+  }
+  public void StopRotateToAngle() {
+    PIDturn.disable();
+    setAngle = 0;
+  }
   public static void ReportData() {
     SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
     SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
@@ -183,7 +196,7 @@ public class Drivebase extends Subsystem {
   public void calcXY() {
 		 leftEncoderDistance  = leftEncoder.getDistance();
 		 rightEncoderDistance = rightEncoder.getDistance();
-		 gyroAngle = NavX.getAngle();
+		 gyroAngle = getAngle();
 		 distance =  ((leftEncoderDistance - prevLeftEncoderDistance) + (rightEncoderDistance - prevRightEncoderDistance))/2;
 		 x = x + distance * Math.sin(Math.toRadians(gyroAngle));
 		 y = y + distance * Math.cos(Math.toRadians(gyroAngle));

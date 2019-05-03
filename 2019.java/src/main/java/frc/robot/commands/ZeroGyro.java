@@ -8,7 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.InstantCommand;
-import frc.robot.subsystems.NavX;
+import frc.robot.subsystems.Drivebase;;
 
 /**
  * Add your docs here.
@@ -26,7 +26,7 @@ public class ZeroGyro extends InstantCommand {
   // Called once when the command executes
   @Override
   protected void initialize() {
-    NavX.zeroYaw();
+    Drivebase.zeroYaw();
   }
 
 }
