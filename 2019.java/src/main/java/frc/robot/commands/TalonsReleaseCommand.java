@@ -9,7 +9,9 @@ public class TalonsReleaseCommand extends Command {
 
   @Override
   protected void initialize() {
-    Tray.TalonsRelease();
+    if (Tray.autograb == false) {
+      Tray.TalonsRelease();
+    }
   }
 
   @Override

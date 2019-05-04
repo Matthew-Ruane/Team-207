@@ -10,13 +10,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Drivebase;
-import frc.robot.RobotMap;
+import frc.robot.Constants;
 
 public class RotateToAngle extends Command {
   private int state;
   private int holding = 0;
   private int moving = 1;
-  private boolean timerflag = RobotMap.Off;
+  private boolean timerflag = Constants.Off;
   private Timer timer;
   private boolean isdone = false;
   public RotateToAngle() {
@@ -45,15 +45,15 @@ public class RotateToAngle extends Command {
       state = holding;
       return false;
     }
-    if (Drivebase.PIDturn.onTarget() && state == holding && timerflag == RobotMap.Off) {
+    if (Drivebase.PIDturn.onTarget() && state == holding && timerflag == Constants.Off) {
       timer.start();
-      timerflag = RobotMap.On;
+      timerflag = Constants.On;
       return false;
     }
     if (Drivebase.PIDturn.onTarget() && state == holding && timer.get() >= 1.0) {
       timer.stop();
       timer.reset();
-      timerflag = RobotMap.Off;
+      timerflag = Constants.Off;
       return true;
     }
     if (!Drivebase.PIDturn.onTarget() && timer.get() > 1.0) {

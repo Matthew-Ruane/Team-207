@@ -71,9 +71,8 @@ public class PathfinderTest1 extends Command {
 
     double angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);
     double turn = -0.05 * angleDifference;
-    
-    Drivebase.setLeftMotors(l + turn);
-    Drivebase.setRightMotors(r - turn);
+
+    Drivebase.tank(l+turn, r-turn);
 
   }
 

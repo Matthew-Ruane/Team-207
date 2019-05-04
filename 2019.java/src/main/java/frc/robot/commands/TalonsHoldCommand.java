@@ -9,8 +9,9 @@ public class TalonsHoldCommand extends Command {
 
   @Override
   protected void initialize() {
-    Tray.TalonsHold();
-  }
+    if (Tray.autograb == false) {}
+      Tray.TalonsHold();
+    }
 
   @Override
   protected void execute() {

@@ -33,7 +33,4 @@ public class RobotMap {
     public static final int mUltrasonic_Ping_ID = 5;
     public static final int mUltrasonic_Echo_ID = 6;
 
-    public static final boolean On = true;
-    public static final boolean Off = false;
-
 }

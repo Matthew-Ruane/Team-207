@@ -26,6 +26,8 @@ public class Tray extends Subsystem {
     public static TalonSRX mShooter;
     public static DigitalInput mCargo_Loaded_Sensor, mHatch_Loaded_Sensor;
 
+    public static boolean autograb;
+
     public Tray() {
         mTray_Extend = new Solenoid(RobotMap.mPCM_B, RobotMap.mTray_Extend_ID);
         mTray_Retract = new Solenoid(RobotMap.mPCM_A, RobotMap.mTray_Retract_ID);
@@ -41,6 +43,8 @@ public class Tray extends Subsystem {
 
         mCargo_Loaded_Sensor = new DigitalInput(RobotMap.mCargo_Loaded_Sensor_ID);
         mHatch_Loaded_Sensor = new DigitalInput(RobotMap.mHatch_Loaded_Sensor_ID);
+
+        autograb = false;
     }
 
     public static void ShootCargo() {
@@ -56,31 +60,33 @@ public class Tray extends Subsystem {
         mShooter.set(ControlMode.PercentOutput, 0.0);
     }
     public static void ExtendTray() {
-        mTray_Extend.set(RobotMap.On);
-        mTray_Retract.set(RobotMap.Off);
+        mTray_Extend.set(Constants.On);
+        mTray_Retract.set(Constants.Off);
         Constants.TRAY_STATE = Constants.TRAY_STATE_EXTENDED;
     }
     public static void RetractTray() {
-        mTray_Extend.set(RobotMap.Off);
-        mTray_Retract.set(RobotMap.On);
+        mTray_Extend.set(Constants.Off);
+        mTray_Retract.set(Constants.On);
         Constants.TRAY_STATE = Constants.TRAY_STATE_RETRACTED;
     }
     public static void TalonsHold() {
-        mTalons_Release.set(RobotMap.Off);
-        mTalons_Hold.set(RobotMap.On);
+        mTalons_Release.set(Constants.Off);
+        mTalons_Hold.set(Constants.On);
         Constants.TALON_STATE = Constants.TALON_STATE_HOLDING;
     }
     public static void TalonsRelease() {
-        mTalons_Hold.set(RobotMap.Off);
-        mTalons_Release.set(RobotMap.On);
+        mTalons_Hold.set(Constants.Off);
+        mTalons_Release.set(Constants.On);
         Constants.TALON_STATE = Constants.TALON_STATE_RELEASED;
     }
     public static void TalonsAutoGrab() {
             if (Constants.WantHatch == true && !mHatch_Loaded_Sensor.get()) {
+                autograb = false;
                 TalonsHold();
                 Constants.WantHatch = false;
             }
             else if (Constants.WantHatch == true && mHatch_Loaded_Sensor.get()){
+                autograb = true;
                 TalonsRelease();
             }
     }

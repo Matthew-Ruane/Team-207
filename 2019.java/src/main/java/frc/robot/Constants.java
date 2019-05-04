@@ -48,7 +48,7 @@ public class Constants {
     public static double kToleranceDistance = 347;
     public static double TurnOutputMin = 0.2;
 
-    public static double kToleranceDegrees = 2;
+    public static double kToleranceDegrees = 3;
     public static double Turn_kP = 0.15;
     public static double Turn_kI = 0.0;
     public static double Turn_kD = 0.0;
@@ -58,7 +58,10 @@ public class Constants {
     public static final double kGearRatio = 4.8;
     public static final double kEncoderDriveRatio = 5.4;
     public static double kDrive_Motion_trackwidth = 2.72;
-	public static double kDrive_WheelDiameterInch = 3.875;
+    public static double kDrive_WheelDiameterInch = 3.875;
+    
+    public static final boolean On = true;
+    public static final boolean Off = false;
     
     public static double getWheelCircumference() { 
         return (kDrive_WheelDiameterInch*Math.PI)/12.0; 

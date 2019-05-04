@@ -52,8 +52,7 @@ public class Drivebase extends Subsystem {
   public static int rightEncoderZero = 0;
 
   private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, 
-                        prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks,
-                        PIDturnOutputScaled;
+                        prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks;
   private static double setAngle = 0;
   private static double desiredAngle = 0;
 
@@ -85,8 +84,8 @@ public class Drivebase extends Subsystem {
     
     mShifter_Low = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_Low_ID);
     mShifter_High = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_High_ID);
-    mShifter_High.set(RobotMap.On);
-    mShifter_Low.set(RobotMap.Off);
+    mShifter_High.set(Constants.On);
+    mShifter_Low.set(Constants.Off);
     Constants.CURRENT_GEAR = Constants.HIGH_GEAR;
 
     ahrs = new AHRS(SerialPort.Port.kMXP);
@@ -116,13 +115,13 @@ public class Drivebase extends Subsystem {
   }
   
   public static void UpShift() {
-    mShifter_High.set(RobotMap.On);
-    mShifter_Low.set(RobotMap.Off);
+    mShifter_High.set(Constants.On);
+    mShifter_Low.set(Constants.Off);
     Constants.CURRENT_GEAR = Constants.HIGH_GEAR;
   }
   public static void DownShift() {
-    mShifter_High.set(RobotMap.Off);
-    mShifter_Low.set(RobotMap.On);
+    mShifter_High.set(Constants.Off);
+    mShifter_Low.set(Constants.On);
     Constants.CURRENT_GEAR = Constants.LOW_GEAR;
   }
   public static void arcade() {
@@ -167,11 +166,10 @@ public class Drivebase extends Subsystem {
     angle = (angle > 180) ? (angle - 360) : angle;
     return angle;
   }
+  /* Methods for locking heading and drive to setpoints.  Tuning ongoing as of 5/3/19.  uses xxx.enable() and xxx.disable to start.  Config set in class constructor. */
   public static void RotateToAngle(double desiredAngle) {
     PIDturn.setSetpoint(desiredAngle);
     tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
-    // remember to use PIDturn.enable() to activate or PIDturn.disable() to stop
-    // use PIDturn.setSetpoint(desiredAngle) to set angle
   }
   public void StopRotateToAngle() {
     PIDturn.disable();
@@ -200,8 +198,7 @@ public class Drivebase extends Subsystem {
     SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
     SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
   }
-  /* 
-  End NavX specific content */
+  /* End NavX specific content */
   public static int getCurrentGear() {
     return Constants.CURRENT_GEAR;
   }
@@ -231,6 +228,7 @@ public class Drivebase extends Subsystem {
 	public static double getRightVelocity() {
 		return rightEncoder.getRate();
   }
+  /* Joe Ross' X-Y plane position tracking */
   public void calcXY() {
 		 leftEncoderDistance  = leftEncoder.getDistance();
 		 rightEncoderDistance = rightEncoder.getDistance();
@@ -247,69 +245,26 @@ public class Drivebase extends Subsystem {
 	public double getY() {
 		return y;
 	}
-
-  	/**
-	 * Captures left Encoder starting position for zeroing
-	 */
+/* 294's methods for zeroing encoders before use in drive PID loops */
 	public static void zeroLeftEncoder() {
     leftEncoderZero = leftEncoder.get();
 	}
-
-	/**
-	 * Captures right Encoder starting position for zeroing
-	 */
 	public static void zeroRightEncoder() {
 		rightEncoderZero = rightEncoder.get();
 	}
-
-	/**
-	 * Get the position of the left encoder, in encoder ticks since last zeroLeftEncoder()
-	 * 
-	 * @return encoder position, in ticks
-	 */
 	public static int getLeftEncoderTicks() {
 		return leftEncoder.get() - leftEncoderZero;
 	}
-	/**
-	 * Get the position of the right encoder, in encoder ticks since last zeroRightEncoder()
-	 * 
-	 * @return encoder position, in ticks
-	 */
 	public static int getRightEncoderTicks() {
 		return rightEncoder.get() + rightEncoderZero;
 	}
-	/**
-	 * Get the distance traveled by left wheel, in inches since last zeroLeftEncoder()
-	 * 
-	 * @return distance traveled, in inches
-	 */
 	public static double getLeftDistance() {
 		return getLeftEncoderTicks()*Constants.encoderTicksPerInch;
 	}
-	/**
-	 * Get the distance traveled by right wheel, in inches ticks since last zeroRightEncoder()
-	 * 
-	 * @return distance traveled, in inches
-	 */
 	public static double getRightDistance() {
 		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
 	}
-  	/**
-	 * Set the percent output of the left motor.
-	 * 
-	 * @param powerPct Percent of power -1.0 (reverse) to 1.0 (forward)
-	 */
-	public static void setLeftMotors(double powerPct) {
-		mDrive_Left.set(-powerPct);
-  }
-	/**
-	 * Set the percent output of the right motor.
-	 * 
-	 * @param powerPct Percent of power -1.0 (reverse) to 1.0 (forward)
-	 */
-	public static void setRightMotors(double powerPct) {
-		mDrive_Right.set(powerPct);
-  }
+
 
   
   @Override
