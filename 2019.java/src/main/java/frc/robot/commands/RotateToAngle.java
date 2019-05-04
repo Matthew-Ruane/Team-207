@@ -18,7 +18,6 @@ public class RotateToAngle extends Command {
   private int moving = 1;
   private boolean timerflag = Constants.Off;
   private Timer timer;
-  private boolean isdone = false;
   public RotateToAngle() {
     timer = new Timer();
     // Use requires() here to declare subsystem dependencies

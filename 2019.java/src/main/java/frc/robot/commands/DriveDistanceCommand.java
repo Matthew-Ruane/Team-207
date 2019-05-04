@@ -10,11 +10,16 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Drivebase;
+import frc.robot.Constants;
 
 public class DriveDistanceCommand extends Command {
 
   private Timer timer;
-  private boolean holding = false;
+  private int state;
+  private int holding = 0;
+  private int moving = 1;
+  private boolean timerflag = Constants.Off;
+  
   public DriveDistanceCommand() {
     timer = new Timer();
     // Use requires() here to declare subsystem dependencies
@@ -41,16 +46,24 @@ public class DriveDistanceCommand extends Command {
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && holding == false) {
-      timer.start();
-      holding = true;
+    if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && state == moving) {
+      state = holding;
       return false;
     }
-    else if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && holding == true && timer.get() >= 0.25) {
-      holding = false;
+    if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && state == holding && timerflag == Constants.Off) {
+      timer.start();
+      timerflag = Constants.On;
+      return false;
+    }
+    if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && state == holding && timer.get() >= 1.0) {
       timer.stop();
       timer.reset();
+      timerflag = Constants.Off;
       return true;
+    }
+    if (!Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && timer.get() > 1.0) {
+      timer.reset();
+      return false;
     }
     else {
       return false;

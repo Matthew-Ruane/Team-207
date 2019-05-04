@@ -29,7 +29,7 @@ public class Drivebase extends Subsystem {
     return instance;
   }
 
-  public DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
+  private static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
 
   public static SpeedControllerGroup mDrive_Left;
   public static SpeedControllerGroup mDrive_Right;
@@ -38,13 +38,9 @@ public class Drivebase extends Subsystem {
 
   public static DifferentialDrive mDrive;
 
-  private static Solenoid mShifter_High;
-  private static Solenoid mShifter_Low;
+  private static Solenoid mShifter_High, mShifter_Low;
 
-  public static Encoder rightEncoder;
-  public static Encoder leftEncoder;
-
-  //private PIDController PIDturn, PIDleft, PIDright;
+  public static Encoder rightEncoder, leftEncoder;
 
   private static DummyPIDOutput PIDturnOutput, PIDleftOutput, PIDrightOutput;
 
@@ -53,6 +49,7 @@ public class Drivebase extends Subsystem {
 
   private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, 
                         prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks;
+
   private static double setAngle = 0;
   private static double desiredAngle = 0;
 
@@ -113,7 +110,7 @@ public class Drivebase extends Subsystem {
     PIDright.setOutputRange(-1.0, 1.0);
     PIDright.setContinuous(true);
   }
-  
+
   public static void UpShift() {
     mShifter_High.set(Constants.On);
     mShifter_Low.set(Constants.Off);
@@ -141,26 +138,39 @@ public class Drivebase extends Subsystem {
   public static double getAngle() {
     return ahrs.getAngle();
   }
+  /* Enabling volt comp apparently yields better resolution in auto routines but lower max power output. voltage comp config set in talon class */
+  public static void EnableVoltComp() {
+    mDrive_Left_Master.enableVoltageCompensation(true);
+    mDrive_Left_B.enableVoltageCompensation(true);
+    mDrive_Left_C.enableVoltageCompensation(true);
+    mDrive_Right_Master.enableVoltageCompensation(true);
+    mDrive_Right_B.enableVoltageCompensation(true);
+    mDrive_Right_C.enableVoltageCompensation(true);
+  }
+  public static void DisableVoltComp() {
+    mDrive_Left_Master.enableVoltageCompensation(false);
+    mDrive_Left_B.enableVoltageCompensation(false);
+    mDrive_Left_C.enableVoltageCompensation(false);
+    mDrive_Right_Master.enableVoltageCompensation(false);
+    mDrive_Right_B.enableVoltageCompensation(false);
+    mDrive_Right_C.enableVoltageCompensation(false);
+  }
       	/**
 	 * Resets the gyro position in software to a specified angle
 	 * 
-	 * @param currentHeading Gyro heading to reset to, in degrees
-	 */
+	 /*
+	 @param currentHeading Gyro heading to reset to, in degrees*/
 	public static void setGyroRotation(double currentHeading) {
 		// set yawZero to gyro angle, offset to currentHeading
     yawZero = -ahrs.getAngle() - currentHeading;
   }
-  	/**
-	 * Zeros the gyro position in software
-	 */
+  /*Zeros the gyro position in software*/
 	public static void zeroGyroRotation() {
-		// set yawZero to gryo angle
     yawZero = -ahrs.getAngle();
   }
   public static double getGyroRotation() {
     double angle = -ahrs.getAngle() - yawZero;
-    // Angle will be in terms of raw gyro units (-inf,inf), so you need to convert
-    // to (-180, 180]
+    /*Angle will be in terms of raw gyro units (-inf,inf), so you need to convert to (-180, 180]*/
     angle = angle % 360;
     angle = (angle <= -180) ? (angle + 360) : angle;
     angle = (angle > 180) ? (angle - 360) : angle;
@@ -233,7 +243,7 @@ public class Drivebase extends Subsystem {
 		 leftEncoderDistance  = leftEncoder.getDistance();
 		 rightEncoderDistance = rightEncoder.getDistance();
 		 gyroAngle = getAngle();
-		 distance =  ((leftEncoderDistance - prevLeftEncoderDistance) + (rightEncoderDistance - prevRightEncoderDistance))/2;
+		 distance = ((leftEncoderDistance - prevLeftEncoderDistance) + (rightEncoderDistance - prevRightEncoderDistance))/2;
 		 x = x + distance * Math.sin(Math.toRadians(gyroAngle));
 		 y = y + distance * Math.cos(Math.toRadians(gyroAngle));
 		 prevLeftEncoderDistance  = leftEncoderDistance;
@@ -265,8 +275,6 @@ public class Drivebase extends Subsystem {
 		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
 	}
 
-
-  
   @Override
   public void initDefaultCommand() {
   }
