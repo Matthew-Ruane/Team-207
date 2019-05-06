@@ -33,16 +33,28 @@ public class OI {
         LeftStick.getButton7().whenPressed(new RotateToAngle());
         }
 
-        public static double getThrottleInput() {
+        public static double getLeftThrottleInput() {
             return RightStick.getYAxis();
         }
-        public static double getSteeringInput() {
+        public static double getRightThrottleInput() {
+            return RightStick.getYAxis();
+        }
+        public static double getLeftSteeringInput() {
             return LeftStick.getXAxis();
         }
-        public static double getThrottleInputInverted() {
+        public static double getRightSteeringInput() {
+            return LeftStick.getXAxis();
+        }
+        public static double getLeftThrottleInputInverted() {
             return RightStick.getYAxisInverted();
         }
-        public static double getSteeringInputInverted() {
+        public static double getRightThrottleInputInverted() {
+            return RightStick.getYAxisInverted();
+        }
+        public static double getLeftSteeringInputInverted() {
             return LeftStick.getXAxisInverted();
-    }
+        }
+        public static double getRightSteeringInputInverted() {
+            return LeftStick.getXAxisInverted();
+        }
 }

@@ -122,10 +122,13 @@ public class Drivebase extends Subsystem {
     Constants.CURRENT_GEAR = Constants.LOW_GEAR;
   }
   public static void arcade() {
-    mDrive.arcadeDrive(OI.getThrottleInput(), OI.getSteeringInputInverted());
+    mDrive.arcadeDrive(OI.getLeftThrottleInput(), OI.getRightSteeringInputInverted());
   }
   public static void tank(double left, double right) {
     mDrive.tankDrive(left, right);
+  }
+  public static void curvature() {
+    mDrive.curvatureDrive(OI.getLeftThrottleInput(), OI.getRightSteeringInputInverted(), true);
   }
   /*   
   Begin NavX specific Content*/

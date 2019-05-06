@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    Drivebase.arcade();
+    Drivebase.curvature();
     Drivebase.ReportData();
     Scheduler.getInstance().run();
     
