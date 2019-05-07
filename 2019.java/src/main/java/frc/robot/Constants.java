@@ -47,6 +47,8 @@ public class Constants {
     public static double Drive_kF = 0.0;
     public static double kToleranceDistance = 347;
     public static double TurnOutputMin = 0.2;
+    public static double kTurnrateCurve = 0.5;
+    public static double kTurnrateLimit = 0.75;
 
     public static double kToleranceDegrees = 3;
     public static double Turn_kP = 0.15;

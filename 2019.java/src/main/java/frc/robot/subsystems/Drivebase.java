@@ -48,7 +48,8 @@ public class Drivebase extends Subsystem {
   public static int rightEncoderZero = 0;
 
   private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, 
-                        prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks;
+                        prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks,
+                        TurnrateCurved;
 
   private static double setAngle = 0;
   private static double desiredAngle = 0;
@@ -128,7 +129,8 @@ public class Drivebase extends Subsystem {
     mDrive.tankDrive(left, right);
   }
   public static void curvature() {
-    mDrive.curvatureDrive(OI.getRightThrottleInput(), OI.getLeftSteeringInputInverted(), true);
+    TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(OI.getLeftSteeringInputInverted(), 3)+(1-Constants.kTurnrateCurve) * OI.getLeftSteeringInputInverted() * Constants.kTurnrateLimit);
+    mDrive.curvatureDrive(OI.getRightThrottleInput(), TurnrateCurved, true);
   }
   /*   
   Begin NavX specific Content*/
