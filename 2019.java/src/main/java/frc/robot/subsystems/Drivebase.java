@@ -128,7 +128,7 @@ public class Drivebase extends Subsystem {
     mDrive.tankDrive(left, right);
   }
   public static void curvature() {
-    mDrive.curvatureDrive(OI.getLeftThrottleInput(), OI.getRightSteeringInputInverted(), true);
+    mDrive.curvatureDrive(OI.getRightThrottleInput(), OI.getLeftSteeringInputInverted(), true);
   }
   /*   
   Begin NavX specific Content*/
