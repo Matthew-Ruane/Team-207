@@ -56,24 +56,11 @@ public class Constants {
     public static double Turn_kD = 0.0;
     public static double Turn_kF = 0.0;
 
-
-    public static final double kGearRatio = 4.8;
-    public static final double kEncoderDriveRatio = 5.4;
-    public static double kDrive_Motion_trackwidth = 2.72;
-    public static double kDrive_WheelDiameterInch = 3.875;
+    public static int DesiredDistance;
+    public static double DesiredHeading;
     
     public static final boolean On = true;
     public static final boolean Off = false;
-    
-    public static double getWheelCircumference() { 
-        return (kDrive_WheelDiameterInch*Math.PI)/12.0; 
-    }
-    public static double getTicksPerWheelRotation() {
-        return (kGearRatio*4096);
-    }
-    public static double getDistancePerTick() {
-        return (getWheelCircumference()/getTicksPerWheelRotation());
-    }
 
     // Robot physical layout
     public static final int encoderTicksPerRevolution = 6542;  // careful when using in math -- this is an int!

@@ -78,7 +78,6 @@ public class Drivebase extends Subsystem {
     leftEncoder.setReverseDirection(true);
     rightEncoder.setReverseDirection(false);
     resetEncoders();
-    configEncoders();
     
     mShifter_Low = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_Low_ID);
     mShifter_High = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_High_ID);
@@ -181,7 +180,7 @@ public class Drivebase extends Subsystem {
     angle = (angle > 180) ? (angle - 360) : angle;
     return angle;
   }
-  /* Methods for locking heading and drive to setpoints.  Tuning ongoing as of 5/3/19.  uses xxx.enable() and xxx.disable to start.  Config set in class constructor. */
+  /* Methods for locking heading and drive to setpoints.  Tuning *probably okay* as of 5/7/19  uses xxx.enable() and xxx.disable to start.  Config set in class constructor. */
   public static void RotateToAngle(double desiredAngle) {
     PIDturn.setSetpoint(desiredAngle);
     tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
@@ -226,16 +225,6 @@ public class Drivebase extends Subsystem {
   public static void resetEncoders() {
     leftEncoder.reset();
     rightEncoder.reset();
-  }
-  public static void configEncoders() {
-    leftEncoder.setDistancePerPulse(Constants.getWheelCircumference()/(4096*Constants.kEncoderDriveRatio));
-    rightEncoder.setDistancePerPulse(Constants.getWheelCircumference()/(4096*Constants.kEncoderDriveRatio));
-  }
-  public static double getLeftPosition() {
-		return MotionUtils.rotationsToDistance(MotionUtils.ticksToRotations(leftEncoder.getRaw(), 4096, Constants.kEncoderDriveRatio), Constants.getWheelCircumference());
-	}
-	public static double getRightPosition() {
-		return MotionUtils.rotationsToDistance(MotionUtils.ticksToRotations(rightEncoder.getRaw(), 4096, Constants.kEncoderDriveRatio), Constants.getWheelCircumference());
   }
   public static double getLeftVelocity() {
 		return leftEncoder.getRate();

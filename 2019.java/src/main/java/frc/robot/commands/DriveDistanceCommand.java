@@ -19,8 +19,11 @@ public class DriveDistanceCommand extends Command {
   private int holding = 0;
   private int moving = 1;
   private boolean timerflag = Constants.Off;
+  private Drivebase drivebase;
   
   public DriveDistanceCommand() {
+    requires(drivebase);
+    isInterruptible();
     timer = new Timer();
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
@@ -29,18 +32,21 @@ public class DriveDistanceCommand extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
+    Drivebase.EnableVoltComp();
     Drivebase.PIDturn.enable();
     Drivebase.PIDleft.enable();
     Drivebase.PIDright.enable();
-    Drivebase.setDriveDistance(72);
-    Drivebase.PIDturn.setSetpoint(0);
+    Drivebase.setDriveDistance(Constants.DesiredDistance);
+    Drivebase.PIDturn.setSetpoint(Constants.DesiredHeading);
     timer.reset();
+    state = moving;
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
     Drivebase.pidDrive();
+    isInterruptible();
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -73,11 +79,14 @@ public class DriveDistanceCommand extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
+    Drivebase.DisableVoltComp();
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
+    cancel();
+    Drivebase.DisableVoltComp();
   }
 }

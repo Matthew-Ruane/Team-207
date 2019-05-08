@@ -18,7 +18,10 @@ public class RotateToAngle extends Command {
   private int moving = 1;
   private boolean timerflag = Constants.Off;
   private Timer timer;
+  private Drivebase drivebase;
   public RotateToAngle() {
+    requires(drivebase);
+    isInterruptible();
     timer = new Timer();
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
@@ -27,6 +30,7 @@ public class RotateToAngle extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
+    Drivebase.EnableVoltComp();
     Drivebase.PIDturn.enable();
     state = moving;
   }
@@ -34,7 +38,7 @@ public class RotateToAngle extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivebase.RotateToAngle(45);
+    Drivebase.RotateToAngle(Constants.DesiredHeading);
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -68,11 +72,14 @@ public class RotateToAngle extends Command {
   @Override
   protected void end() {
     Drivebase.PIDturn.disable();
+    Drivebase.DisableVoltComp();
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
+    cancel();
+    Drivebase.DisableVoltComp();
   }
 }

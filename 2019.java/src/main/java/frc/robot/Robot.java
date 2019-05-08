@@ -29,6 +29,7 @@ public class Robot extends TimedRobot {
     m_oi = new OI();
     m_oi.registerControls();
     Elevator.zeroElevatorEncoder();
+    Drivebase.DisableVoltComp();
     //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     //SmartDashboard.putData("Auto mode", m_chooser);
@@ -56,6 +57,8 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     Elevator.stopElevator();
     Drivebase.resetEncoders();
+    Constants.DesiredDistance = 0;
+    Constants.DesiredHeading = 0;
   }
 
   @Override
