@@ -200,10 +200,17 @@ public class Drivebase extends Subsystem {
   public static void pidDrive_Disable() {
     PIDleft.disable();
     PIDright.disable();
+    PIDturn.disable();
   }
   public static void pidDrive_Enable() {
     PIDleft.enable();
     PIDright.enable();
+    PIDturn.enable();
+  }
+  public static void pidDrive_Reset() {
+    PIDleft.reset();
+    PIDright.reset();
+    PIDturn.reset();
   }
   public static void ReportData() {
     SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
@@ -268,7 +275,6 @@ public class Drivebase extends Subsystem {
 	public static double getRightDistance() {
 		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
 	}
-
   @Override
   public void initDefaultCommand() {
   }
