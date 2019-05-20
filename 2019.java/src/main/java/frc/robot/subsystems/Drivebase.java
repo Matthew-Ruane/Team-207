@@ -181,7 +181,7 @@ public class Drivebase extends Subsystem {
     return angle;
   }
   /* Methods for locking heading and drive to setpoints.  Tuning *probably okay* as of 5/7/19  uses xxx.enable() and xxx.disable to start.  Config set in class constructor. */
-  public static void RotateToAngle(double desiredAngle) {
+  public static void RotateToAngle(double desiredAngle) {  //class should be obsolete, all pidDrive function now handled by setting setpoint and calling drivebase.piddrive
     PIDturn.setSetpoint(desiredAngle);
     tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
   }

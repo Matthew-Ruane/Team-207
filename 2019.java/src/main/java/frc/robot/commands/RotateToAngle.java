@@ -34,13 +34,14 @@ public class RotateToAngle extends Command {
   protected void initialize() {
     Drivebase.EnableVoltComp();
     Drivebase.pidDrive_Enable();
+    Drivebase.PIDturn.setSetpoint(heading);
     state = moving;
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivebase.RotateToAngle(heading);
+    Drivebase.pidDrive();
   }
 
   // Make this return true when this Command no longer needs to run execute()
