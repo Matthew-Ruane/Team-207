@@ -25,8 +25,6 @@ public class DriveDistanceCommand extends Command {
   public DriveDistanceCommand(double DesiredDistance, Double DesiredHeading) {
     distance = DesiredDistance;
     heading = DesiredHeading;
-    requires(drivebase);
-    isInterruptible();
     timer = new Timer();
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
@@ -36,10 +34,10 @@ public class DriveDistanceCommand extends Command {
   @Override
   protected void initialize() {
     Drivebase.EnableVoltComp();
-    Drivebase.pidDrive_Enable();
     Drivebase.setDriveDistance(distance);
     Drivebase.PIDturn.setSetpoint(heading);
     state = moving;
+    Drivebase.pidDrive_Enable();
   }
 
   // Called repeatedly when this Command is scheduled to run
@@ -66,7 +64,7 @@ public class DriveDistanceCommand extends Command {
       timerflag = Constants.Off;
       return true;
     }
-    if (!Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && timer.get() > 1.0) {
+    if (!Drivebase.PIDleft.onTarget() || !Drivebase.PIDright.onTarget() && timer.get() > 1.0) {
       timer.reset();
       return false;
     }
