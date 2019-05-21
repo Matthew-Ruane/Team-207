@@ -34,7 +34,7 @@ public class Drivebase extends Subsystem {
   public static SpeedControllerGroup mDrive_Left;
   public static SpeedControllerGroup mDrive_Right;
 
-  private static double leftspeed, rightspeed;
+  private static double left, right;
 
   public static DifferentialDrive mDrive;
 
@@ -101,14 +101,10 @@ public class Drivebase extends Subsystem {
     PIDturn.setContinuous(true);
 
     PIDleft.setAbsoluteTolerance(Constants.kToleranceDistance);
-    PIDleft.setInputRange(-1.0, 1.0);
     PIDleft.setOutputRange(-1.0, 1.0);
-    PIDleft.setContinuous(true);
 
     PIDright.setAbsoluteTolerance(Constants.kToleranceDistance);
-    PIDright.setInputRange(-1.0, 1.0);
     PIDright.setOutputRange(-1.0, 1.0);
-    PIDright.setContinuous(true);
   }
 
   public static void UpShift() {
@@ -181,16 +177,22 @@ public class Drivebase extends Subsystem {
     return angle;
   }
   /* Methods for locking heading and drive to setpoints.  Tuning *probably okay* as of 5/7/19  uses xxx.enable() and xxx.disable to start.  Config set in class constructor. */
-  public static void RotateToAngle(double desiredAngle) {  //class should be obsolete, all pidDrive function now handled by setting setpoint and calling drivebase.piddrive
-    PIDturn.setSetpoint(desiredAngle);
+  public static void RotateToAngle() {  //class should be obsolete, all pidDrive function now handled by setting setpoint and calling drivebase.piddrive
     tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
   }
-  public void StopRotateToAngle() {
+  public static void StopRotateToAngle() {
     PIDturn.disable();
   }
   public static void pidDrive() {
-    mDrive_Left.set(-PIDleftOutput.getOutput()-PIDturnOutput.getOutput());
-    mDrive_Right.set(-PIDrightOutput.getOutput()+PIDturnOutput.getOutput());
+    //mDrive_Left.set(-PIDleftOutput.getOutput()-PIDturnOutput.getOutput());
+    //mDrive_Right.set(-PIDrightOutput.getOutput()+PIDturnOutput.getOutput());
+    left = PIDleftOutput.getOutput();
+    right = PIDrightOutput.getOutput();
+    drive(left, right);
+  }
+  private static void drive(double left, double right) {
+    mDrive_Left.set(-left);
+    mDrive_Right.set(right);
   }
   public static void setDriveDistance (double desiredDistanceInches) {
     desiredDistanceTicks = desiredDistanceInches*347.22;
@@ -213,11 +215,13 @@ public class Drivebase extends Subsystem {
     PIDturn.reset();
   }
   public static void ReportData() {
-    SmartDashboard.putBoolean(  "IMU_Connected",        ahrs.isConnected());
-    SmartDashboard.putBoolean(  "IMU_IsCalibrating",    ahrs.isCalibrating());
     SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
-    SmartDashboard.putNumber(   "IMU_Pitch",            ahrs.getPitch());
-    SmartDashboard.putNumber(   "IMU_Roll",             ahrs.getRoll());
+    SmartDashboard.putNumber("Left encoder", Drivebase.getleftEncoder());
+    SmartDashboard.putNumber("right encoder", Drivebase.getrightEncoder());
+    SmartDashboard.putNumber("Left encoder rate", Drivebase.leftEncoder.getRate());
+    SmartDashboard.putNumber("right encoder rate", Drivebase.rightEncoder.getRate());
+    SmartDashboard.putNumber("left", left);
+    SmartDashboard.putNumber("right", right);
   }
   /* End NavX specific content */
   public static int getCurrentGear() {
@@ -267,7 +271,7 @@ public class Drivebase extends Subsystem {
 		return leftEncoder.get() - leftEncoderZero;
 	}
 	public static int getRightEncoderTicks() {
-		return rightEncoder.get() + rightEncoderZero;
+		return rightEncoder.get() - rightEncoderZero;
 	}
 	public static double getLeftDistance() {
 		return getLeftEncoderTicks()*Constants.encoderTicksPerInch;

@@ -118,14 +118,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    Drivebase.curvature();
+    //Drivebase.curvature();
     Drivebase.ReportData();
     Scheduler.getInstance().run();
     
-    SmartDashboard.putNumber("Left encoder", Drivebase.getleftEncoder());
-    SmartDashboard.putNumber("right encoder", Drivebase.getrightEncoder());
-    SmartDashboard.putNumber("Left encoder rate", Drivebase.leftEncoder.getRate());
-    SmartDashboard.putNumber("right encoder rate", Drivebase.rightEncoder.getRate());
   }
 
   /**

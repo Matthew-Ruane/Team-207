@@ -33,9 +33,13 @@ public class DriveDistanceCommand extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
+    Drivebase.zeroLeftEncoder();
+    Drivebase.zeroRightEncoder();
     Drivebase.EnableVoltComp();
-    Drivebase.setDriveDistance(distance);
-    Drivebase.PIDturn.setSetpoint(heading);
+    //Drivebase.setDriveDistance(distance);
+    Drivebase.PIDleft.setSetpoint(50000);
+    Drivebase.PIDright.setSetpoint(50000);
+    //Drivebase.PIDturn.setSetpoint(heading);
     state = moving;
     Drivebase.pidDrive_Enable();
   }
@@ -49,7 +53,7 @@ public class DriveDistanceCommand extends Command {
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && state == moving) {
+    /* if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && state == moving) {
       state = holding;
       return false;
     }
@@ -70,7 +74,8 @@ public class DriveDistanceCommand extends Command {
     }
     else {
       return false;
-    }
+    } */
+    return false;
   }
 
   // Called once after isFinished returns true

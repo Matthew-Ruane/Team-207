@@ -1,0 +1,171 @@
+{
+  "dividerPosition": 0.2386961093585699,
+  "tabPane": [
+    {
+      "title": "Tab 1",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "tiles": {
+          "6,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "Encoder Positions",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Left Encoder Position",
+                  "_title": "SmartDashboard/Left Encoder Position"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Right Encoder Position",
+                  "_title": "SmartDashboard/Right Encoder Position"
+                }
+              ]
+            }
+          },
+          "4,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "Motor Speeds",
+              "_children": [
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Left Speed",
+                  "_title": "/SmartDashboard/Left Speed"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Right Speed",
+                  "_title": "/SmartDashboard/Right Speed"
+                }
+              ]
+            }
+          },
+          "2,0": {
+            "size": [
+              2,
+              6
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "Turn Commands",
+              "_children": [
+                {
+                  "_type": "Command",
+                  "_source0": "network_table:///SmartDashboard/Turn heckla small",
+                  "_title": "SmartDashboard/Turn heckla small"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/Gyro Levels:",
+                  "_title": "SmartDashboard/Gyro Levels:"
+                },
+                {
+                  "_type": "Graph",
+                  "_title": "Graph (no sources)",
+                  "Visible time": 10.0
+                }
+              ]
+            }
+          },
+          "0,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "List Layout",
+              "_title": "Drive Commands",
+              "_children": [
+                {
+                  "_type": "Command",
+                  "_source0": "network_table:///SmartDashboard/Drive Straight Gyro Angle",
+                  "_title": "/SmartDashboard/Drive Straight Gyro Angle"
+                },
+                {
+                  "_type": "Command",
+                  "_source0": "network_table:///SmartDashboard/DriveStraightDistanceProfile",
+                  "_title": "SmartDashboard/DriveStraightDistanceProfile"
+                },
+                {
+                  "_type": "Text View",
+                  "_source0": "network_table:///SmartDashboard/DistToTravelDSDG",
+                  "_title": "SmartDashboard/DistToTravelDSDG"
+                }
+              ]
+            }
+          },
+          "4,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/AutoTest1",
+              "_title": "SmartDashboard/AutoTest1"
+            }
+          },
+          "4,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/TGVelTime",
+              "_title": "SmartDashboard/TGVelTime"
+            }
+          },
+          "4,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/Turn heckla small",
+              "_title": "/SmartDashboard/Turn heckla small"
+            }
+          },
+          "4,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/DriveStraightDistanceProfile",
+              "_title": "SmartDashboard/DriveStraightDistanceProfile"
+            }
+          },
+          "5,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Actual Distance",
+              "_title": "/SmartDashboard/Actual Distance"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
