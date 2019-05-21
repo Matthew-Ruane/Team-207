@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FollowerType;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
@@ -30,9 +31,6 @@ public class Drivebase extends Subsystem {
   }
 
   private static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
-
-  public static SpeedControllerGroup mDrive_Left;
-  public static SpeedControllerGroup mDrive_Right;
 
   private static double left, right;
 
@@ -68,10 +66,18 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_A_ID);
     mDrive_Right_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_B_ID);
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
-    mDrive_Left = new SpeedControllerGroup(mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C);
-    mDrive_Right = new SpeedControllerGroup(mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C);
+
+    mDrive_Left_B.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
+    mDrive_Left_C.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
+    mDrive_Right_B.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
+    mDrive_Right_C.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
+
+    mDrive_Left_Master.configMotionCruiseVelocity(Constants.kDriveCruiseVelo);
+    mDrive_Left_Master.configMotionAcceleration(Constants.kDriveAccel);
+    mDrive_Right_Master.configMotionCruiseVelocity(Constants.kDriveCruiseVelo);
+    mDrive_Right_Master.configMotionAcceleration(Constants.kDriveAccel);
     
-    mDrive = new DifferentialDrive(mDrive_Left, mDrive_Right);
+    mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
     mDrive.setSafetyEnabled(false);
     leftEncoder = new Encoder(3, 4, false, EncodingType.k1X);
     rightEncoder = new Encoder(1, 2, false, EncodingType.k1X);
@@ -126,6 +132,9 @@ public class Drivebase extends Subsystem {
   public static void curvature() {
     TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(OI.getLeftSteeringInputInverted(), 3)+(1-Constants.kTurnrateCurve) * OI.getLeftSteeringInputInverted() * Constants.kTurnrateLimit);
     mDrive.curvatureDrive(OI.getRightThrottleInput(), TurnrateCurved, true);
+  }
+  public static void motionmagic(double target) {
+    mDrive_Left_Master.set(ControlMode.MotionMagic, target);
   }
   /*   
   Begin NavX specific Content*/
@@ -191,8 +200,8 @@ public class Drivebase extends Subsystem {
     drive(left, right);
   }
   private static void drive(double left, double right) {
-    mDrive_Left.set(-left);
-    mDrive_Right.set(right);
+    mDrive_Left_Master.set(-left);
+    mDrive_Right_Master.set(right);
   }
   public static void setDriveDistance (double desiredDistanceInches) {
     desiredDistanceTicks = desiredDistanceInches*347.22;
