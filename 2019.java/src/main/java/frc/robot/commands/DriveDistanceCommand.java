@@ -36,18 +36,16 @@ public class DriveDistanceCommand extends Command {
     Drivebase.zeroLeftEncoder();
     Drivebase.zeroRightEncoder();
     Drivebase.EnableVoltComp();
-    //Drivebase.setDriveDistance(distance);
-    Drivebase.PIDleft.setSetpoint(50000);
-    Drivebase.PIDright.setSetpoint(50000);
-    //Drivebase.PIDturn.setSetpoint(heading);
+    Drivebase.zeroGyroRotation();
+    Drivebase.PIDturn.setSetpoint(Drivebase.getGyroRotation());
     state = moving;
-    Drivebase.pidDrive_Enable();
+    Drivebase.PIDturn.enable();
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivebase.pidDrive();
+    Drivebase.motionmagic(Drivebase.DistanceInchesToTicks(distance), Drivebase.getTurnOutput());
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -75,7 +73,12 @@ public class DriveDistanceCommand extends Command {
     else {
       return false;
     } */
-    return false;
+    if (Drivebase.PIDturn.onTarget() && Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget()) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   // Called once after isFinished returns true

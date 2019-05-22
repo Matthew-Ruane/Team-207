@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FollowerType;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -76,6 +77,16 @@ public class Drivebase extends Subsystem {
     mDrive_Left_Master.configMotionAcceleration(Constants.kDriveAccel);
     mDrive_Right_Master.configMotionCruiseVelocity(Constants.kDriveCruiseVelo);
     mDrive_Right_Master.configMotionAcceleration(Constants.kDriveAccel);
+
+    mDrive_Left_Master.config_kP(0, Constants.Drive_kP);
+    mDrive_Left_Master.config_kI(0, Constants.Drive_kI);
+    mDrive_Left_Master.config_kD(0, Constants.Drive_kD);
+    mDrive_Left_Master.config_kF(0, Constants.Drive_kF);
+
+    mDrive_Right_Master.config_kP(0, Constants.Drive_kP);
+    mDrive_Right_Master.config_kI(0, Constants.Drive_kI);
+    mDrive_Right_Master.config_kD(0, Constants.Drive_kD);
+    mDrive_Right_Master.config_kF(0, Constants.Drive_kF);
     
     mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
     mDrive.setSafetyEnabled(false);
@@ -97,19 +108,22 @@ public class Drivebase extends Subsystem {
     PIDleftOutput =  new DummyPIDOutput();
     PIDrightOutput = new DummyPIDOutput();
 
-    PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, ahrs, PIDturnOutput);
-    PIDleft = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, leftEncoder, PIDleftOutput);
-    PIDright = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, rightEncoder, PIDrightOutput);
+    PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, ahrs, PIDturnOutput, 0.02);
+    PIDleft = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, leftEncoder, PIDleftOutput, 0.02);
+    PIDright = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, rightEncoder, PIDrightOutput, 0.02);
 
     PIDturn.setInputRange(-180.0,  180.0);
     PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
+    PIDturn.setToleranceBuffer(10);
     PIDturn.setContinuous(true);
 
     PIDleft.setAbsoluteTolerance(Constants.kToleranceDistance);
+    PIDleft.setToleranceBuffer(10);
     PIDleft.setOutputRange(-1.0, 1.0);
 
     PIDright.setAbsoluteTolerance(Constants.kToleranceDistance);
+    PIDright.setToleranceBuffer(10);
     PIDright.setOutputRange(-1.0, 1.0);
   }
 
@@ -132,9 +146,6 @@ public class Drivebase extends Subsystem {
   public static void curvature() {
     TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(OI.getLeftSteeringInputInverted(), 3)+(1-Constants.kTurnrateCurve) * OI.getLeftSteeringInputInverted() * Constants.kTurnrateLimit);
     mDrive.curvatureDrive(OI.getRightThrottleInput(), TurnrateCurved, true);
-  }
-  public static void motionmagic(double target) {
-    mDrive_Left_Master.set(ControlMode.MotionMagic, target);
   }
   /*   
   Begin NavX specific Content*/
@@ -186,27 +197,26 @@ public class Drivebase extends Subsystem {
     return angle;
   }
   /* Methods for locking heading and drive to setpoints.  Tuning *probably okay* as of 5/7/19  uses xxx.enable() and xxx.disable to start.  Config set in class constructor. */
-  public static void RotateToAngle() {  //class should be obsolete, all pidDrive function now handled by setting setpoint and calling drivebase.piddrive
+  public static void RotateToAngle() {
     tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
   }
   public static void StopRotateToAngle() {
     PIDturn.disable();
   }
-  public static void pidDrive() {
-    //mDrive_Left.set(-PIDleftOutput.getOutput()-PIDturnOutput.getOutput());
-    //mDrive_Right.set(-PIDrightOutput.getOutput()+PIDturnOutput.getOutput());
-    left = PIDleftOutput.getOutput();
-    right = PIDrightOutput.getOutput();
-    drive(left, right);
+  public static double getTurnOutput() {
+    return PIDturnOutput.getOutput();
+  }
+  public static void motionmagic(double distanceticks, double turnoutput) {
+    mDrive_Left_Master.set(ControlMode.MotionMagic, distanceticks, DemandType.ArbitraryFeedForward, -turnoutput);
+    mDrive_Right_Master.set(ControlMode.MotionMagic, distanceticks, DemandType.ArbitraryFeedForward, turnoutput);
   }
   private static void drive(double left, double right) {
     mDrive_Left_Master.set(-left);
     mDrive_Right_Master.set(right);
   }
-  public static void setDriveDistance (double desiredDistanceInches) {
+  public static double DistanceInchesToTicks (double desiredDistanceInches) {
     desiredDistanceTicks = desiredDistanceInches*347.22;
-    PIDleft.setSetpoint(getLeftEncoderTicks()+desiredDistanceTicks);
-    PIDright.setSetpoint(getRightEncoderTicks()+desiredDistanceTicks);
+    return desiredDistanceTicks;
   }
   public static void pidDrive_Disable() {
     PIDleft.disable();

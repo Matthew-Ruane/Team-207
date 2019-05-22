@@ -45,7 +45,7 @@ public class RotateToAngle extends Command {
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    if (Drivebase.PIDturn.onTarget() && state == moving) {
+/*     if (Drivebase.PIDturn.onTarget() && state == moving) {
       state = holding;
       return false;
     }
@@ -66,7 +66,8 @@ public class RotateToAngle extends Command {
     }
     else {
       return false;
-    }
+    } */
+    return Drivebase.PIDturn.onTarget();
   }
 
   // Called once after isFinished returns true
