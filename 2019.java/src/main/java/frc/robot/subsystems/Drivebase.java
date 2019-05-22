@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.FollowerType;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -90,8 +91,10 @@ public class Drivebase extends Subsystem {
     
     mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
     mDrive.setSafetyEnabled(false);
-    leftEncoder = new Encoder(3, 4, false, EncodingType.k1X);
-    rightEncoder = new Encoder(1, 2, false, EncodingType.k1X);
+    leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
+    rightEncoder = new Encoder(1, 2, false, EncodingType.k4X);
+    leftEncoder.setDistancePerPulse(1/1388.88);
+    rightEncoder.setDistancePerPulse(1/1388.88);
     leftEncoder.setReverseDirection(true);
     rightEncoder.setReverseDirection(false);
     resetEncoders();
@@ -120,6 +123,7 @@ public class Drivebase extends Subsystem {
 
     PIDleft.setAbsoluteTolerance(Constants.kToleranceDistance);
     PIDleft.setToleranceBuffer(10);
+    PIDleft.setPIDSourceType(PIDSourceType.kDisplacement);
     PIDleft.setOutputRange(-1.0, 1.0);
 
     PIDright.setAbsoluteTolerance(Constants.kToleranceDistance);
@@ -214,9 +218,19 @@ public class Drivebase extends Subsystem {
     mDrive_Left_Master.set(-left);
     mDrive_Right_Master.set(right);
   }
+  public static void pidDrive() {
+    left = PIDleftOutput.getOutput()-PIDturnOutput.getOutput();
+    right = PIDrightOutput.getOutput()+PIDturnOutput.getOutput();
+    drive(left, right);
+  }
   public static double DistanceInchesToTicks (double desiredDistanceInches) {
     desiredDistanceTicks = desiredDistanceInches*347.22;
     return desiredDistanceTicks;
+  }
+  public static void setDriveDistance (double desiredDistanceInches) {
+    desiredDistanceTicks = desiredDistanceInches*1388.88;
+    PIDleft.setSetpoint(desiredDistanceTicks);
+    PIDleft.setSetpoint(desiredDistanceTicks);
   }
   public static void pidDrive_Disable() {
     PIDleft.disable();

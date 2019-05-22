@@ -41,9 +41,9 @@ public class Constants {
     public static final int Elevator_MotionCruiseVelo = 15000;
     public static final int kTimeoutms = 10;
 
-    public static double Drive_kP = 0.05;
+    public static double Drive_kP = 0.03;
     public static double Drive_kI = 0.0;
-    public static double Drive_kD = 0.1;
+    public static double Drive_kD = 10.0;
     public static double Drive_kF = 0.0;
     public static int kDriveCruiseVelo = 1000;
     public static int kDriveAccel = 1000;
@@ -70,7 +70,7 @@ public class Constants {
     public static final double wheelbase_in = 26.5;       // wheelbase, in inches
     public static final double wheel_diameter_in = 4.0;   // wheel diamater, in inches
     public static final double wheel_distance_in_per_tick = wheel_diameter_in*Math.PI/encoderTicksPerRevolution; //Wheel distance traveled per encoder tick, in inche
-    public static final double encoderTicksPerInch = 347.22;
+    public static final double encoderTicksPerInch = 1388.88; // 347.22*4;
     public static final double max_velocity_ips = 165.0;   // max robot velocity, in inches per second
     public static final double max_acceleration_ipsps = 80.0;  // max robot acceleration, in inches per second per second
     public static final double max_jerk_ipspsps = 2400.0;  // max robot jerk, in inches per second per second per second

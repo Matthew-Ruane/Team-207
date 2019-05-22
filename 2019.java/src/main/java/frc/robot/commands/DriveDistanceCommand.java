@@ -38,14 +38,16 @@ public class DriveDistanceCommand extends Command {
     Drivebase.EnableVoltComp();
     Drivebase.zeroGyroRotation();
     Drivebase.PIDturn.setSetpoint(Drivebase.getGyroRotation());
+    Drivebase.setDriveDistance(distance);
     state = moving;
-    Drivebase.PIDturn.enable();
+    Drivebase.pidDrive_Enable();
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivebase.motionmagic(Drivebase.DistanceInchesToTicks(distance), Drivebase.getTurnOutput());
+    //Drivebase.motionmagic(Drivebase.DistanceInchesToTicks(distance), Drivebase.getTurnOutput());
+    Drivebase.pidDrive();
   }
 
   // Make this return true when this Command no longer needs to run execute()
