@@ -43,13 +43,13 @@ public class Constants {
     public static final int Elevator_MotionCruiseVelo = 15000;
     public static final int kTimeoutms = 10;
 
-    public static double Drive_kP = 0.03;
+    public static double Drive_kP = 0.05;
     public static double Drive_kI = 0.0;
     public static double Drive_kD = 0.0;
     public static double Drive_kF = 0.0;
-    public static final PIDGains DriveHigh     = new PIDGains(0.05,0,0.80,0,0.5,0.01, 0.05,"DriveHigh");
-    public static int kDriveCruiseVelo = 1000;
-    public static int kDriveAccel = 1000;
+    public static final PIDGains DriveHigh = new PIDGains(Drive_kP, Drive_kI, Drive_kD, 0, 0.5, 0.01, 0.05,"DriveHigh");
+    public static int kDriveCruiseVelo = 20000;
+    public static int kDriveAccel = 10000;
     public static double kToleranceDistance = 347;
     public static double TurnOutputMin = 0.2;
     public static double kTurnrateCurve = 0.1;

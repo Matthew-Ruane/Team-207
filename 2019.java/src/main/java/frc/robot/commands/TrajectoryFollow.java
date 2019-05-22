@@ -31,8 +31,8 @@ public class TrajectoryFollow extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    Drivebase.zeroLeftEncoder();
-    Drivebase.zeroRightEncoder();
+/*     Drivebase.zeroLeftEncoder();
+    Drivebase.zeroRightEncoder(); */
     double maxVelocityPercentLimit = 1.0;       // Limit max velocity to 0.4 of real max velocity (for safety and to obsereve)
     Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, 
       Trajectory.Config.SAMPLES_HIGH, 0.01, Constants.max_velocity_ips*maxVelocityPercentLimit, 

@@ -37,38 +37,31 @@ public class DriveDistanceCommand extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    Drivebase.zeroLeftEncoder();
-    Drivebase.zeroRightEncoder();
+ /*    Drivebase.zeroLeftEncoder();
+    Drivebase.zeroRightEncoder(); */
     Drivebase.EnableVoltComp();
     Drivebase.zeroGyroRotation();
     Drivebase.PIDturn.setSetpoint(Drivebase.getGyroRotation());
     SmartDashboard.putNumber("SHOULD EQUAL CURRENT YAW", Drivebase.getGyroRotation());
-    // Drivebase.setDriveDistance(distance);
 
-    maxOutput = gains.getMinStartOutput();
+    //maxOutput = gains.getMinStartOutput();
 
-    Drivebase.PIDleft.setPID(gains);
+/*     Drivebase.PIDleft.setPID(gains);
     Drivebase.PIDright.setPID(gains);
     maxOutputMax = gains.getMaxOutput();
-    maxOutputStep = gains.getMaxOutputStep();
+    maxOutputStep = gains.getMaxOutputStep(); 
     Drivebase.PIDleft.setSetpoint(50000);
     Drivebase.PIDright.setSetpoint(50000);
     Drivebase.PIDleft.setAbsoluteTolerance(500);
     Drivebase.PIDright.setAbsoluteTolerance(500);
     state = moving;
-    Drivebase.pidDrive_Enable();
+    Drivebase.pidDrive_Enable();*/
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    //Drivebase.motionmagic(Drivebase.DistanceInchesToTicks(distance), Drivebase.getTurnOutput());
-    maxOutput += maxOutputStep;
-    if (maxOutput >= maxOutputMax) 
-      maxOutput = maxOutputMax;
-    Drivebase.PIDleft.setMaxOutput(maxOutput);
-    Drivebase.PIDright.setMaxOutput(maxOutput);
-    Drivebase.pidDrive();
+    Drivebase.motionmagic(100000, Drivebase.getTurnOutput());
   }
 
   // Make this return true when this Command no longer needs to run execute()
