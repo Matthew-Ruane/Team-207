@@ -216,7 +216,7 @@ public class Drivebase extends Subsystem {
   }
   private static void drive(double left, double right) {
     mDrive_Left_Master.set(-left);
-    mDrive_Right_Master.set(right);
+    mDrive_Right_Master.set(-right);
   }
   public static void pidDrive() {
     left = PIDleftOutput.getOutput()-PIDturnOutput.getOutput();

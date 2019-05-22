@@ -8,6 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.Constants;
@@ -38,6 +39,7 @@ public class DriveDistanceCommand extends Command {
     Drivebase.EnableVoltComp();
     Drivebase.zeroGyroRotation();
     Drivebase.PIDturn.setSetpoint(Drivebase.getGyroRotation());
+    SmartDashboard.putNumber("SHOULD EQUAL CURRENT YAW", Drivebase.getGyroRotation());
     Drivebase.setDriveDistance(distance);
     state = moving;
     Drivebase.pidDrive_Enable();
