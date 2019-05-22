@@ -30,6 +30,7 @@ public class Robot extends TimedRobot {
     m_oi.registerControls();
     Elevator.zeroElevatorEncoder();
     Drivebase.DisableVoltComp();
+    Drivebase.setCoast();
     //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
     // chooser.addOption("My Auto", new MyAutoCommand());
     //SmartDashboard.putData("Auto mode", m_chooser);
@@ -59,6 +60,7 @@ public class Robot extends TimedRobot {
     Drivebase.resetEncoders();
     Constants.DesiredDistance = 0;
     Constants.DesiredHeading = 0;
+    Drivebase.setCoast();
   }
 
   @Override
@@ -111,6 +113,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    Drivebase.setBrake();
   }
 
   /**

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Drivebase;
+import frc.utility.PIDGains;
 import frc.robot.Constants;
 
 public class DriveDistanceCommand extends Command {
@@ -21,12 +22,14 @@ public class DriveDistanceCommand extends Command {
   private int moving = 1;
   private boolean timerflag = Constants.Off;
   private Drivebase drivebase;
-  private double distance, heading;
+  private double distance, heading, tolerance, maxOutput, maxOutputStep, maxOutputMax;
+  PIDGains gains;
   
-  public DriveDistanceCommand(double DesiredDistance, Double DesiredHeading) {
+  public DriveDistanceCommand(double DesiredDistance, Double DesiredHeading, PIDGains gains) {
     distance = DesiredDistance;
     heading = DesiredHeading;
-    timer = new Timer();
+    this.gains = gains;
+    maxOutput = 0;
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
   }
@@ -40,7 +43,18 @@ public class DriveDistanceCommand extends Command {
     Drivebase.zeroGyroRotation();
     Drivebase.PIDturn.setSetpoint(Drivebase.getGyroRotation());
     SmartDashboard.putNumber("SHOULD EQUAL CURRENT YAW", Drivebase.getGyroRotation());
-    Drivebase.setDriveDistance(distance);
+    // Drivebase.setDriveDistance(distance);
+
+    maxOutput = gains.getMinStartOutput();
+
+    Drivebase.PIDleft.setPID(gains);
+    Drivebase.PIDright.setPID(gains);
+    maxOutputMax = gains.getMaxOutput();
+    maxOutputStep = gains.getMaxOutputStep();
+    Drivebase.PIDleft.setSetpoint(50000);
+    Drivebase.PIDright.setSetpoint(50000);
+    Drivebase.PIDleft.setAbsoluteTolerance(500);
+    Drivebase.PIDright.setAbsoluteTolerance(500);
     state = moving;
     Drivebase.pidDrive_Enable();
   }
@@ -49,6 +63,11 @@ public class DriveDistanceCommand extends Command {
   @Override
   protected void execute() {
     //Drivebase.motionmagic(Drivebase.DistanceInchesToTicks(distance), Drivebase.getTurnOutput());
+    maxOutput += maxOutputStep;
+    if (maxOutput >= maxOutputMax) 
+      maxOutput = maxOutputMax;
+    Drivebase.PIDleft.setMaxOutput(maxOutput);
+    Drivebase.PIDright.setMaxOutput(maxOutput);
     Drivebase.pidDrive();
   }
 
@@ -76,13 +95,14 @@ public class DriveDistanceCommand extends Command {
     }
     else {
       return false;
-    } */
+    } 
     if (Drivebase.PIDturn.onTarget() && Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget()) {
       return true;
     }
     else {
       return false;
-    }
+    } */
+    return false;
   }
 
   // Called once after isFinished returns true

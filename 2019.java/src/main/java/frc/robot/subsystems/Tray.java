@@ -93,11 +93,9 @@ public class Tray extends Subsystem {
     public static void UpdateLoadState() {
         if (!mCargo_Loaded_Sensor.get()) {
             Constants.CARGO_STATE = Constants.CARGO_STATE_LOADED;
-            SmartDashboard.putNumber("0 if loaded, 1 if unloaded", Constants.CARGO_STATE);
         }
         else if (mCargo_Loaded_Sensor.get()) {
             Constants.CARGO_STATE = Constants.CARGO_STATE_UNLOADED;
-            SmartDashboard.putNumber("0 if loaded, 1 if unloaded", Constants.CARGO_STATE);
         }
     }
     

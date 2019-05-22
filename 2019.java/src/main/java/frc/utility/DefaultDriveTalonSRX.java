@@ -16,12 +16,13 @@ public class DefaultDriveTalonSRX extends WPI_TalonSRX {
 
 	public DefaultDriveTalonSRX(int deviceNumber) {
 		super(deviceNumber);
+		configFactoryDefault();
 		configVoltageCompSaturation(12, 10);
 		enableCurrentLimit(true);
 		configContinuousCurrentLimit(40);
 		configPeakCurrentDuration(100);
 		configPeakCurrentLimit(40);
-		setNeutralMode(NeutralMode.Brake);
+		setNeutralMode(NeutralMode.Coast);
 		setSafetyEnabled(false);
 	}
 

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
@@ -34,6 +35,9 @@ public class Drivebase extends Subsystem {
 
   private static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
 
+  public static SpeedControllerGroup mDrive_Left;
+  public static SpeedControllerGroup mDrive_Right;
+
   private static double left, right;
 
   public static DifferentialDrive mDrive;
@@ -58,7 +62,8 @@ public class Drivebase extends Subsystem {
   private static double yawZero = 0;
   public static AHRS ahrs;
 
-  public static PIDController PIDturn, PIDleft, PIDright;
+  public static MultiPIDController PIDleft, PIDright;
+  public static PIDController PIDturn;
 
 
   public Drivebase() {
@@ -68,11 +73,8 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_A_ID);
     mDrive_Right_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_B_ID);
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
-
-    mDrive_Left_B.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
-    mDrive_Left_C.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
-    mDrive_Right_B.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
-    mDrive_Right_C.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
+    mDrive_Left = new SpeedControllerGroup(mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C);
+    mDrive_Right = new SpeedControllerGroup(mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C);
 
     mDrive_Left_Master.configMotionCruiseVelocity(Constants.kDriveCruiseVelo);
     mDrive_Left_Master.configMotionAcceleration(Constants.kDriveAccel);
@@ -89,12 +91,16 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master.config_kD(0, Constants.Drive_kD);
     mDrive_Right_Master.config_kF(0, Constants.Drive_kF);
     
-    mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
+    mDrive = new DifferentialDrive(mDrive_Left, mDrive_Right);
     mDrive.setSafetyEnabled(false);
     leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
+    leftEncoder.setDistancePerPulse(1.0);
+    leftEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
     rightEncoder = new Encoder(1, 2, false, EncodingType.k4X);
-    leftEncoder.setDistancePerPulse(1/1388.88);
-    rightEncoder.setDistancePerPulse(1/1388.88);
+    rightEncoder.setDistancePerPulse(1.0);
+    rightEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
+    //leftEncoder.setDistancePerPulse(1/1388.88);
+    //rightEncoder.setDistancePerPulse(1/1388.88);
     leftEncoder.setReverseDirection(true);
     rightEncoder.setReverseDirection(false);
     resetEncoders();
@@ -112,8 +118,8 @@ public class Drivebase extends Subsystem {
     PIDrightOutput = new DummyPIDOutput();
 
     PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, ahrs, PIDturnOutput, 0.02);
-    PIDleft = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, leftEncoder, PIDleftOutput, 0.02);
-    PIDright = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kD, rightEncoder, PIDrightOutput, 0.02);
+    PIDleft = new MultiPIDController(Constants.DriveHigh, leftEncoder, PIDleftOutput, 0.02, "LeftDrive");
+    PIDright = new MultiPIDController(Constants.DriveHigh, rightEncoder, PIDrightOutput, 0.02, "LeftDrive");
 
     PIDturn.setInputRange(-180.0,  180.0);
     PIDturn.setOutputRange(-0.65, 0.65);
@@ -124,11 +130,12 @@ public class Drivebase extends Subsystem {
     PIDleft.setAbsoluteTolerance(Constants.kToleranceDistance);
     PIDleft.setToleranceBuffer(10);
     PIDleft.setPIDSourceType(PIDSourceType.kDisplacement);
-    PIDleft.setOutputRange(-1.0, 1.0);
+    PIDleft.setOutputRange(-0.2, 0.2);
 
     PIDright.setAbsoluteTolerance(Constants.kToleranceDistance);
     PIDright.setToleranceBuffer(10);
-    PIDright.setOutputRange(-1.0, 1.0);
+    PIDright.setPIDSourceType(PIDSourceType.kDisplacement);
+    PIDright.setOutputRange(-0.2, 0.2);
   }
 
   public static void UpShift() {
@@ -215,13 +222,30 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master.set(ControlMode.MotionMagic, distanceticks, DemandType.ArbitraryFeedForward, turnoutput);
   }
   private static void drive(double left, double right) {
-    mDrive_Left_Master.set(-left);
-    mDrive_Right_Master.set(-right);
+    mDrive_Left.set(-left);
+    mDrive_Right.set(right);
   }
   public static void pidDrive() {
-    left = PIDleftOutput.getOutput()-PIDturnOutput.getOutput();
-    right = PIDrightOutput.getOutput()+PIDturnOutput.getOutput();
+    left = PIDleftOutput.getOutput();//-PIDturnOutput.getOutput();
+    right = PIDrightOutput.getOutput();//+PIDturnOutput.getOutput();
     drive(left, right);
+    SmartDashboard.putNumber("leftoutput", left);
+  }
+  public static void setBrake() {
+    mDrive_Left_Master.setNeutralMode(NeutralMode.Brake);
+    mDrive_Left_B.setNeutralMode(NeutralMode.Brake);
+    mDrive_Left_C.setNeutralMode(NeutralMode.Brake);
+    mDrive_Right_Master.setNeutralMode(NeutralMode.Brake);
+    mDrive_Right_B.setNeutralMode(NeutralMode.Brake);
+    mDrive_Right_C.setNeutralMode(NeutralMode.Brake);
+  }
+  public static void setCoast() {
+    mDrive_Left_Master.setNeutralMode(NeutralMode.Coast);
+    mDrive_Left_B.setNeutralMode(NeutralMode.Coast);
+    mDrive_Left_C.setNeutralMode(NeutralMode.Coast);
+    mDrive_Right_Master.setNeutralMode(NeutralMode.Coast);
+    mDrive_Right_B.setNeutralMode(NeutralMode.Coast);
+    mDrive_Right_C.setNeutralMode(NeutralMode.Coast);
   }
   public static double DistanceInchesToTicks (double desiredDistanceInches) {
     desiredDistanceTicks = desiredDistanceInches*347.22;
@@ -230,7 +254,7 @@ public class Drivebase extends Subsystem {
   public static void setDriveDistance (double desiredDistanceInches) {
     desiredDistanceTicks = desiredDistanceInches*1388.88;
     PIDleft.setSetpoint(desiredDistanceTicks);
-    PIDleft.setSetpoint(desiredDistanceTicks);
+    PIDright.setSetpoint(desiredDistanceTicks);
   }
   public static void pidDrive_Disable() {
     PIDleft.disable();

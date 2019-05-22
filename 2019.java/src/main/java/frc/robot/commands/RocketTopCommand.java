@@ -20,7 +20,6 @@ public class RocketTopCommand extends Command {
   protected void execute() {
     Elevator.DesiredPosition = ElevatorPositions.ROCKET_TOP;
     Elevator.SetElevatorPosition();
-    SmartDashboard.putNumber("Elevator seeking position", Elevator.getTargetHeight());
   }
 
   @Override
