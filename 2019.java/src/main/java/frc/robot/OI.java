@@ -32,7 +32,7 @@ public class OI {
         LeftStick.getButtonTrigger().whenPressed(new TrayExtensionToggle());
         //zeroing Elevator encoder and NavX yaw gyro
         LeftStick.getButton9().whenPressed(new ZeroGyro());
-        LeftStick.getButton7().whenPressed(new DriveDistanceCommand(100.0, 0.0, Constants.DriveHigh));
+        LeftStick.getButton7().whenPressed(new DriveDistanceCommand(100.0, Constants.TurnGains));
         }
 
         public static double getLeftThrottleInput() {

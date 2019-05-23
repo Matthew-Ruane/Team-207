@@ -36,18 +36,12 @@ public class Drivebase extends Subsystem {
 
   private static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
 
-/*   public static SpeedControllerGroup mDrive_Left;
-  public static SpeedControllerGroup mDrive_Right; */
-
   private static double left, right;
 
   public static DifferentialDrive mDrive;
 
   private static Solenoid mShifter_High, mShifter_Low;
 
-  public static Encoder rightEncoder, leftEncoder;
-
-  //private static DummyPIDOutput PIDturnOutput, PIDleftOutput, PIDrightOutput;
   private static DummyPIDOutput PIDturnOutput;
 
   public static int leftEncoderZero = 0;
@@ -64,9 +58,7 @@ public class Drivebase extends Subsystem {
   private static double yawZero = 0;
   public static AHRS ahrs;
 
-  //public static MultiPIDController PIDleft, PIDright;
-  //public static MultiPIDController PIDleft, PIDright;
-  public static PIDController PIDturn;
+  public static MultiPIDController PIDturn;
 
 
   public Drivebase() {
@@ -76,8 +68,6 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_A_ID);
     mDrive_Right_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_B_ID);
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
-    /* mDrive_Left = new SpeedControllerGroup(mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C);
-    mDrive_Right = new SpeedControllerGroup(mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C); */
 
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTimeoutms);
     mDrive_Left_Master.setSensorPhase(true);
@@ -105,18 +95,7 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master.config_kF(0, Constants.Drive_kF);
     
     mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
-    mDrive.setSafetyEnabled(false);
-    /* leftEncoder = new Encoder(3, 4, false, EncodingType.k4X);
-    leftEncoder.setDistancePerPulse(1.0);
-    leftEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
-    rightEncoder = new Encoder(1, 2, false, EncodingType.k4X);
-    rightEncoder.setDistancePerPulse(1.0);
-    rightEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
-    //leftEncoder.setDistancePerPulse(1/1388.88);
-    //rightEncoder.setDistancePerPulse(1/1388.88);
-    leftEncoder.setReverseDirection(true);
-    rightEncoder.setReverseDirection(false);
-    resetEncoders(); */
+    mDrive.setSafetyEnabled(true);
     
     mShifter_Low = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_Low_ID);
     mShifter_High = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_High_ID);
@@ -126,31 +105,15 @@ public class Drivebase extends Subsystem {
 
     ahrs = new AHRS(SerialPort.Port.kMXP);
 
-    PIDturnOutput = new DummyPIDOutput();/*
-    PIDleftOutput =  new DummyPIDOutput();
-    PIDrightOutput = new DummyPIDOutput(); */
+    PIDturnOutput = new DummyPIDOutput();
 
-    PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, ahrs, PIDturnOutput, 0.02);
-    //PIDleft = new MultiPIDController(Constants.DriveHigh, leftEncoder, PIDleftOutput, 0.02, "LeftDrive");
-    //PIDright = new MultiPIDController(Constants.DriveHigh, rightEncoder, PIDrightOutput, 0.02, "LeftDrive");
-
+    PIDturn = new MultiPIDController(Constants.TurnGains, ahrs, PIDturnOutput, 0.02, "PIDturn");
+    PIDturn.setMaxOutput(0.65);
     PIDturn.setInputRange(-180.0,  180.0);
-    PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
     PIDturn.setToleranceBuffer(10);
     PIDturn.setContinuous(true);
-
-/*     PIDleft.setAbsoluteTolerance(Constants.kToleranceDistance);
-    PIDleft.setToleranceBuffer(10);
-    PIDleft.setPIDSourceType(PIDSourceType.kDisplacement);
-    PIDleft.setOutputRange(-0.2, 0.2);
-
-    PIDright.setAbsoluteTolerance(Constants.kToleranceDistance);
-    PIDright.setToleranceBuffer(10);
-    PIDright.setPIDSourceType(PIDSourceType.kDisplacement);
-    PIDright.setOutputRange(-0.2, 0.2); */
   }
-
   public static void UpShift() {
     mShifter_High.set(Constants.On);
     mShifter_Low.set(Constants.Off);
@@ -230,22 +193,10 @@ public class Drivebase extends Subsystem {
   public static double getTurnOutput() {
     return PIDturnOutput.getOutput();
   }
-  public static void motionmagic(double distanceticks, double turnoutput) {
-    //mDrive_Left_Master.set(ControlMode.MotionMagic, distanceticks, DemandType.ArbitraryFeedForward, -turnoutput);
-    //mDrive_Right_Master.set(ControlMode.MotionMagic, distanceticks, DemandType.ArbitraryFeedForward, turnoutput);
-    mDrive_Left_Master.set(ControlMode.MotionMagic, -distanceticks);
-    mDrive_Right_Master.set(ControlMode.MotionMagic, -distanceticks);
+  public static void motionmagic(double leftTarget, double rightTarget, double turnoutput) {
+    mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.5);
+    mDrive_Right_Master.set(ControlMode.MotionMagic, -rightTarget, DemandType.ArbitraryFeedForward, turnoutput*0.5);
   }
-  /* private static void drive(double left, double right) {
-    mDrive_Left_.set(-left);
-    mDrive_Right_.set(right);
-  }
-  public static void pidDrive() {
-    left = PIDleftOutput.getOutput();//-PIDturnOutput.getOutput();
-    right = PIDrightOutput.getOutput();//+PIDturnOutput.getOutput();
-    drive(left, right);
-    SmartDashboard.putNumber("leftoutput", left);
-  } */
   public static void setBrake() {
     mDrive_Left_Master.setNeutralMode(NeutralMode.Brake);
     mDrive_Left_B.setNeutralMode(NeutralMode.Brake);
@@ -266,11 +217,6 @@ public class Drivebase extends Subsystem {
     desiredDistanceTicks = desiredDistanceInches*347.22;
     return desiredDistanceTicks;
   }
-  /* public static void setDriveDistance (double desiredDistanceInches) {
-    desiredDistanceTicks = desiredDistanceInches*1388.88;
-    PIDleft.setSetpoint(desiredDistanceTicks);
-    PIDright.setSetpoint(desiredDistanceTicks);
-  } */
   public static void setMMSetpoint (int setpoint) {
     mDrive_Left_Master.setSelectedSensorPosition(setpoint, 0, Constants.kTimeoutms);
     mDrive_Right_Master.setSelectedSensorPosition(setpoint, 0, Constants.kTimeoutms);
@@ -279,52 +225,33 @@ public class Drivebase extends Subsystem {
     mDrive_Left_Master.setSelectedSensorPosition(0, 0, Constants.kTimeoutms);
     mDrive_Right_Master.setSelectedSensorPosition(0, 0, Constants.kTimeoutms);
   }
-  public static void pidDrive_Disable() {
-/*     PIDleft.disable();
-    PIDright.disable(); */
-    PIDturn.disable();
-  }
-  public static void pidDrive_Enable() {
-/*     PIDleft.enable();
-    PIDright.enable(); */
-    PIDturn.enable();
-  }
-  public static void pidDrive_Reset() {
-/*     PIDleft.reset();
-    PIDright.reset(); */
-    PIDturn.reset();
-  }
   public static void ReportData() {
-    SmartDashboard.putNumber(   "IMU_Yaw",              ahrs.getYaw());
-/*     SmartDashboard.putNumber("Left encoder", Drivebase.getleftEncoder());
-    SmartDashboard.putNumber("right encoder", Drivebase.getrightEncoder());
-    SmartDashboard.putNumber("Left encoder rate", Drivebase.leftEncoder.getRate());
-    SmartDashboard.putNumber("right encoder rate", Drivebase.rightEncoder.getRate()); */
+    SmartDashboard.putNumber(   "IMU_Yaw", ahrs.getYaw());
+    SmartDashboard.putNumber("Left encoder", getleftEncoder());
+    SmartDashboard.putNumber("right encoder", getrightEncoder());
+    SmartDashboard.putNumber("Left encoder rate", getLeftVelocity());
+    SmartDashboard.putNumber("right encoder rate", getRightVelocity());
     SmartDashboard.putNumber("left", left);
     SmartDashboard.putNumber("right", right);
   }
-  /* public static int getCurrentGear() {
+  public static int getCurrentGear() {
     return Constants.CURRENT_GEAR;
   }
   public static int getleftEncoder() {
-    return leftEncoder.get();
+    return mDrive_Left_Master.getSelectedSensorPosition(0);
   }
   public static int getrightEncoder() {
-    return rightEncoder.get();
-  }
-  public static void resetEncoders() {
-    leftEncoder.reset();
-    rightEncoder.reset();
+    return mDrive_Right_Master.getSelectedSensorPosition(0);
   }
   public static double getLeftVelocity() {
-		return leftEncoder.getRate();
+		return mDrive_Left_Master.getSelectedSensorVelocity(0);
 	}
 	public static double getRightVelocity() {
-		return rightEncoder.getRate();
+		return mDrive_Right_Master.getSelectedSensorVelocity(0);
   }
   public void calcXY() {
-		 leftEncoderDistance  = leftEncoder.getDistance();
-		 rightEncoderDistance = rightEncoder.getDistance();
+		 leftEncoderDistance  = getLeftDistance();
+		 rightEncoderDistance = getRightDistance();
 		 gyroAngle = getAngle();
 		 distance = ((leftEncoderDistance - prevLeftEncoderDistance) + (rightEncoderDistance - prevRightEncoderDistance))/2;
 		 x = x + distance * Math.sin(Math.toRadians(gyroAngle));
@@ -337,25 +264,28 @@ public class Drivebase extends Subsystem {
 	}
 	public double getY() {
 		return y;
-	}
+  }
 	public static void zeroLeftEncoder() {
-    leftEncoderZero = leftEncoder.get();
+    leftEncoderZero = mDrive_Left_Master.getSelectedSensorPosition(0);
 	}
 	public static void zeroRightEncoder() {
-		rightEncoderZero = rightEncoder.get();
+		rightEncoderZero = mDrive_Right_Master.getSelectedSensorPosition(0);
 	}
 	public static int getLeftEncoderTicks() {
-		return leftEncoder.get() - leftEncoderZero;
+    zeroLeftEncoder();
+		return mDrive_Left_Master.getSelectedSensorPosition(0) - leftEncoderZero;
 	}
 	public static int getRightEncoderTicks() {
-		return rightEncoder.get() - rightEncoderZero;
-	}
+    zeroRightEncoder();
+		return mDrive_Right_Master.getSelectedSensorPosition(0) - rightEncoderZero;
+  }
+  /* Returns distance in inches */
 	public static double getLeftDistance() {
 		return getLeftEncoderTicks()*Constants.encoderTicksPerInch;
 	}
 	public static double getRightDistance() {
 		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
-	} */
+	}
   @Override
   public void initDefaultCommand() {
   }

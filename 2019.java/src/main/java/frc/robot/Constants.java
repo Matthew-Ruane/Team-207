@@ -47,7 +47,6 @@ public class Constants {
     public static double Drive_kI = 0.0;
     public static double Drive_kD = 0.0;
     public static double Drive_kF = 0.0;
-    public static final PIDGains DriveHigh = new PIDGains(Drive_kP, Drive_kI, Drive_kD, 0, 0.5, 0.01, 0.05,"DriveHigh");
     public static int kDriveCruiseVelo = 20000;
     public static int kDriveAccel = 10000;
     public static double kToleranceDistance = 347;
@@ -60,6 +59,7 @@ public class Constants {
     public static double Turn_kI = 0.0;
     public static double Turn_kD = 0.0;
     public static double Turn_kF = 0.0;
+    public static final PIDGains TurnGains = new PIDGains(Turn_kP, Turn_kI, Turn_kD, Turn_kF, 0.8, 0.02, 0.1,"TurnGains");
 
     public static int DesiredDistance;
     public static double DesiredHeading;

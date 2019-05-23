@@ -22,12 +22,14 @@ public class DriveDistanceCommand extends Command {
   private int moving = 1;
   private boolean timerflag = Constants.Off;
   private Drivebase drivebase;
-  private double distance, heading, tolerance, maxOutput, maxOutputStep, maxOutputMax;
-  PIDGains gains;
+  private double distance, heading, tolerance, maxOutput, maxOutputStep, maxOutputMax, leftdistance, rightdistance;
+  private PIDGains gains;
   
-  public DriveDistanceCommand(double DesiredDistance, Double DesiredHeading, PIDGains gains) {
-    distance = DesiredDistance;
-    heading = DesiredHeading;
+  public DriveDistanceCommand(double DesiredDistance, PIDGains gains) {
+    Drivebase.zeroLeftEncoder();
+    Drivebase.zeroRightEncoder();
+    leftdistance = DesiredDistance + Drivebase.leftEncoderZero;
+    rightdistance = DesiredDistance + Drivebase.rightEncoderZero;
     this.gains = gains;
     maxOutput = 0;
     // Use requires() here to declare subsystem dependencies
@@ -37,31 +39,22 @@ public class DriveDistanceCommand extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
- /*    Drivebase.zeroLeftEncoder();
-    Drivebase.zeroRightEncoder(); */
     Drivebase.EnableVoltComp();
     Drivebase.zeroGyroRotation();
     Drivebase.PIDturn.setSetpoint(Drivebase.getGyroRotation());
-    SmartDashboard.putNumber("SHOULD EQUAL CURRENT YAW", Drivebase.getGyroRotation());
 
-    //maxOutput = gains.getMinStartOutput();
-
-/*     Drivebase.PIDleft.setPID(gains);
-    Drivebase.PIDright.setPID(gains);
-    maxOutputMax = gains.getMaxOutput();
-    maxOutputStep = gains.getMaxOutputStep(); 
-    Drivebase.PIDleft.setSetpoint(50000);
-    Drivebase.PIDright.setSetpoint(50000);
-    Drivebase.PIDleft.setAbsoluteTolerance(500);
-    Drivebase.PIDright.setAbsoluteTolerance(500);
     state = moving;
-    Drivebase.pidDrive_Enable();*/
+    maxOutput = gains.getMinStartOutput();
+    maxOutputMax = gains.getMaxOutput();
+    maxOutputStep = gains.getMaxOutputStep();
+    Drivebase.PIDturn.enable();
+    
+    Drivebase.motionmagic(leftdistance, rightdistance, Drivebase.getTurnOutput());
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivebase.motionmagic(100000, Drivebase.getTurnOutput());
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -102,14 +95,14 @@ public class DriveDistanceCommand extends Command {
   @Override
   protected void end() {
     Drivebase.DisableVoltComp();
-    Drivebase.pidDrive_Reset();
+    Drivebase.PIDturn.reset();
   }
 
   // Called when another command which requires one or more of the same
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    Drivebase.pidDrive_Reset();
+    Drivebase.PIDturn.reset();
     Drivebase.DisableVoltComp();
     cancel();
   }

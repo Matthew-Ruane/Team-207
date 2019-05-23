@@ -73,7 +73,7 @@ public class RotateToAngle extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    Drivebase.pidDrive_Reset();
+    Drivebase.PIDturn.reset();
     Drivebase.DisableVoltComp();
   }
 
@@ -81,7 +81,7 @@ public class RotateToAngle extends Command {
   // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    Drivebase.pidDrive_Reset();
+    Drivebase.PIDturn.reset();
     Drivebase.DisableVoltComp();
     cancel();
   }

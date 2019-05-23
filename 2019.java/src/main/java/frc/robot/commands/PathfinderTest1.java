@@ -31,9 +31,9 @@ public class PathfinderTest1 extends Command {
 
   // Called just before this Command runs the first time
   @Override
-  protected void initialize() {/* 
+  protected void initialize() {
     Drivebase.zeroLeftEncoder();
-    Drivebase.zeroRightEncoder(); */
+    Drivebase.zeroRightEncoder();
     Drivebase.setGyroRotation(90.0);   // gyro initial angle (starting robot heading)
 
     double maxVelocityPercentLimit = 1.0;       // Limit max velocity to 0.4 of real max velocity (for safety and to obsereve)
@@ -63,8 +63,8 @@ public class PathfinderTest1 extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-/*     double l = dfLeft.calculate(Drivebase.getLeftDistance());
-    double r = dfRight.calculate(Drivebase.getRightDistance()); */
+    double l = dfLeft.calculate(Drivebase.getLeftDistance());
+    double r = dfRight.calculate(Drivebase.getRightDistance());
 
     double gyro_heading = Drivebase.getGyroRotation();    // Assuming the gyro is giving a value in degrees
     double desired_heading = Pathfinder.r2d(dfLeft.getHeading());  // Should also be in degrees
@@ -72,7 +72,7 @@ public class PathfinderTest1 extends Command {
     double angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);
     double turn = -0.05 * angleDifference;
 
-  //  Drivebase.tank(l+turn, r-turn);
+    Drivebase.tank(l+turn, r-turn);
 
   }
 
