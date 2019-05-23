@@ -20,6 +20,7 @@ import frc.robot.Constants;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.utility.DummyPIDOutput;
 
@@ -70,7 +71,7 @@ public class Drivebase extends Subsystem {
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
 
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTimeoutms);
-    mDrive_Left_Master.setSensorPhase(true);
+    mDrive_Left_Master.setSensorPhase(false);
     mDrive_Left_Master.configMotionCruiseVelocity(Constants.kDriveCruiseVelo);
     mDrive_Left_Master.configMotionAcceleration(Constants.kDriveAccel);
 
@@ -95,7 +96,7 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master.config_kF(0, Constants.Drive_kF);
     
     mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
-    mDrive.setSafetyEnabled(true);
+    mDrive.setSafetyEnabled(false);
     
     mShifter_Low = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_Low_ID);
     mShifter_High = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_High_ID);
@@ -195,7 +196,7 @@ public class Drivebase extends Subsystem {
   }
   public static void motionmagic(double leftTarget, double rightTarget, double turnoutput) {
     mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.5);
-    mDrive_Right_Master.set(ControlMode.MotionMagic, -rightTarget, DemandType.ArbitraryFeedForward, turnoutput*0.5);
+    mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.5);
   }
   public static void setBrake() {
     mDrive_Left_Master.setNeutralMode(NeutralMode.Brake);

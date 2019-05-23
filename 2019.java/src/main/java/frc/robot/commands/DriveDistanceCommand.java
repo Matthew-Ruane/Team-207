@@ -28,8 +28,10 @@ public class DriveDistanceCommand extends Command {
   public DriveDistanceCommand(double DesiredDistance, PIDGains gains) {
     Drivebase.zeroLeftEncoder();
     Drivebase.zeroRightEncoder();
-    leftdistance = DesiredDistance + Drivebase.leftEncoderZero;
-    rightdistance = DesiredDistance + Drivebase.rightEncoderZero;
+    /* leftdistance = DesiredDistance + Drivebase.leftEncoderZero;
+    rightdistance = DesiredDistance + Drivebase.rightEncoderZero; */
+    leftdistance = 500000;
+    rightdistance = 500000;
     this.gains = gains;
     maxOutput = 0;
     // Use requires() here to declare subsystem dependencies
@@ -49,12 +51,12 @@ public class DriveDistanceCommand extends Command {
     maxOutputStep = gains.getMaxOutputStep();
     Drivebase.PIDturn.enable();
     
-    Drivebase.motionmagic(leftdistance, rightdistance, Drivebase.getTurnOutput());
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
+    Drivebase.motionmagic(leftdistance, rightdistance, Drivebase.getTurnOutput());
   }
 
   // Make this return true when this Command no longer needs to run execute()
