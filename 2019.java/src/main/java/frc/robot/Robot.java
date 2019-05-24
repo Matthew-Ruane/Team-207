@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.subsystems.*;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.AutoRoutines.*;
 
 public class Robot extends TimedRobot {
   
@@ -17,8 +18,8 @@ public class Robot extends TimedRobot {
   Rangefinder rangefinder = Rangefinder.getInstance();
   
 
-  Command m_autonomousCommand;
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
+  Command autonomousCommand;
+  SendableChooser<Command> autoProgram = new SendableChooser<>();
 
   /**
    * This function is run when the robot is first started up and should be
@@ -31,9 +32,11 @@ public class Robot extends TimedRobot {
     Elevator.zeroElevatorEncoder();
     Drivebase.DisableVoltComp();
     Drivebase.setCoast();
-    //m_chooser.setDefaultOption("Default Auto", new ExampleCommand());
-    // chooser.addOption("My Auto", new MyAutoCommand());
-    //SmartDashboard.putData("Auto mode", m_chooser);
+
+    autoProgram.addDefault("TestAuto1", new TestAuto1());
+    autoProgram.addObject("TestAuto2", new TestAuto1());
+
+    SmartDashboard.putData("Selected Auto", autoProgram);
   }
 
   /**
@@ -81,18 +84,18 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_chooser.getSelected();
+    autonomousCommand = autoProgram.getSelected();
 
-    /*
-     * String autoSelected = SmartDashboard.getString("Auto Selector",
-     * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
-     * = new MyAutoCommand(); break; case "Default Auto": default:
-     * autonomousCommand = new ExampleCommand(); break; }
-     */
+    
+    /*   String autoSelected = SmartDashboard.getString("Auto Selector",
+      "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
+      = new MyAutoCommand(); break; case "Default Auto": default:
+      autonomousCommand = new ExampleCommand(); break; } */
+     
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.start();
+    if (autonomousCommand != null) {
+      autonomousCommand.start();
     }
   }
 
@@ -110,8 +113,8 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
     Drivebase.setBrake();
   }
