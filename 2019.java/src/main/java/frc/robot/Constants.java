@@ -66,7 +66,7 @@ public class Constants {
     public static final boolean On = true;
     public static final boolean Off = false;
 
-    // Robot physical layout
+    /* Pathfinder Constants below */
     public static final int encoderTicksPerRevolution = 6542;  // careful when using in math -- this is an int!
     // Imperial versions
     public static final double wheelbase_in = 26.5;       // wheelbase, in inches

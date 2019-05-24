@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorPositions;
 
 public class HatchModeCommand extends Command {
   public HatchModeCommand() {
@@ -10,7 +11,7 @@ public class HatchModeCommand extends Command {
   @Override
   protected void initialize() {
     Elevator.SetHatchMode();
-    Elevator.SetElevatorPosition();
+    Elevator.SetElevatorPosition(Elevator.GetElevatorPosition(), Elevator.getMode());
   }
 
   @Override

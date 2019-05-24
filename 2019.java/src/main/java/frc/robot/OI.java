@@ -2,6 +2,9 @@ package frc.robot;
 
 import frc.robot.Input.*;
 import frc.robot.commands.*;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorModes;
+import frc.robot.subsystems.Elevator.ElevatorPositions;
 import frc.utility.PIDGains;
 import frc.robot.Constants;
 
@@ -21,13 +24,13 @@ public class OI {
         //cargo shooting control
         RightStick.getButtonTrigger().whenPressed(new ShootCargoCommand());
         //gamepad methods to move elevator to different positions
-        Gamepad.getButtonA().whenPressed(new RocketBottomCommand());
-        Gamepad.getButtonB().whenPressed(new RocketMidCommand());
-        Gamepad.getButtonY().whenPressed(new RocketTopCommand());
-        Gamepad.getButtonX().whenPressed(new CargoshipCommand());
+        Gamepad.getButtonA().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_BOTTOM, Elevator.getMode()));
+        Gamepad.getButtonB().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_MID, Elevator.getMode()));
+        Gamepad.getButtonY().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_TOP, Elevator.getMode()));
+        Gamepad.getButtonX().whenPressed(new ElevatorCommand(ElevatorPositions.CARGO_SHIP, Elevator.getMode()));
         //Fallback Gamepad method to switch between ball and hatch mode
-        Gamepad.getButtonBack().whenPressed(new CargoModeCommand());
-        Gamepad.getButtonStart().whenPressed(new HatchModeCommand());
+        Gamepad.getButtonBack().whenPressed(new ElevatorCommand(Elevator.GetElevatorPosition(), ElevatorModes.CARGO));
+        Gamepad.getButtonStart().whenPressed(new ElevatorCommand(Elevator.GetElevatorPosition(), ElevatorModes.HATCH));
         //Toggling extension of tray with left trigger
         LeftStick.getButtonTrigger().whenPressed(new TrayExtensionToggle());
         //zeroing Elevator encoder and NavX yaw gyro

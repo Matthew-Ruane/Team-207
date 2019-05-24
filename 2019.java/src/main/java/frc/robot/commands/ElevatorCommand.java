@@ -3,12 +3,17 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorModes;
 import frc.robot.subsystems.Elevator.ElevatorPositions;
 
 
-public class RocketTopCommand extends Command {
+public class ElevatorCommand extends Command {
+  ElevatorPositions position;
+  ElevatorModes mode;
 
-  public RocketTopCommand() {
+  public ElevatorCommand(ElevatorPositions Position, ElevatorModes Mode) {
+    position = Position;
+    mode = Mode;
   }
 
   @Override
@@ -18,8 +23,7 @@ public class RocketTopCommand extends Command {
 
   @Override
   protected void execute() {
-    Elevator.DesiredPosition = ElevatorPositions.ROCKET_TOP;
-    Elevator.SetElevatorPosition();
+    Elevator.SetElevatorPosition(position, mode);
   }
 
   @Override

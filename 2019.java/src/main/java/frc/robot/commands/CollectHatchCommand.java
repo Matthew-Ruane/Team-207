@@ -16,14 +16,12 @@ public class CollectHatchCommand extends Command {
   }
 
   @Override
-  protected void initialize() {    
-    Elevator.DesiredPosition = ElevatorPositions.COLLECT;
-    Elevator.Mode = ElevatorModes.HATCH;
+  protected void initialize() {
     Tray.StopIntakeCargo();
     Tray.TalonsRelease();
     Tray.ExtendTray();
     Constants.WantHatch = true;
-    Elevator.SetElevatorPosition();
+    Elevator.SetElevatorPosition(ElevatorPositions.COLLECT, ElevatorModes.HATCH);
   }
 
   @Override

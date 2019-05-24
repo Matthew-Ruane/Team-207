@@ -59,15 +59,26 @@ public class Elevator extends Subsystem {
       mElevator_Slave.setInverted(false);
       mElevator_Slave.set(ControlMode.Follower, RobotMap.mElevator_Master_ID);
     }
-    public static void SetElevatorPosition() {
+    public static void SetElevatorPosition(ElevatorPositions position, ElevatorModes mode) {
+        DesiredPosition = position;
+        Mode = mode;
         Constants.kPosition = Constants.kEncoderTicksPerInch*Elevator.getTargetHeight();
         mElevator_Master.set(ControlMode.MotionMagic, Constants.kPosition);
+    }
+    public static ElevatorPositions GetElevatorPosition() {
+      return DesiredPosition;
     }
     public static void SetCargoMode() {
         Mode = ElevatorModes.CARGO;
     }
     public static void SetHatchMode() {
         Mode = ElevatorModes.HATCH;
+    }
+    public static void SetMode(ElevatorModes mode) {
+      Mode = mode;
+    }
+    public static ElevatorModes getMode() {
+      return Mode;
     }
     public static void zeroElevatorEncoder() {
         mElevator_Master.setSelectedSensorPosition(0);

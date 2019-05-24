@@ -21,10 +21,8 @@ public class CollectCargoCommand extends Command {
     Tray.UpdateLoadState();
     if (Constants.CARGO_STATE == Constants.CARGO_STATE_UNLOADED) {
         Tray.ExtendTray();
-        Elevator.DesiredPosition = ElevatorPositions.COLLECT;
-        Elevator.Mode = ElevatorModes.CARGO;
         Tray.IntakeCargo();
-        Elevator.SetElevatorPosition();
+        Elevator.SetElevatorPosition(ElevatorPositions.COLLECT, ElevatorModes.CARGO);
     }
   }
 
@@ -38,8 +36,7 @@ public class CollectCargoCommand extends Command {
       if (Constants.CARGO_STATE == Constants.CARGO_STATE_LOADED) {
         Tray.StopIntakeCargo();
         Tray.RetractTray();
-        Elevator.DesiredPosition = ElevatorPositions.ROCKET_BOTTOM;
-        Elevator.SetElevatorPosition();
+        Elevator.SetElevatorPosition(ElevatorPositions.ROCKET_BOTTOM, ElevatorModes.CARGO);
         return true;
       }
       else {

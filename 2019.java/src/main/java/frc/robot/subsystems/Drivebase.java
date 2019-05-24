@@ -160,6 +160,14 @@ public class Drivebase extends Subsystem {
     mDrive_Right_B.enableVoltageCompensation(false);
     mDrive_Right_C.enableVoltageCompensation(false);
   }
+  public static void StopDrivetrain() {
+    mDrive_Left_Master.set(ControlMode.PercentOutput, 0.0);
+    mDrive_Left_B.set(ControlMode.PercentOutput, 0.0);
+    mDrive_Left_C.set(ControlMode.PercentOutput, 0.0);
+    mDrive_Right_Master.set(ControlMode.PercentOutput, 0.0);
+    mDrive_Right_B.set(ControlMode.PercentOutput, 0.0);
+    mDrive_Right_C.set(ControlMode.PercentOutput, 0.0);
+  }
   /** @param currentHeading Gyro heading to reset to, in degrees*/
 	public static void setGyroRotation(double currentHeading) {
 		// set yawZero to gyro angle, offset to currentHeading
@@ -217,8 +225,6 @@ public class Drivebase extends Subsystem {
     SmartDashboard.putNumber("right encoder", getrightEncoder());
     SmartDashboard.putNumber("Left encoder rate", getLeftVelocity());
     SmartDashboard.putNumber("right encoder rate", getRightVelocity());
-    SmartDashboard.putNumber("left", left);
-    SmartDashboard.putNumber("right", right);
   }
   public static int getCurrentGear() {
     return Constants.CURRENT_GEAR;
