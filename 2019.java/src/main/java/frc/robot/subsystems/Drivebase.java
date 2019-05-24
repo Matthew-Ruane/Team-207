@@ -59,7 +59,7 @@ public class Drivebase extends Subsystem {
   private static double yawZero = 0;
   public static AHRS ahrs;
 
-  public static MultiPIDController PIDturn;
+  public static PIDController PIDturn;
 
 
   public Drivebase() {
@@ -108,11 +108,11 @@ public class Drivebase extends Subsystem {
 
     PIDturnOutput = new DummyPIDOutput();
 
-    PIDturn = new MultiPIDController(Constants.TurnGains, ahrs, PIDturnOutput, 0.02, "PIDturn");
-    PIDturn.setMaxOutput(0.65);
+    PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, ahrs, PIDturnOutput);
     PIDturn.setInputRange(-180.0,  180.0);
+    PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
-    PIDturn.setToleranceBuffer(10);
+    PIDturn.setToleranceBuffer(100);
     PIDturn.setContinuous(true);
   }
   public static void UpShift() {
@@ -125,15 +125,12 @@ public class Drivebase extends Subsystem {
     mShifter_Low.set(Constants.On);
     Constants.CURRENT_GEAR = Constants.LOW_GEAR;
   }
-  public static void arcade() {
-    mDrive.arcadeDrive(OI.getLeftThrottleInput(), OI.getRightSteeringInputInverted());
-  }
   public static void tank(double left, double right) {
     mDrive.tankDrive(left, right);
   }
-  public static void curvature() {
-    TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(OI.getLeftSteeringInputInverted(), 3)+(1-Constants.kTurnrateCurve) * OI.getLeftSteeringInputInverted() * Constants.kTurnrateLimit);
-    mDrive.curvatureDrive(OI.getRightThrottleInput(), TurnrateCurved, true);
+  public static void curvature(double throttleaxis, double turnaxis) {
+    TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(turnaxis, 3)+(1-Constants.kTurnrateCurve) *turnaxis*Constants.kTurnrateLimit);
+    mDrive.curvatureDrive(throttleaxis, TurnrateCurved, true);
   }
   /*   
   Begin NavX specific Content*/
@@ -163,11 +160,7 @@ public class Drivebase extends Subsystem {
     mDrive_Right_B.enableVoltageCompensation(false);
     mDrive_Right_C.enableVoltageCompensation(false);
   }
-      	/**
-	 * Resets the gyro position in software to a specified angle
-	 * 
-	 /*
-	 @param currentHeading Gyro heading to reset to, in degrees*/
+  /** @param currentHeading Gyro heading to reset to, in degrees*/
 	public static void setGyroRotation(double currentHeading) {
 		// set yawZero to gyro angle, offset to currentHeading
     yawZero = -ahrs.getAngle() - currentHeading;
@@ -184,19 +177,15 @@ public class Drivebase extends Subsystem {
     angle = (angle > 180) ? (angle - 360) : angle;
     return angle;
   }
-  /* Methods for locking heading and drive to setpoints.  Tuning *probably okay* as of 5/7/19  uses xxx.enable() and xxx.disable to start.  Config set in class constructor. */
-  public static void RotateToAngle() {
+  public static void pidTurn() {
     tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
-  }
-  public static void StopRotateToAngle() {
-    PIDturn.disable();
   }
   public static double getTurnOutput() {
     return PIDturnOutput.getOutput();
   }
   public static void motionmagic(double leftTarget, double rightTarget, double turnoutput) {
-    mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.5);
-    mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.5);
+    mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.1);
+    mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.1);
   }
   public static void setBrake() {
     mDrive_Left_Master.setNeutralMode(NeutralMode.Brake);
@@ -215,19 +204,15 @@ public class Drivebase extends Subsystem {
     mDrive_Right_C.setNeutralMode(NeutralMode.Coast);
   }
   public static double DistanceInchesToTicks (double desiredDistanceInches) {
-    desiredDistanceTicks = desiredDistanceInches*347.22;
+    desiredDistanceTicks = desiredDistanceInches*Constants.encoderTicksPerInch;
     return desiredDistanceTicks;
-  }
-  public static void setMMSetpoint (int setpoint) {
-    mDrive_Left_Master.setSelectedSensorPosition(setpoint, 0, Constants.kTimeoutms);
-    mDrive_Right_Master.setSelectedSensorPosition(setpoint, 0, Constants.kTimeoutms);
   }
   public static void resetEncoders() {
     mDrive_Left_Master.setSelectedSensorPosition(0, 0, Constants.kTimeoutms);
     mDrive_Right_Master.setSelectedSensorPosition(0, 0, Constants.kTimeoutms);
   }
   public static void ReportData() {
-    SmartDashboard.putNumber(   "IMU_Yaw", ahrs.getYaw());
+    SmartDashboard.putNumber("IMU_Yaw", ahrs.getYaw());
     SmartDashboard.putNumber("Left encoder", getleftEncoder());
     SmartDashboard.putNumber("right encoder", getrightEncoder());
     SmartDashboard.putNumber("Left encoder rate", getLeftVelocity());

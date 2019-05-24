@@ -32,11 +32,11 @@ public class OI {
         LeftStick.getButtonTrigger().whenPressed(new TrayExtensionToggle());
         //zeroing Elevator encoder and NavX yaw gyro
         LeftStick.getButton9().whenPressed(new ZeroGyro());
-        LeftStick.getButton7().whenPressed(new DriveDistanceCommand(100.0, Constants.TurnGains));
+        LeftStick.getButton7().whenPressed(new DriveDistanceCommand(100.0));
         }
 
         public static double getLeftThrottleInput() {
-            return RightStick.getYAxis();
+            return LeftStick.getYAxis();
         }
         public static double getRightThrottleInput() {
             return RightStick.getYAxis();
@@ -45,10 +45,10 @@ public class OI {
             return LeftStick.getXAxis();
         }
         public static double getRightSteeringInput() {
-            return LeftStick.getXAxis();
+            return RightStick.getXAxis();
         }
         public static double getLeftThrottleInputInverted() {
-            return RightStick.getYAxisInverted();
+            return LeftStick.getYAxisInverted();
         }
         public static double getRightThrottleInputInverted() {
             return RightStick.getYAxisInverted();
@@ -57,6 +57,6 @@ public class OI {
             return LeftStick.getXAxisInverted();
         }
         public static double getRightSteeringInputInverted() {
-            return LeftStick.getXAxisInverted();
+            return RightStick.getXAxisInverted();
         }
 }

@@ -49,7 +49,7 @@ public class Constants {
     public static double Drive_kF = 0.0;
     public static int kDriveCruiseVelo = 20000;
     public static int kDriveAccel = 10000;
-    public static double kToleranceDistance = 347;
+    public static double kToleranceDistance = 3000;
     public static double TurnOutputMin = 0.2;
     public static double kTurnrateCurve = 0.1;
     public static double kTurnrateLimit = 0.8;
@@ -59,7 +59,6 @@ public class Constants {
     public static double Turn_kI = 0.0;
     public static double Turn_kD = 0.0;
     public static double Turn_kF = 0.0;
-    public static final PIDGains TurnGains = new PIDGains(Turn_kP, Turn_kI, Turn_kD, Turn_kF, 0.8, 0.02, 0.1,"TurnGains");
 
     public static int DesiredDistance;
     public static double DesiredHeading;
@@ -73,7 +72,7 @@ public class Constants {
     public static final double wheelbase_in = 26.5;       // wheelbase, in inches
     public static final double wheel_diameter_in = 4.0;   // wheel diamater, in inches
     public static final double wheel_distance_in_per_tick = wheel_diameter_in*Math.PI/encoderTicksPerRevolution; //Wheel distance traveled per encoder tick, in inche
-    public static final double encoderTicksPerInch = 1388.88; // 347.22*4;
+    public static final double encoderTicksPerInch = 1950.0; // 347.22*4;
     public static final double max_velocity_ips = 165.0;   // max robot velocity, in inches per second
     public static final double max_acceleration_ipsps = 80.0;  // max robot acceleration, in inches per second per second
     public static final double max_jerk_ipspsps = 2400.0;  // max robot jerk, in inches per second per second per second

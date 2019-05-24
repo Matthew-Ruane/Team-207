@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Drivebase;
-import frc.utility.PIDGains;
 import frc.robot.Constants;
 
 public class DriveDistanceCommand extends Command {
@@ -22,86 +21,59 @@ public class DriveDistanceCommand extends Command {
   private int moving = 1;
   private boolean timerflag = Constants.Off;
   private Drivebase drivebase;
-  private double distance, heading, tolerance, maxOutput, maxOutputStep, maxOutputMax, leftdistance, rightdistance;
-  private PIDGains gains;
+  private double distance, lowerbound, upperbound, leftdistance, rightdistance;
   
-  public DriveDistanceCommand(double DesiredDistance, PIDGains gains) {
+  public DriveDistanceCommand(double DesiredDistance) {
+    distance = DesiredDistance;
     Drivebase.zeroLeftEncoder();
     Drivebase.zeroRightEncoder();
-    /* leftdistance = DesiredDistance + Drivebase.leftEncoderZero;
-    rightdistance = DesiredDistance + Drivebase.rightEncoderZero; */
-    leftdistance = 500000;
-    rightdistance = 500000;
-    this.gains = gains;
-    maxOutput = 0;
-    // Use requires() here to declare subsystem dependencies
-    // eg. requires(chassis);
+    leftdistance = Drivebase.DistanceInchesToTicks(distance) + Drivebase.leftEncoderZero;
+    rightdistance = Drivebase.DistanceInchesToTicks(distance) + Drivebase.rightEncoderZero;
+    lowerbound = Drivebase.DistanceInchesToTicks(distance)-Constants.kToleranceDistance;
+    upperbound = Drivebase.DistanceInchesToTicks(distance)-Constants.kToleranceDistance;
   }
-
-  // Called just before this Command runs the first time
   @Override
   protected void initialize() {
     Drivebase.EnableVoltComp();
     Drivebase.zeroGyroRotation();
     Drivebase.PIDturn.setSetpoint(Drivebase.getGyroRotation());
-
-    state = moving;
-    maxOutput = gains.getMinStartOutput();
-    maxOutputMax = gains.getMaxOutput();
-    maxOutputStep = gains.getMaxOutputStep();
     Drivebase.PIDturn.enable();
-    
+    state = moving;
   }
-
-  // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
     Drivebase.motionmagic(leftdistance, rightdistance, Drivebase.getTurnOutput());
   }
-
-  // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    /* if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && state == moving) {
+    if (Drivebase.getLeftDistance() >= lowerbound && Drivebase.getLeftDistance() <= upperbound && state == moving) {
       state = holding;
       return false;
     }
-    if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && state == holding && timerflag == Constants.Off) {
+    if (Drivebase.getLeftDistance() >= lowerbound && Drivebase.getLeftDistance() <= upperbound && state == holding && timerflag == Constants.Off) {
       timer.start();
       timerflag = Constants.On;
       return false;
     }
-    if (Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget() && state == holding && timer.get() >= 1.0) {
+    if (Drivebase.getLeftDistance() >= lowerbound && Drivebase.getLeftDistance() <= upperbound && state == holding && timer.get() >= 1.0) {
       timer.stop();
       timer.reset();
       timerflag = Constants.Off;
       return true;
     }
-    if (!Drivebase.PIDleft.onTarget() || !Drivebase.PIDright.onTarget() && timer.get() > 1.0) {
+    if (!(Drivebase.getLeftDistance() >= lowerbound) || !(Drivebase.getLeftDistance() <= upperbound) && timer.get() > 1.0) {
       timer.reset();
       return false;
     }
     else {
       return false;
-    } 
-    if (Drivebase.PIDturn.onTarget() && Drivebase.PIDleft.onTarget() || Drivebase.PIDright.onTarget()) {
-      return true;
     }
-    else {
-      return false;
-    } */
-    return false;
   }
-
-  // Called once after isFinished returns true
   @Override
   protected void end() {
     Drivebase.DisableVoltComp();
     Drivebase.PIDturn.reset();
   }
-
-  // Called when another command which requires one or more of the same
-  // subsystems is scheduled to run
   @Override
   protected void interrupted() {
     Drivebase.PIDturn.reset();
