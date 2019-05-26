@@ -25,12 +25,11 @@ public class DriveDistanceCommand extends Command {
   
   public DriveDistanceCommand(double DesiredDistance) {
     distance = DesiredDistance;
+    Constants.DesiredDistance = distance;
     Drivebase.zeroLeftEncoder();
     Drivebase.zeroRightEncoder();
     leftdistance = Drivebase.DistanceInchesToTicks(distance) + Drivebase.leftEncoderZero;
     rightdistance = Drivebase.DistanceInchesToTicks(distance) + Drivebase.rightEncoderZero;
-    lowerbound = Drivebase.DistanceInchesToTicks(distance)-Constants.kToleranceDistance;
-    upperbound = Drivebase.DistanceInchesToTicks(distance)-Constants.kToleranceDistance;
   }
   @Override
   protected void initialize() {
@@ -46,22 +45,22 @@ public class DriveDistanceCommand extends Command {
   }
   @Override
   protected boolean isFinished() {
-    if (Drivebase.getLeftDistance() >= lowerbound && Drivebase.getLeftDistance() <= upperbound && state == moving) {
+    if (Drivebase.onTargetDistance(leftdistance) && state == moving) {
       state = holding;
       return false;
     }
-    if (Drivebase.getLeftDistance() >= lowerbound && Drivebase.getLeftDistance() <= upperbound && state == holding && timerflag == Constants.Off) {
+    if (Drivebase.onTargetDistance(leftdistance) && state == holding && timerflag == Constants.Off) {
       timer.start();
       timerflag = Constants.On;
       return false;
     }
-    if (Drivebase.getLeftDistance() >= lowerbound && Drivebase.getLeftDistance() <= upperbound && state == holding && timer.get() >= 1.0) {
+    if (Drivebase.onTargetDistance(leftdistance) && state == holding && timer.get() >= 1.0) {
       timer.stop();
       timer.reset();
       timerflag = Constants.Off;
       return true;
     }
-    if (!(Drivebase.getLeftDistance() >= lowerbound) || !(Drivebase.getLeftDistance() <= upperbound) && timer.get() > 1.0) {
+    if (!Drivebase.onTargetDistance(leftdistance) && timer.get() > 1.0) {
       timer.reset();
       return false;
     }
