@@ -20,7 +20,7 @@ public class DriveDistanceCommand extends Command {
   private int holding = 0;
   private int moving = 1;
   private boolean timerflag = Constants.Off;
-  private double distance, LeftDistanceTarget, RightDistanceTarget, distanceTraveled;
+  private double distance, LeftDistanceTarget, RightDistanceTarget, distanceTraveled, heading;
   
   public DriveDistanceCommand(double DesiredDistance) {
     distance = DesiredDistance;
@@ -33,7 +33,9 @@ public class DriveDistanceCommand extends Command {
   @Override
   protected void initialize() {
     Drivebase.zeroGyroRotation();
-    Drivebase.PIDturn.setSetpoint(Drivebase.getGyroRotation());
+    heading = Drivebase.getGyroRotation();
+    Drivebase.PIDturn.setSetpoint(heading);
+    SmartDashboard.putNumber("driveheading", heading);
     Drivebase.PIDturn.enable();
     Constants.TurnOutput = Drivebase.getTurnOutput();
     state = moving;
