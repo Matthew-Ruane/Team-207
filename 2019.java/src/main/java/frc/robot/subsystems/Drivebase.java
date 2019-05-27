@@ -195,6 +195,7 @@ public class Drivebase extends Subsystem {
     mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.1);
     mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.1);
   }
+  /** @param current must be pulled directly from actively updating source, generally from getLeftDistance or getRightDistance */
   public static boolean onTargetDistance(double target, double current) {
     lowerbound = target - Constants.kToleranceDistance;
     upperbound = target - Constants.kToleranceDistance;

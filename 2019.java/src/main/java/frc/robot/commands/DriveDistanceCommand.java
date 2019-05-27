@@ -1,10 +1,6 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
+/* 
+** If you fuck with my source I'll kill you
+*/
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -20,7 +16,7 @@ public class DriveDistanceCommand extends Command {
   private int holding = 0;
   private int moving = 1;
   private boolean timerflag = Constants.Off;
-  private double distance, LeftDistanceTarget, RightDistanceTarget, distanceTraveled, heading;
+  private double distance, LeftDistanceTarget, RightDistanceTarget, displacement, heading;
   
   public DriveDistanceCommand(double DesiredDistance) {
     distance = DesiredDistance;
@@ -35,7 +31,7 @@ public class DriveDistanceCommand extends Command {
     Drivebase.zeroGyroRotation();
     heading = Drivebase.getGyroRotation();
     Drivebase.PIDturn.setSetpoint(heading);
-    SmartDashboard.putNumber("driveheading", heading);
+    SmartDashboard.putNumber("setheading", heading);
     Drivebase.PIDturn.enable();
     Constants.TurnOutput = Drivebase.getTurnOutput();
     state = moving;
@@ -47,23 +43,23 @@ public class DriveDistanceCommand extends Command {
   }
   @Override
   protected boolean isFinished() {
-    distanceTraveled = Drivebase.getLeftDistance();
-    if (Drivebase.onTargetDistance(LeftDistanceTarget, distanceTraveled) && state == moving) {
+    displacement = Drivebase.getLeftDistance();
+    if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) && state == moving) {
       state = holding;
       return false;
     }
-    if (Drivebase.onTargetDistance(LeftDistanceTarget, distanceTraveled) && state == holding && timerflag == Constants.Off) {
+    if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) && state == holding && timerflag == Constants.Off) {
       timer.start();
       timerflag = Constants.On;
       return false;
     }
-    if (Drivebase.onTargetDistance(LeftDistanceTarget, distanceTraveled) && state == holding && timer.get() >= 1.0) {
+    if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) && state == holding && timer.get() >= 1.0) {
       timer.stop();
       timer.reset();
       timerflag = Constants.Off;
       return true;
     }
-    if (!Drivebase.onTargetDistance(LeftDistanceTarget, distanceTraveled) && timer.get() > 1.0) {
+    if (!Drivebase.onTargetDistance(LeftDistanceTarget, displacement) && timer.get() > 1.0) {
       timer.reset();
       return false;
     }
