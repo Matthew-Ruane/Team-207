@@ -16,7 +16,6 @@ import frc.robot.Constants;
 
 public class RotateToAngle extends Command {
 
-  private Drivebase drivebase;
   private double heading;
 
   public RotateToAngle(double DesiredHeading) {
@@ -28,7 +27,6 @@ public class RotateToAngle extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    Drivebase.EnableVoltComp();
     Drivebase.PIDturn.setSetpoint(heading);
     Drivebase.PIDturn.enable();
   }
@@ -49,7 +47,6 @@ public class RotateToAngle extends Command {
   @Override
   protected void end() {
     Drivebase.PIDturn.reset();
-    Drivebase.DisableVoltComp();
   }
 
   // Called when another command which requires one or more of the same
@@ -57,7 +54,6 @@ public class RotateToAngle extends Command {
   @Override
   protected void interrupted() {
     Drivebase.PIDturn.reset();
-    Drivebase.DisableVoltComp();
     cancel();
   }
 }

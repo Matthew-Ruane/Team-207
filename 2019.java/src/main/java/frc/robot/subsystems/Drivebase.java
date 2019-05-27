@@ -37,7 +37,7 @@ public class Drivebase extends Subsystem {
 
   private static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
 
-  private static double left, right;
+  private static double left, right, lowerbound, upperbound, target;
 
   public static DifferentialDrive mDrive;
 
@@ -195,6 +195,16 @@ public class Drivebase extends Subsystem {
     mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.1);
     mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.1);
   }
+  public static boolean onTargetDistance(double target, double current) {
+    lowerbound = target - Constants.kToleranceDistance;
+    upperbound = target - Constants.kToleranceDistance;
+    if (lowerbound <= current && current <= upperbound) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
   public static void setBrake() {
     mDrive_Left_Master.setNeutralMode(NeutralMode.Brake);
     mDrive_Left_B.setNeutralMode(NeutralMode.Brake);
@@ -277,7 +287,11 @@ public class Drivebase extends Subsystem {
 	}
 	public static double getRightDistance() {
 		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
-	}
+  }
+  public static void resetPosition() {
+    resetEncoders();
+    ahrs.reset();
+  }
   @Override
   public void initDefaultCommand() {
   }

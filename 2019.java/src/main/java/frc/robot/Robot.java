@@ -27,7 +27,6 @@ public class Robot extends TimedRobot {
     m_oi.registerControls();
     Elevator.zeroElevatorEncoder();
     Drivebase.setCoast();
-    Drivebase.EnableVoltComp();
 
     autoProgram.addDefault("TestAuto1", new TestAuto1());
     autoProgram.addObject("TestAuto2", new TestAuto1());
@@ -78,6 +77,7 @@ public class Robot extends TimedRobot {
   }
   @Override
   public void autonomousPeriodic() {
+    Drivebase.resetPosition();
     Scheduler.getInstance().run();
   }
   @Override

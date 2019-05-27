@@ -53,6 +53,7 @@ public class Constants {
     public static double TurnOutputMin = 0.2;
     public static double kTurnrateCurve = 0.1;
     public static double kTurnrateLimit = 0.8;
+    public static double LeftDistanceTarget, RightDistanceTarget, TurnOutput;
 
     public static double kToleranceDegrees = 3;
     public static double Turn_kP = 0.15;
@@ -60,7 +61,7 @@ public class Constants {
     public static double Turn_kD = 0.0;
     public static double Turn_kF = 0.0;
 
-    public static int DesiredDistance;
+    public static double DesiredDistance;
     public static double DesiredHeading;
     
     public static final boolean On = true;
