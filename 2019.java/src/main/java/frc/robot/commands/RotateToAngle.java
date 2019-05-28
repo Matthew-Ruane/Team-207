@@ -17,9 +17,15 @@ import frc.robot.Constants;
 public class RotateToAngle extends Command {
 
   private double heading;
+  private Timer timer;
+  private int state;
+  private int holding = 0;
+  private int moving = 1;
+  private boolean timerflag = Constants.Off;
 
   public RotateToAngle(double DesiredHeading) {
     heading = DesiredHeading;
+    timer = new Timer();
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
   }
@@ -40,9 +46,31 @@ public class RotateToAngle extends Command {
   // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    //return Drivebase.PIDturn.onTarget();
-    return false;
+    if (Drivebase.PIDturn.onTarget() && state == moving) {
+      state = holding;
+      return false;
+    }
+    if (Drivebase.PIDturn.onTarget() && state == holding && timerflag == Constants.Off) {
+      timer.start();
+      timerflag = Constants.On;
+      return false;
+    }
+    if (Drivebase.PIDturn.onTarget() && state == holding && timer.get() >= 1.0) {
+      timer.stop();
+      timer.reset();
+      timerflag = Constants.Off;
+      return true;
+
+    }
+    if (!Drivebase.PIDturn.onTarget() && timer.get() > 1.0) {
+      timer.reset();
+      return false;
+
+    }
+    else {
+      return false;
   }
+}
 
   // Called once after isFinished returns true
   @Override
