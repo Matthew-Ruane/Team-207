@@ -280,7 +280,7 @@ public class Drivebase extends Subsystem {
   }
   /* Returns distance in inches */
 	public static double getLeftDistance() {
-		return mDrive_Left_Master.getSelectedSensorPosition()*Constants.encoderTicksPerInch;
+		return getLeftEncoderTicks()*Constants.encoderTicksPerInch;
 	}
 	public static double getRightDistance() {
 		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
