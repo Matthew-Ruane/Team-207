@@ -31,7 +31,7 @@ public class DriveDistanceCommand extends Command {
   protected void initialize() {
     Drivebase.zeroGyroRotation();
     heading = Drivebase.getGyroRotation();
-    Drivebase.PIDturn.setSetpoint(0.0);
+    Drivebase.PIDturn.setSetpoint(heading);
     SmartDashboard.putNumber("setheading", heading);
     Drivebase.PIDturn.enable();
     state = moving;
@@ -44,7 +44,9 @@ public class DriveDistanceCommand extends Command {
   }
   @Override
   protected boolean isFinished() {
-    displacement = Drivebase.getLeftDistance();
+    displacement = Drivebase.getLeftEncoderTicks();
+    SmartDashboard.putNumber("displacement", displacement);
+    SmartDashboard.putNumber("leftdistance", LeftDistanceTarget);
     if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == moving) {
       state = holding;
       return false;
@@ -71,6 +73,7 @@ public class DriveDistanceCommand extends Command {
   @Override
   protected void end() {
     Drivebase.PIDturn.reset();
+    SmartDashboard.putString("Finished", "");
   }
   @Override
   protected void interrupted() {

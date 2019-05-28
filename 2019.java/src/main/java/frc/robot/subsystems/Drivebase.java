@@ -273,16 +273,14 @@ public class Drivebase extends Subsystem {
 		rightEncoderZero = mDrive_Right_Master.getSelectedSensorPosition(0);
 	}
 	public static int getLeftEncoderTicks() {
-    zeroLeftEncoder();
 		return mDrive_Left_Master.getSelectedSensorPosition(0) - leftEncoderZero;
 	}
 	public static int getRightEncoderTicks() {
-    zeroRightEncoder();
 		return mDrive_Right_Master.getSelectedSensorPosition(0) - rightEncoderZero;
   }
   /* Returns distance in inches */
 	public static double getLeftDistance() {
-		return getLeftEncoderTicks()*Constants.encoderTicksPerInch;
+		return mDrive_Left_Master.getSelectedSensorPosition()*Constants.encoderTicksPerInch;
 	}
 	public static double getRightDistance() {
 		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
