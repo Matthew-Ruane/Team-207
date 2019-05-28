@@ -55,10 +55,10 @@ public class Constants {
     public static double kTurnrateLimit = 0.8;
     public static double LeftDistanceTarget, RightDistanceTarget, TurnOutput;
 
-    public static double kToleranceDegrees = 3;
-    public static double Turn_kP = 0.15;
+    public static double kToleranceDegrees = 2;
+    public static double Turn_kP = 0.1;
     public static double Turn_kI = 0.0;
-    public static double Turn_kD = 0.0;
+    public static double Turn_kD = 0.2;
     public static double Turn_kF = 0.0;
 
     public static double DesiredDistance;

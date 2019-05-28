@@ -108,11 +108,10 @@ public class Drivebase extends Subsystem {
 
     PIDturnOutput = new DummyPIDOutput();
 
-    PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, ahrs, PIDturnOutput);
+    PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, Constants.Turn_kF, ahrs, PIDturnOutput);
     PIDturn.setInputRange(-180.0,  180.0);
     PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
-    PIDturn.setToleranceBuffer(100);
     PIDturn.setContinuous(true);
   }
   public static void UpShift() {
@@ -129,7 +128,7 @@ public class Drivebase extends Subsystem {
     mDrive.tankDrive(left, right);
   }
   public static void curvature(double throttleaxis, double turnaxis) {
-    TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(turnaxis, 3)+(1-Constants.kTurnrateCurve) *turnaxis*Constants.kTurnrateLimit);
+    TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(turnaxis, 3)+(1-Constants.kTurnrateCurve)*turnaxis*Constants.kTurnrateLimit);
     mDrive.curvatureDrive(throttleaxis, TurnrateCurved, true);
   }
   /*   
@@ -162,11 +161,7 @@ public class Drivebase extends Subsystem {
   }
   public static void StopDrivetrain() {
     mDrive_Left_Master.set(ControlMode.PercentOutput, 0.0);
-    mDrive_Left_B.set(ControlMode.PercentOutput, 0.0);
-    mDrive_Left_C.set(ControlMode.PercentOutput, 0.0);
     mDrive_Right_Master.set(ControlMode.PercentOutput, 0.0);
-    mDrive_Right_B.set(ControlMode.PercentOutput, 0.0);
-    mDrive_Right_C.set(ControlMode.PercentOutput, 0.0);
   }
   /** @param currentHeading Gyro heading to reset to, in degrees*/
 	public static void setGyroRotation(double currentHeading) {
@@ -186,7 +181,9 @@ public class Drivebase extends Subsystem {
     return angle;
   }
   public static void pidTurn() {
-    tank(-PIDturnOutput.getOutput(), PIDturnOutput.getOutput());
+    left = -PIDturnOutput.getOutput();
+    right = PIDturnOutput.getOutput();
+    tank(left, right);
   }
   public static double getTurnOutput() {
     return PIDturnOutput.getOutput();

@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
   }
   @Override
   public void teleopPeriodic() {
-    Drivebase.curvature(OI.getLeftThrottleInput(), OI.getRightSteeringInput());
+    Drivebase.curvature(OI.getLeftThrottleInput(), OI.getRightSteeringInputInverted());
     Scheduler.getInstance().run();
     
   }

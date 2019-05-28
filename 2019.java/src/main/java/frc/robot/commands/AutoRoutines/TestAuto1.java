@@ -21,7 +21,7 @@ public class TestAuto1 extends CommandGroup {
     Drivebase.resetEncoders();
     Drivebase.zeroYaw();
 
-    addSequential(new RotateToAngle(90));
+    addSequential(new RotateToAngle(150.0));
     //addSequential(new DriveDistanceCommand(50));
     //addSequential(new RotateToAngle(0));
     //addSequential(new DriveDistanceCommand(50));
