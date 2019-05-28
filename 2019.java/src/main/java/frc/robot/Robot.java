@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
     Drivebase.setCoast();
 
     autoProgram.addDefault("TestAuto1", new TestAuto1());
-    autoProgram.addObject("TestAuto2", new TestAuto1());
+    //autoProgram.addObject("TestAuto2", new TestAuto1());
 
     SmartDashboard.putData("Selected Auto", autoProgram);
   }
@@ -69,6 +69,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    
+    Drivebase.resetPosition();
     autonomousCommand = autoProgram.getSelected();
 
     if (autonomousCommand != null) {
@@ -77,7 +79,6 @@ public class Robot extends TimedRobot {
   }
   @Override
   public void autonomousPeriodic() {
-    Drivebase.resetPosition();
     Scheduler.getInstance().run();
   }
   @Override

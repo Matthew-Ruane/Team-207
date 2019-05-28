@@ -22,9 +22,9 @@ public class TestAuto1 extends CommandGroup {
     Drivebase.zeroYaw();
 
     addSequential(new RotateToAngle(90));
-    addSequential(new DriveDistanceCommand(50));
-    addSequential(new RotateToAngle(0));
-    addSequential(new DriveDistanceCommand(50));
+    //addSequential(new DriveDistanceCommand(50));
+    //addSequential(new RotateToAngle(0));
+    //addSequential(new DriveDistanceCommand(50));
 
 
     // Add Commands here:

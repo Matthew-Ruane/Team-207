@@ -16,50 +16,51 @@ public class DriveDistanceCommand extends Command {
   private int holding = 0;
   private int moving = 1;
   private boolean timerflag = Constants.Off;
-  private double distance, LeftDistanceTarget, RightDistanceTarget, displacement, heading;
+  private double distance, LeftDistanceTarget, RightDistanceTarget, displacement, heading, TurnOutput;
   
   public DriveDistanceCommand(double DesiredDistance) {
+    timer = new Timer();
     distance = DesiredDistance;
     Constants.DesiredDistance = distance;
     Drivebase.zeroLeftEncoder();
     Drivebase.zeroRightEncoder();
-    Constants.LeftDistanceTarget = Drivebase.DistanceInchesToTicks(distance) + Drivebase.leftEncoderZero;
-    Constants.RightDistanceTarget = Drivebase.DistanceInchesToTicks(distance) + Drivebase.rightEncoderZero;
+    LeftDistanceTarget = Drivebase.DistanceInchesToTicks(distance) + Drivebase.leftEncoderZero;
+    RightDistanceTarget = Drivebase.DistanceInchesToTicks(distance) + Drivebase.rightEncoderZero;
   }
   @Override
   protected void initialize() {
     Drivebase.zeroGyroRotation();
     heading = Drivebase.getGyroRotation();
-    Drivebase.PIDturn.setSetpoint(heading);
+    Drivebase.PIDturn.setSetpoint(0.0);
     SmartDashboard.putNumber("setheading", heading);
     Drivebase.PIDturn.enable();
-    Constants.TurnOutput = Drivebase.getTurnOutput();
     state = moving;
-    Drivebase.motionmagic(LeftDistanceTarget, RightDistanceTarget, Constants.TurnOutput);
   }
   @Override
   protected void execute() {
-    Constants.TurnOutput = Drivebase.getTurnOutput();
+    TurnOutput = Drivebase.getTurnOutput();
+    Drivebase.motionmagic(LeftDistanceTarget, RightDistanceTarget, TurnOutput);
+    SmartDashboard.putNumber("testturn", TurnOutput);
   }
   @Override
   protected boolean isFinished() {
     displacement = Drivebase.getLeftDistance();
-    if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) && state == moving) {
+    if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == moving) {
       state = holding;
       return false;
     }
-    if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) && state == holding && timerflag == Constants.Off) {
+    else if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == holding && timerflag == Constants.Off) {
       timer.start();
       timerflag = Constants.On;
       return false;
     }
-    if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) && state == holding && timer.get() >= 1.0) {
+    else if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == holding && timer.get() >= 1.0) {
       timer.stop();
       timer.reset();
       timerflag = Constants.Off;
       return true;
     }
-    if (!Drivebase.onTargetDistance(LeftDistanceTarget, displacement) && timer.get() > 1.0) {
+    else if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == false && timer.get() > 1.0) {
       timer.reset();
       return false;
     }
@@ -73,7 +74,7 @@ public class DriveDistanceCommand extends Command {
   }
   @Override
   protected void interrupted() {
-    Drivebase.PIDturn.reset();
-    cancel();
+/*     Drivebase.PIDturn.reset();
+    cancel(); */
   }
 }

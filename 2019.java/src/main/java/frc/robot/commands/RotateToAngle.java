@@ -46,6 +46,7 @@ public class RotateToAngle extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
+    Drivebase.StopDrivetrain();
     Drivebase.PIDturn.reset();
   }
 

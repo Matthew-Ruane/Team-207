@@ -197,9 +197,9 @@ public class Drivebase extends Subsystem {
   }
   /** @param current must be pulled directly from actively updating source, generally from getLeftDistance or getRightDistance */
   public static boolean onTargetDistance(double target, double current) {
-    lowerbound = target - Constants.kToleranceDistance;
-    upperbound = target - Constants.kToleranceDistance;
-    if (lowerbound <= current && current <= upperbound) {
+    lowerbound = Math.abs(target) - Constants.kToleranceDistance;
+    upperbound = Math.abs(target) + Constants.kToleranceDistance;
+    if (lowerbound <= Math.abs(current) && Math.abs(current) <= upperbound) {
       return true;
     }
     else {
@@ -236,6 +236,7 @@ public class Drivebase extends Subsystem {
     SmartDashboard.putNumber("right encoder", getrightEncoder());
     SmartDashboard.putNumber("Left encoder rate", getLeftVelocity());
     SmartDashboard.putNumber("right encoder rate", getRightVelocity());
+    SmartDashboard.putNumber("turnoutput", getTurnOutput());
   }
   public static int getCurrentGear() {
     return Constants.CURRENT_GEAR;
