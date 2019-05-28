@@ -76,6 +76,7 @@ public class RotateToAngle extends Command {
   @Override
   protected void end() {
     Drivebase.StopDrivetrain();
+    Drivebase.PIDturn.disable();
     Drivebase.PIDturn.reset();
   }
 
