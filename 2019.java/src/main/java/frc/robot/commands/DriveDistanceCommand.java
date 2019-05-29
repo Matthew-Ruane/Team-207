@@ -23,7 +23,6 @@ public class DriveDistanceCommand extends Command {
     distance = DesiredDistance;
     timerflag = Constants.Off;
     turn = Constants.On;
-    Constants.DesiredDistance = distance;
     //Drivebase.zeroLeftEncoder();
     //Drivebase.zeroRightEncoder();
     Drivebase.resetEncoders();
@@ -42,14 +41,8 @@ public class DriveDistanceCommand extends Command {
   }
   @Override
   protected void execute() {
-    if (turn == Constants.On) {
-      TurnOutput = Drivebase.getTurnOutput();
-    }
-    else {
-      TurnOutput = 0;
-    }
+    TurnOutput = Drivebase.getTurnOutput();
     Drivebase.motionmagic(LeftDistanceTarget, RightDistanceTarget, TurnOutput);
-    SmartDashboard.putNumber("testturn", TurnOutput);
   }
   @Override
   protected boolean isFinished() {
@@ -58,9 +51,6 @@ public class DriveDistanceCommand extends Command {
     SmartDashboard.putNumber("leftdistance", LeftDistanceTarget);
     if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == moving) {
       state = holding;
-      Drivebase.PIDturn.disable();
-      TurnOutput = 0;
-      turn = Constants.Off;
       return false;
     }
     else if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == holding && timerflag == Constants.Off) {
@@ -87,7 +77,6 @@ public class DriveDistanceCommand extends Command {
     Drivebase.PIDturn.disable();
     Drivebase.PIDturn.reset();
     Drivebase.StopDrivetrain();
-    SmartDashboard.putString("Finished", "");
   }
   @Override
   protected void interrupted() {
