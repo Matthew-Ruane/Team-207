@@ -21,6 +21,8 @@ import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
 
+import org.usfirst.frc330.wpilibj.MultiPIDController;
+
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.utility.DummyPIDOutput;
 
@@ -110,7 +112,7 @@ public class Drivebase extends Subsystem {
 
     PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, Constants.Turn_kF, ahrs, PIDturnOutput, 0.02);
     PIDturn.setInputRange(-180.0,  180.0);
-    PIDturn.setOutputRange(-0.6, 0.6);
+    PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
     PIDturn.setContinuous(true);
   }

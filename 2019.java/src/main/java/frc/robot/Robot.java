@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     Scheduler.getInstance().run();
+    SmartDashboard.putData("PIDturn", Drivebase.PIDturn);
   }
   @Override
   public void teleopInit() {
