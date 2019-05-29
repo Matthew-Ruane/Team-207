@@ -108,9 +108,9 @@ public class Drivebase extends Subsystem {
 
     PIDturnOutput = new DummyPIDOutput();
 
-    PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, Constants.Turn_kF, ahrs, PIDturnOutput);
+    PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, Constants.Turn_kF, ahrs, PIDturnOutput, 0.02);
     PIDturn.setInputRange(-180.0,  180.0);
-    PIDturn.setOutputRange(-0.65, 0.65);
+    PIDturn.setOutputRange(-0.6, 0.6);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
     PIDturn.setContinuous(true);
   }

@@ -22,12 +22,10 @@ public class DriveDistanceCommand extends Command {
     timer = new Timer();
     distance = DesiredDistance;
     timerflag = Constants.Off;
-    turn = Constants.On;
-    //Drivebase.zeroLeftEncoder();
-    //Drivebase.zeroRightEncoder();
-    Drivebase.resetEncoders();
-    LeftDistanceTarget = Drivebase.DistanceInchesToTicks(distance);// + Drivebase.leftEncoderZero;
-    RightDistanceTarget = Drivebase.DistanceInchesToTicks(distance);// + Drivebase.rightEncoderZero;
+    Drivebase.zeroLeftEncoder();
+    Drivebase.zeroRightEncoder();
+    LeftDistanceTarget = Drivebase.DistanceInchesToTicks(distance) + Math.abs(Drivebase.leftEncoderZero);
+    RightDistanceTarget = Drivebase.DistanceInchesToTicks(distance) + Math.abs(Drivebase.rightEncoderZero);
     SmartDashboard.putNumber("lefttarget", LeftDistanceTarget);
     SmartDashboard.putNumber("righttarget", RightDistanceTarget);
   }
