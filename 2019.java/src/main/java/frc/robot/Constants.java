@@ -58,11 +58,10 @@ public class Constants {
     public static double LeftDistanceTarget, RightDistanceTarget, TurnOutput;
 
     public static double kToleranceDegrees = 2.0;
-    public static double Turn_kP = 0.17; // 025
-    public static double Turn_kI = 0.045; //0025
-    public static double Turn_kD = 1.1; // .02
+    public static double Turn_kP = 0.17;
+    public static double Turn_kI = 0.045;
+    public static double Turn_kD = 1.1;
     public static double Turn_kF = 0.0;
-    //public static PIDGains TurnGains = new PIDGains(Turn_kP, Turn_kI, Turn_kD, Turn_kF,  0.8, 0.001, 0.0, "Turn");
     public static double DesiredDistance;
     public static double DesiredHeading;
     
