@@ -4,6 +4,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.WaitCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Drivebase;
@@ -18,53 +19,46 @@ public class DriveDistanceCommand extends Command {
   private boolean timerflag, turn;
   private double distance, LeftDistanceTarget, RightDistanceTarget, displacement, heading, TurnOutput;
   
-  public DriveDistanceCommand(double DesiredDistance) {
+  public DriveDistanceCommand(double DesiredDistance, double DesiredHeading) {
     timer = new Timer();
-    distance = DesiredDistance;
+    this.distance = DesiredDistance;
+    this.heading = DesiredHeading;
+
+  }
+  @Override
+  protected void initialize() {
     timerflag = Constants.Off;
     Drivebase.zeroLeftEncoder();
     Drivebase.zeroRightEncoder();
     LeftDistanceTarget = Drivebase.DistanceInchesToTicks(distance) + Math.abs(Drivebase.leftEncoderZero);
     RightDistanceTarget = Drivebase.DistanceInchesToTicks(distance) + Math.abs(Drivebase.rightEncoderZero);
-    SmartDashboard.putNumber("lefttarget", LeftDistanceTarget);
-    SmartDashboard.putNumber("righttarget", RightDistanceTarget);
-  }
-  @Override
-  protected void initialize() {
-    heading = Drivebase.getYaw();
     Drivebase.PIDturn.setSetpoint(heading);
     SmartDashboard.putNumber("setheading", heading);
+    SmartDashboard.putNumber("this.distance", distance);
+    SmartDashboard.putNumber("lefttarget", LeftDistanceTarget);
+    SmartDashboard.putNumber("righttarget", RightDistanceTarget);
     Drivebase.PIDturn.enable();
     state = moving;
   }
   @Override
   protected void execute() {
     TurnOutput = Drivebase.getTurnOutput();
+    displacement = Drivebase.getLeftEncoderTicks();
     Drivebase.motionmagic(LeftDistanceTarget, RightDistanceTarget, TurnOutput);
   }
   @Override
   protected boolean isFinished() {
-    displacement = Drivebase.getLeftEncoderTicks();
     SmartDashboard.putNumber("displacement", displacement);
     SmartDashboard.putNumber("leftdistance", LeftDistanceTarget);
-    if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == moving) {
-      state = holding;
-      return false;
-    }
-    else if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == holding && timerflag == Constants.Off) {
+    if (Drivebase.onTargetDistance(Drivebase.DistanceInchesToTicks(distance), displacement) == true && timerflag == Constants.Off) {
       timer.start();
       timerflag = Constants.On;
       return false;
     }
-    else if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == true && state == holding && timer.get() >= 1.0) {
+    if (timer.get() > 0.3) {
       timer.stop();
       timer.reset();
-      timerflag = Constants.Off;
       return true;
-    }
-    else if (Drivebase.onTargetDistance(LeftDistanceTarget, displacement) == false && timer.get() > 1.0) {
-      timer.reset();
-      return false;
     }
     else {
       return false;

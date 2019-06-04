@@ -7,7 +7,7 @@ import java.util.Arrays;
  */
 
 
-class RingBuffer {
+public class RingBuffer {
     final int bufferSize;
     private int[] valueBuffer;
     private long[] timeBuffer;

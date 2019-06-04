@@ -50,17 +50,17 @@ public class Constants {
     public static double Drive_kD = 0.0;
     public static double Drive_kF = 0.0;
     public static int kDriveCruiseVelo = 30000;
-    public static int kDriveAccel = 20000;
+    public static int kDriveAccel = 25000;
     public static double kToleranceDistance = 1000;
     public static double TurnOutputMin = 0.2;
     public static double kTurnrateCurve = 0.1;
     public static double kTurnrateLimit = 0.8;
     public static double LeftDistanceTarget, RightDistanceTarget, TurnOutput;
 
-    public static double kToleranceDegrees = 2.0;
-    public static double Turn_kP = 0.17;
-    public static double Turn_kI = 0.045;
-    public static double Turn_kD = 1.1;
+    public static double kToleranceDegrees = 5.0;
+    public static double Turn_kP = 0.1;
+    public static double Turn_kI = 0.0;
+    public static double Turn_kD = 0.35;
     public static double Turn_kF = 0.0;
     public static double DesiredDistance;
     public static double DesiredHeading;

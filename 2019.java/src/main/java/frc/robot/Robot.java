@@ -8,6 +8,7 @@ import frc.robot.subsystems.*;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.AutoRoutines.*;
+import frc.utility.*;
 
 public class Robot extends TimedRobot {
   
@@ -16,6 +17,7 @@ public class Robot extends TimedRobot {
   Elevator elevator = Elevator.getInstance();
   Tray tray = Tray.getInstance();
   Rangefinder rangefinder = Rangefinder.getInstance();
+  RingBuffer shiftbuffer = new RingBuffer(16, 0);
   
 
   Command autonomousCommand;
@@ -41,6 +43,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     Drivebase.ReportData();
+    shiftbuffer.Record((Math.abs(Drivebase.getLeftVelocity())+Math.abs(Drivebase.getRightVelocity())));
+    SmartDashboard.putNumber("rateoversamples", shiftbuffer.RateOverSamples(10));
   }
   @Override
   public void disabledInit() {

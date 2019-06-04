@@ -191,8 +191,8 @@ public class Drivebase extends Subsystem {
     return PIDturnOutput.getOutput();
   }
   public static void motionmagic(double leftTarget, double rightTarget, double turnoutput) {
-    mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.1);
-    mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*0.1);
+    mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*.75);
+    mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*.75);
   }
   /** @param current must be pulled directly from actively updating source, generally from getLeftDistance or getRightDistance */
   public static boolean onTargetDistance(double target, double current) {
@@ -246,10 +246,10 @@ public class Drivebase extends Subsystem {
   public static int getrightEncoder() {
     return mDrive_Right_Master.getSelectedSensorPosition(0);
   }
-  public static double getLeftVelocity() {
+  public static int getLeftVelocity() {
 		return mDrive_Left_Master.getSelectedSensorVelocity(0);
 	}
-	public static double getRightVelocity() {
+	public static int getRightVelocity() {
 		return mDrive_Right_Master.getSelectedSensorVelocity(0);
   }
   public void calcXY() {
@@ -269,16 +269,16 @@ public class Drivebase extends Subsystem {
 		return y;
   }
 	public static void zeroLeftEncoder() {
-    leftEncoderZero = mDrive_Left_Master.getSelectedSensorPosition(0);
+    leftEncoderZero = Math.abs(mDrive_Left_Master.getSelectedSensorPosition(0));
 	}
 	public static void zeroRightEncoder() {
-		rightEncoderZero = mDrive_Right_Master.getSelectedSensorPosition(0);
+		rightEncoderZero = Math.abs(mDrive_Right_Master.getSelectedSensorPosition(0));
 	}
 	public static int getLeftEncoderTicks() {
-		return mDrive_Left_Master.getSelectedSensorPosition(0) - leftEncoderZero;
+		return Math.abs(mDrive_Left_Master.getSelectedSensorPosition(0)) - leftEncoderZero;
 	}
 	public static int getRightEncoderTicks() {
-		return mDrive_Right_Master.getSelectedSensorPosition(0) - rightEncoderZero;
+		return Math.abs(mDrive_Right_Master.getSelectedSensorPosition(0)) - rightEncoderZero;
   }
   /* Returns distance in inches */
 	public static double getLeftDistance() {
