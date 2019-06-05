@@ -45,9 +45,9 @@ public class Constants {
     public static final int Elevator_MotionCruiseVelo = 15000;
     public static final int kTimeoutms = 10;
 
-    public static double Drive_kP = 0.01;
+    public static double Drive_kP = 0.0001;
     public static double Drive_kI = 0.0;
-    public static double Drive_kD = 0.025;
+    public static double Drive_kD = 0.001;
     public static double Drive_kF = 0.0;
     public static int kDriveCruiseVelo = 30000;
     public static int kDriveAccel = 25000;
