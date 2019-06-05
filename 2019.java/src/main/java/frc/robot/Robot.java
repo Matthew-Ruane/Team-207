@@ -43,8 +43,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     Drivebase.ReportData();
-    shiftbuffer.Record((Math.abs(Drivebase.getLeftVelocity())+Math.abs(Drivebase.getRightVelocity())));
-    SmartDashboard.putNumber("rateoversamples", shiftbuffer.GetBufferAverage());
   }
   @Override
   public void disabledInit() {
@@ -73,7 +71,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    
+    Drivebase.setCoast();
     Drivebase.resetPosition();
     autonomousCommand = autoProgram.getSelected();
 
@@ -85,6 +83,8 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     Scheduler.getInstance().run();
     SmartDashboard.putData("PIDturn", Drivebase.PIDturn);
+    SmartDashboard.putData("PIDleft", Drivebase.PIDleft);
+    SmartDashboard.putData("PIDright", Drivebase.PIDright);
   }
   @Override
   public void teleopInit() {

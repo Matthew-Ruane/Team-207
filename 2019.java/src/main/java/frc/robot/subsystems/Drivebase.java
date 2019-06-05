@@ -45,7 +45,7 @@ public class Drivebase extends Subsystem {
 
   private static Solenoid mShifter_High, mShifter_Low;
 
-  private static DummyPIDOutput PIDturnOutput;
+  public static DummyPIDOutput PIDturnOutput, PIDleftOutput, PIDrightOutput;
 
   public static int leftEncoderZero = 0;
   public static int rightEncoderZero = 0;
@@ -61,7 +61,9 @@ public class Drivebase extends Subsystem {
   private static double yawZero = 0;
   public static AHRS ahrs;
 
-  public static PIDController PIDturn;
+  public static PIDController PIDturn, PIDleft, PIDright;
+
+  public static Encoder leftEncoder, rightEncoder;
 
 
   public Drivebase() {
@@ -71,6 +73,9 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_A_ID);
     mDrive_Right_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_B_ID);
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
+
+    leftEncoder = new Encoder(3, 4, true, EncodingType.k4X);
+    rightEncoder = new Encoder(1, 2, false, EncodingType.k4X);
 
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTimeoutms);
     mDrive_Left_Master.setSensorPhase(false);
@@ -109,12 +114,17 @@ public class Drivebase extends Subsystem {
     ahrs = new AHRS(SerialPort.Port.kMXP);
 
     PIDturnOutput = new DummyPIDOutput();
+    PIDleftOutput = new DummyPIDOutput();
+    PIDrightOutput = new DummyPIDOutput();
 
     PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, Constants.Turn_kF, ahrs, PIDturnOutput, 0.02);
     PIDturn.setInputRange(-180.0,  180.0);
     PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
     PIDturn.setContinuous(true);
+
+    PIDleft = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kF, leftEncoder, PIDleftOutput, 0.02);
+    PIDright = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kF, rightEncoder, PIDrightOutput, 0.02);
   }
   public static void UpShift() {
     mShifter_High.set(Constants.On);
@@ -164,6 +174,10 @@ public class Drivebase extends Subsystem {
   public static void StopDrivetrain() {
     mDrive_Left_Master.set(ControlMode.PercentOutput, 0.0);
     mDrive_Right_Master.set(ControlMode.PercentOutput, 0.0);
+    PIDleft.reset();
+    PIDright.reset();
+    leftEncoder.reset();
+    rightEncoder.reset();
   }
   /** @param currentHeading Gyro heading to reset to, in degrees*/
 	public static void setGyroRotation(double currentHeading) {
@@ -186,6 +200,10 @@ public class Drivebase extends Subsystem {
     left = -PIDturnOutput.getOutput();
     right = PIDturnOutput.getOutput();
     tank(left, right);
+  }
+  public static void pidDrive(double left, double right, double turnInput) {
+    mDrive_Left_Master.set(-left - turnInput);
+    mDrive_Right_Master.set(right + turnInput);
   }
   public static double getTurnOutput() {
     return PIDturnOutput.getOutput();
