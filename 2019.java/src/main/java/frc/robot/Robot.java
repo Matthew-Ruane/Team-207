@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     Drivebase.ReportData();
     shiftbuffer.Record((Math.abs(Drivebase.getLeftVelocity())+Math.abs(Drivebase.getRightVelocity())));
-    SmartDashboard.putNumber("rateoversamples", shiftbuffer.RateOverSamples(10));
+    SmartDashboard.putNumber("rateoversamples", shiftbuffer.GetBufferAverage());
   }
   @Override
   public void disabledInit() {
