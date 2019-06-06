@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.subsystems.*;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.AutoRoutines.*;
 import frc.utility.*;
+import frc.robot.commands.Auto.*;
 
 public class Robot extends TimedRobot {
   
@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
     Elevator.zeroElevatorEncoder();
     Drivebase.setCoast();
 
-    autoProgram.addDefault("TestAuto1", new TestAuto1());
+    //autoProgram.addDefault("TestAuto1", new TestA());
     //autoProgram.addObject("TestAuto2", new TestAuto1());
 
     SmartDashboard.putData("Selected Auto", autoProgram);

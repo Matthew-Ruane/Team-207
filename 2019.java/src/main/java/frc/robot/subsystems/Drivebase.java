@@ -51,20 +51,23 @@ public class Drivebase extends Subsystem {
   public static int leftEncoderZero = 0;
   public static int rightEncoderZero = 0;
 
+  protected static final int kVelocityControlSlot = 0;
+  protected static final int kBaseLockControlSlot = 1;
+
   private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, 
                         prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks,
                         TurnrateCurved;
 
-  public enum DriveControlState {OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL }
+  public static enum DriveControlState {OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL }
   
-  private DriveControlState driveControlState_;
+  private static DriveControlState driveControlState_;
   
-  private VelocityHeadingSetpoint velocityHeadingSetpoint_;
+  private static VelocityHeadingSetpoint velocityHeadingSetpoint_;
 
   private static double setAngle = 0;
   private static double desiredAngle = 0;
   
-  private double mLastHeadingErrorDegrees;
+  private static double mLastHeadingErrorDegrees;
 
 
   private static double yawZero = 0;
@@ -74,8 +77,8 @@ public class Drivebase extends Subsystem {
 
   public static Encoder leftEncoder, rightEncoder;
 
-  private AdaptivePurePursuitController pathFollowingController_;
-  private SynchronousPID velocityHeadingPid_;
+  private static AdaptivePurePursuitController pathFollowingController_;
+  private static SynchronousPID velocityHeadingPid_;
 
 
   public Drivebase() {
@@ -85,9 +88,6 @@ public class Drivebase extends Subsystem {
     mDrive_Right_Master = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_A_ID);
     mDrive_Right_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_B_ID);
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
-
-    leftEncoder = new Encoder(3, 4, true, EncodingType.k4X);
-    rightEncoder = new Encoder(1, 2, false, EncodingType.k4X);
 
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTimeoutms);
     mDrive_Left_Master.setSensorPhase(false);
@@ -104,15 +104,20 @@ public class Drivebase extends Subsystem {
     mDrive_Right_B.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
     mDrive_Right_C.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
 
-    mDrive_Left_Master.config_kP(0, Constants.Drive_kP);
-    mDrive_Left_Master.config_kI(0, Constants.Drive_kI);
-    mDrive_Left_Master.config_kD(0, Constants.Drive_kD);
-    mDrive_Left_Master.config_kF(0, Constants.Drive_kF);
+    mDrive_Left_Master.config_kP(kVelocityControlSlot, Constants.kDriveVelocityKp);
+    mDrive_Left_Master.config_kI(kVelocityControlSlot, Constants.kDriveVelocityKi);
+    mDrive_Left_Master.config_kD(kVelocityControlSlot, Constants.kDriveVelocityKd);
+    mDrive_Left_Master.config_kF(kVelocityControlSlot, Constants.kDriveVelocityKf);
+    mDrive_Left_Master.config_IntegralZone(kVelocityControlSlot, Constants.Drive_kIzone);
 
-    mDrive_Right_Master.config_kP(0, Constants.Drive_kP);
-    mDrive_Right_Master.config_kI(0, Constants.Drive_kI);
-    mDrive_Right_Master.config_kD(0, Constants.Drive_kD);
-    mDrive_Right_Master.config_kF(0, Constants.Drive_kF);
+    mDrive_Right_Master.config_kP(kVelocityControlSlot, Constants.kDriveVelocityKp);
+    mDrive_Right_Master.config_kI(kVelocityControlSlot, Constants.kDriveVelocityKi);
+    mDrive_Right_Master.config_kD(kVelocityControlSlot, Constants.kDriveVelocityKd);
+    mDrive_Right_Master.config_kF(kVelocityControlSlot, Constants.kDriveVelocityKf);
+    mDrive_Right_Master.config_IntegralZone(kVelocityControlSlot, Constants.Drive_kIzone);
+
+    velocityHeadingPid_ = new SynchronousPID(Constants.kDriveHeadingVelocityKp, Constants.kDriveHeadingVelocityKi, Constants.kDriveHeadingVelocityKd);
+    velocityHeadingPid_.setOutputRange(-30, 30);
     
     mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
     mDrive.setSafetyEnabled(false);
@@ -126,8 +131,6 @@ public class Drivebase extends Subsystem {
     ahrs = new AHRS(SerialPort.Port.kMXP);
 
     PIDturnOutput = new DummyPIDOutput();
-    PIDleftOutput = new DummyPIDOutput();
-    PIDrightOutput = new DummyPIDOutput();
 
     PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, Constants.Turn_kF, ahrs, PIDturnOutput, 0.02);
     PIDturn.setInputRange(-180.0,  180.0);
@@ -169,7 +172,7 @@ public synchronized void setVelocityHeadingSetpoint(double forward_inches_per_se
             headingSetpoint);
     updateVelocityHeadingSetpoint();
 }
-public synchronized void followPath(Path path, boolean reversed) {
+public static synchronized void followPath(Path path, boolean reversed) {
   if (driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
       configureTalonsForSpeedControl();
       driveControlState_ = DriveControlState.PATH_FOLLOWING_CONTROL;
@@ -179,10 +182,21 @@ public synchronized void followPath(Path path, boolean reversed) {
           Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed, 0.25);
   updatePathFollower();
 }
-  private void configureTalonsForSpeedControl() {
-    /* ADD THINGS HERE */
-    }
-    private synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+private static void configureTalonsForSpeedControl() {
+  if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL
+          && driveControlState_ != DriveControlState.VELOCITY_SETPOINT
+          && driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
+      mDrive_Left_Master.set(ControlMode.Velocity, 0.0);
+      mDrive_Left_Master.selectProfileSlot(kVelocityControlSlot, 0);
+      mDrive_Left_Master.configAllowableClosedloopError(0, Constants.kDriveVelocityAllowableError);
+      mDrive_Right_Master.set(ControlMode.Velocity, 0.0);
+      mDrive_Right_Master.selectProfileSlot(kVelocityControlSlot, 0);
+      mDrive_Right_Master.configAllowableClosedloopError(0, Constants.kDriveVelocityAllowableError);
+      DownShift();
+      setBrake();
+      }
+  }
+    private static synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
       if (driveControlState_ == DriveControlState.VELOCITY_HEADING_CONTROL
               || driveControlState_ == DriveControlState.VELOCITY_SETPOINT
               || driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL) {
@@ -194,10 +208,10 @@ public synchronized void followPath(Path path, boolean reversed) {
           mDrive_Right_Master.set(0);
       }
   }
-  public synchronized Rotation2d getGyroAngle() {
+  public static synchronized Rotation2d getGyroAngle() {
     return Rotation2d.fromDegrees(ahrs.getAngle());
 }
-  private void updateVelocityHeadingSetpoint() {
+  private static void updateVelocityHeadingSetpoint() {
       Rotation2d actualGyroAngle = getGyroAngle();
 
       mLastHeadingErrorDegrees = velocityHeadingSetpoint_.getHeading().rotateBy(actualGyroAngle.inverse())
@@ -207,7 +221,7 @@ public synchronized void followPath(Path path, boolean reversed) {
       updateVelocitySetpoint(velocityHeadingSetpoint_.getLeftSpeed() + deltaSpeed / 2,
               velocityHeadingSetpoint_.getRightSpeed() - deltaSpeed / 2);
   }
-  private void updatePathFollower() {
+  public static void updatePathFollower() {
     RigidTransform2d robot_pose = RobotState.getInstance().getLatestFieldToVehicle().getValue();
     RigidTransform2d.Delta command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
     Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
@@ -220,6 +234,10 @@ public synchronized void followPath(Path path, boolean reversed) {
         double scaling = Constants.kPathFollowingMaxVel / max_vel;
         setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
     }
+}
+public static synchronized boolean isFinishedPath() {
+  return (driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL && pathFollowingController_.isDone())
+          || driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL;
 }
 private static double rotationsToInches(double rotations) {
   return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
@@ -290,16 +308,8 @@ private static double inchesPerSecondToRpm(double inches_per_second) {
     right = PIDturnOutput.getOutput();
     tank(left, right);
   }
-  public static void pidDrive(double left, double right, double turnInput) {
-    mDrive_Left_Master.set(-left - turnInput);
-    mDrive_Right_Master.set(right + turnInput);
-  }
   public static double getTurnOutput() {
     return PIDturnOutput.getOutput();
-  }
-  public static void motionmagic(double leftTarget, double rightTarget, double turnoutput) {
-    mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*.75);
-    mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*.75);
   }
   /** @param current must be pulled directly from actively updating source, generally from getLeftDistance or getRightDistance */
   public static boolean onTargetDistance(double target, double current) {
@@ -359,22 +369,7 @@ private static double inchesPerSecondToRpm(double inches_per_second) {
 	public static int getRightVelocity() {
 		return mDrive_Right_Master.getSelectedSensorVelocity(0);
   }
-  public void calcXY() {
-		 leftEncoderDistance  = getLeftDistance();
-		 rightEncoderDistance = getRightDistance();
-		 gyroAngle = getAngle();
-		 distance = ((leftEncoderDistance - prevLeftEncoderDistance) + (rightEncoderDistance - prevRightEncoderDistance))/2;
-		 x = x + distance * Math.sin(Math.toRadians(gyroAngle));
-		 y = y + distance * Math.cos(Math.toRadians(gyroAngle));
-		 prevLeftEncoderDistance  = leftEncoderDistance;
-		 prevRightEncoderDistance = rightEncoderDistance;
-  }
-  public double getX() {
-		return x;
-	}
-	public double getY() {
-		return y;
-  }
+  
 	public static void zeroLeftEncoder() {
     leftEncoderZero = Math.abs(mDrive_Left_Master.getSelectedSensorPosition(0));
 	}
