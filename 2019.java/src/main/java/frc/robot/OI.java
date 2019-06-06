@@ -5,7 +5,6 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorModes;
 import frc.robot.subsystems.Elevator.ElevatorPositions;
-import frc.utility.PIDGains;
 import frc.robot.Constants;
 
 public class OI {
