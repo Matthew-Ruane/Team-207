@@ -20,8 +20,9 @@ import frc.robot.Constants;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
-
-import org.usfirst.frc330.wpilibj.MultiPIDController;
+import frc.utility.PurePursuit.*;
+import frc.robot.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.utility.DummyPIDOutput;
@@ -61,9 +62,12 @@ public class Drivebase extends Subsystem {
   private static double yawZero = 0;
   public static AHRS ahrs;
 
-  public static PIDController PIDturn, PIDleft, PIDright;
+  public static PIDController PIDturn;
 
   public static Encoder leftEncoder, rightEncoder;
+
+  private AdaptivePurePursuitController pathFollowingController_;
+  private SynchronousPID velocityHeadingPid_;
 
 
   public Drivebase() {
@@ -122,9 +126,6 @@ public class Drivebase extends Subsystem {
     PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
     PIDturn.setContinuous(true);
-
-    PIDleft = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kF, leftEncoder, PIDleftOutput, 0.02);
-    PIDright = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kF, rightEncoder, PIDrightOutput, 0.02);
   }
   public static void UpShift() {
     mShifter_High.set(Constants.On);
@@ -143,8 +144,85 @@ public class Drivebase extends Subsystem {
     TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(turnaxis, 3)+(1-Constants.kTurnrateCurve)*turnaxis*Constants.kTurnrateLimit);
     mDrive.curvatureDrive(throttleaxis, TurnrateCurved, true);
   }
-  /*   
-  Begin NavX specific Content*/
+  /* PURE PURSUIT */
+  public synchronized void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+    configureTalonsForSpeedControl();
+    driveControlState_ = DriveControlState.VELOCITY_SETPOINT;
+    updateVelocitySetpoint(left_inches_per_sec, right_inches_per_sec);
+}
+
+public synchronized void setVelocityHeadingSetpoint(double forward_inches_per_sec, Rotation2d headingSetpoint) {
+    if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL) {
+        configureTalonsForSpeedControl();
+        driveControlState_ = DriveControlState.VELOCITY_HEADING_CONTROL;
+        velocityHeadingPid_.reset();
+    }
+    velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, forward_inches_per_sec,
+            headingSetpoint);
+    updateVelocityHeadingSetpoint();
+}
+  public synchronized void followPath(Path path, boolean reversed) {
+        setVelocityControl(0.0, 0.0);
+        velocityHeadingPid_.reset();
+    pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead,
+            Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed, 0.25);
+    updatePathFollower();
+  }
+  private void configureTalonsForSpeedControl() {
+    /* ADD THINGS HERE */
+    }
+    private synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+      if (driveControlState_ == DriveControlState.VELOCITY_HEADING_CONTROL
+              || driveControlState_ == DriveControlState.VELOCITY_SETPOINT
+              || driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL) {
+          leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
+          rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
+      } else {
+          System.out.println("Hit a bad velocity control state");
+          leftMaster_.set(0);
+          rightMaster_.set(0);
+      }
+  }
+
+  private void updateVelocityHeadingSetpoint() {
+      Rotation2d actualGyroAngle = getGyroAngle();
+
+      mLastHeadingErrorDegrees = velocityHeadingSetpoint_.getHeading().rotateBy(actualGyroAngle.inverse())
+              .getDegrees();
+
+      double deltaSpeed = velocityHeadingPid_.calculate(mLastHeadingErrorDegrees);
+      updateVelocitySetpoint(velocityHeadingSetpoint_.getLeftSpeed() + deltaSpeed / 2,
+              velocityHeadingSetpoint_.getRightSpeed() - deltaSpeed / 2);
+  }
+  private void updatePathFollower() {
+    RigidTransform2d robot_pose = RobotState.getInstance().getLatestFieldToVehicle().getValue();
+    RigidTransform2d.Delta command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
+    Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
+
+    // Scale the command to respect the max velocity limits
+    double max_vel = 0.0;
+    max_vel = Math.max(max_vel, Math.abs(setpoint.left));
+    max_vel = Math.max(max_vel, Math.abs(setpoint.right));
+    if (max_vel > Constants.kPathFollowingMaxVel) {
+        double scaling = Constants.kPathFollowingMaxVel / max_vel;
+        setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
+    }
+}
+private static double rotationsToInches(double rotations) {
+  return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
+}
+
+private static double rpmToInchesPerSecond(double rpm) {
+  return rotationsToInches(rpm) / 60;
+}
+
+private static double inchesToRotations(double inches) {
+  return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
+}
+
+private static double inchesPerSecondToRpm(double inches_per_second) {
+  return inchesToRotations(inches_per_second) * 60;
+  /* END PURE PURSUIT */
   public static void zeroYaw() {
     ahrs.zeroYaw();
   }
@@ -154,7 +232,6 @@ public class Drivebase extends Subsystem {
   public static double getAngle() {
     return ahrs.getAngle();
   }
-  /* Enabling volt comp apparently yields better resolution in auto routines but lower max power output. voltage comp config set in talon class */
   public static void EnableVoltComp() {
     mDrive_Left_Master.enableVoltageCompensation(true);
     mDrive_Left_B.enableVoltageCompensation(true);
@@ -174,8 +251,6 @@ public class Drivebase extends Subsystem {
   public static void StopDrivetrain() {
     mDrive_Left_Master.set(ControlMode.PercentOutput, 0.0);
     mDrive_Right_Master.set(ControlMode.PercentOutput, 0.0);
-    PIDleft.reset();
-    PIDright.reset();
     leftEncoder.reset();
     rightEncoder.reset();
   }

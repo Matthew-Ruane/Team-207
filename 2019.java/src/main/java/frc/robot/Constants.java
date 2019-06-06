@@ -45,9 +45,9 @@ public class Constants {
     public static final int Elevator_MotionCruiseVelo = 15000;
     public static final int kTimeoutms = 10;
 
-    public static double Drive_kP = 0.0001;
+    public static double Drive_kP = 0.1;
     public static double Drive_kI = 0.0;
-    public static double Drive_kD = 0.001;
+    public static double Drive_kD = 0.0;
     public static double Drive_kF = 0.0;
     public static int kDriveCruiseVelo = 30000;
     public static int kDriveAccel = 25000;
@@ -64,6 +64,18 @@ public class Constants {
     public static double Turn_kF = 0.0;
     public static double DesiredDistance;
     public static double DesiredHeading;
+
+    public static double kTrackLengthInches = 8.265;
+    public static double kTrackWidthInches = 23.8;
+    public static double kTrackEffectiveDiameter = (kTrackWidthInches * kTrackWidthInches
+            + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
+    public static double kTrackScrubFactor = 0.5;
+
+    public static double kPathFollowingLookahead = 24.0; // inches
+    public static double kPathFollowingMaxVel = 120.0; // inches/sec
+    public static double kPathFollowingMaxAccel = 80.0; // inches/sec^2
+    
+    public static double kLooperDt = 0.01;
     
     public static final boolean On = true;
     public static final boolean Off = false;
