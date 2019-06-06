@@ -1,7 +1,4 @@
-/* 
-** If you fuck with my source I'll kill you
-*/
-package frc.robot.commands;
+/* package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.WaitCommand;
@@ -86,3 +83,4 @@ public class PIDtest extends Command {
   protected void interrupted() {
   }
 }
+ */

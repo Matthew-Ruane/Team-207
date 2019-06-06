@@ -70,6 +70,7 @@ public class Constants {
     public static double kTrackEffectiveDiameter = (kTrackWidthInches * kTrackWidthInches
             + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
     public static double kTrackScrubFactor = 0.5;
+    public static double kDriveWheelDiameterInches = 6;
 
     public static double kPathFollowingLookahead = 24.0; // inches
     public static double kPathFollowingMaxVel = 120.0; // inches/sec

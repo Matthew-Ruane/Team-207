@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.commands.RotateToAngle;
 import frc.robot.commands.DriveDistanceCommand;
-import frc.robot.commands.PIDtest;
 import frc.utility.*;
 
 public class TestAuto1 extends CommandGroup {
@@ -23,6 +22,5 @@ public class TestAuto1 extends CommandGroup {
     Drivebase.resetEncoders();
     Drivebase.zeroYaw();
 
-      addSequential(new PIDtest());
   }
 }

@@ -55,8 +55,16 @@ public class Drivebase extends Subsystem {
                         prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks,
                         TurnrateCurved;
 
+  public enum DriveControlState {OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL }
+  
+  private DriveControlState driveControlState_;
+  
+  private VelocityHeadingSetpoint velocityHeadingSetpoint_;
+
   private static double setAngle = 0;
   private static double desiredAngle = 0;
+  
+  private double mLastHeadingErrorDegrees;
 
 
   private static double yawZero = 0;
@@ -161,13 +169,16 @@ public synchronized void setVelocityHeadingSetpoint(double forward_inches_per_se
             headingSetpoint);
     updateVelocityHeadingSetpoint();
 }
-  public synchronized void followPath(Path path, boolean reversed) {
-        setVelocityControl(0.0, 0.0);
-        velocityHeadingPid_.reset();
-    pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead,
-            Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed, 0.25);
-    updatePathFollower();
+public synchronized void followPath(Path path, boolean reversed) {
+  if (driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
+      configureTalonsForSpeedControl();
+      driveControlState_ = DriveControlState.PATH_FOLLOWING_CONTROL;
+      velocityHeadingPid_.reset();
   }
+  pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead,
+          Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed, 0.25);
+  updatePathFollower();
+}
   private void configureTalonsForSpeedControl() {
     /* ADD THINGS HERE */
     }
@@ -175,15 +186,17 @@ public synchronized void setVelocityHeadingSetpoint(double forward_inches_per_se
       if (driveControlState_ == DriveControlState.VELOCITY_HEADING_CONTROL
               || driveControlState_ == DriveControlState.VELOCITY_SETPOINT
               || driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL) {
-          leftMaster_.set(inchesPerSecondToRpm(left_inches_per_sec));
-          rightMaster_.set(inchesPerSecondToRpm(right_inches_per_sec));
+          mDrive_Left_Master.set(inchesPerSecondToRpm(left_inches_per_sec));
+          mDrive_Right_Master.set(inchesPerSecondToRpm(right_inches_per_sec));
       } else {
           System.out.println("Hit a bad velocity control state");
-          leftMaster_.set(0);
-          rightMaster_.set(0);
+          mDrive_Left_Master.set(0);
+          mDrive_Right_Master.set(0);
       }
   }
-
+  public synchronized Rotation2d getGyroAngle() {
+    return Rotation2d.fromDegrees(ahrs.getAngle());
+}
   private void updateVelocityHeadingSetpoint() {
       Rotation2d actualGyroAngle = getGyroAngle();
 
@@ -222,6 +235,7 @@ private static double inchesToRotations(double inches) {
 
 private static double inchesPerSecondToRpm(double inches_per_second) {
   return inchesToRotations(inches_per_second) * 60;
+}
   /* END PURE PURSUIT */
   public static void zeroYaw() {
     ahrs.zeroYaw();
