@@ -101,13 +101,17 @@ public class Constants {
     public static double kDriveHeadingVelocityKd = 50.0;
 
     public static double kPathFollowingLookahead = 24.0; // inches
-    public static double kPathFollowingMaxVel = 120.0; // inches/sec
-    public static double kPathFollowingMaxAccel = 80.0; // inches/sec^2
+    public static double kPathFollowingMaxVel = 120; // inches/sec
+    public static double kPathFollowingMaxAccel = 60.0; // inches/sec^2
     
     public static double kLooperDt = 0.01;
     
     public static final boolean On = true;
     public static final boolean Off = false;
+
+    // 12t pinions, 50/24 first reduction, 60/34 second reduction, 20->64 final drive
+    // 36/12 encoder
+    // 39321.6 ticks per wheel rotation in low gear (experimentally confirmed)
 
 
     /* Pathfinder Constants below */
