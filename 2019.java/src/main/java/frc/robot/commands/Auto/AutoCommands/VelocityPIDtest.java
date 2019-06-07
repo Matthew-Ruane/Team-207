@@ -7,28 +7,13 @@
 
 package frc.robot.commands.Auto.AutoCommands;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.wpilibj.command.Command;
-import frc.robot.commands.Auto.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import frc.robot.commands.Auto.AutoModeBase;
-import frc.robot.commands.Auto.AutoModeEndedException;
-import frc.robot.commands.Auto.Actions.FollowPathAction;
-import frc.robot.commands.Auto.Actions.SeriesAction;
-import frc.robot.subsystems.Drivebase;
-import frc.utility.PurePursuit.Path;
-import frc.utility.PurePursuit.Path.Waypoint;
-import frc.utility.PurePursuit.Rotation2d;
-import frc.utility.PurePursuit.Translation2d;
 import frc.robot.subsystems.Drivebase;
 
-public class CommandA extends Command {
-
-  Path path;
-  public CommandA() {
+public class VelocityPIDtest extends Command {
+  public VelocityPIDtest() {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
   }
@@ -37,18 +22,12 @@ public class CommandA extends Command {
   @Override
   protected void initialize() {
     Drivebase.DownShift();
-    List<Waypoint> first_path = new ArrayList<>();
-    first_path.add(new Waypoint(new Translation2d(0, 0), 10.0));
-    first_path.add(new Waypoint(new Translation2d(24, 0), 10.0));
-
-    path = new Path(first_path);
-    Drivebase.followPath(path, false);
+    Drivebase.updateVelocitySetpoint(100.0, 100.0);
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivebase.updatePathFollower();
   }
 
   // Make this return true when this Command no longer needs to run execute()

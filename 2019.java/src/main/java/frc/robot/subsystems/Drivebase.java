@@ -38,7 +38,7 @@ public class Drivebase extends Subsystem {
     return instance;
   }
 
-  private static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
+  public static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
 
   private static double left, right, lowerbound, upperbound, target;
 
@@ -74,8 +74,6 @@ public class Drivebase extends Subsystem {
   public static AHRS ahrs;
 
   public static PIDController PIDturn;
-
-  public static Encoder leftEncoder, rightEncoder;
 
   private static AdaptivePurePursuitController pathFollowingController_;
   private static SynchronousPID velocityHeadingPid_;
@@ -156,36 +154,25 @@ public class Drivebase extends Subsystem {
     mDrive.curvatureDrive(throttleaxis, TurnrateCurved, true);
   }
   /* PURE PURSUIT */
-  public synchronized void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-    configureTalonsForSpeedControl();
-    driveControlState_ = DriveControlState.VELOCITY_SETPOINT;
+  public static void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+    //configureTalonsForSpeedControl();
     updateVelocitySetpoint(left_inches_per_sec, right_inches_per_sec);
 }
 
-public synchronized void setVelocityHeadingSetpoint(double forward_inches_per_sec, Rotation2d headingSetpoint) {
-    if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL) {
-        configureTalonsForSpeedControl();
-        driveControlState_ = DriveControlState.VELOCITY_HEADING_CONTROL;
-        velocityHeadingPid_.reset();
-    }
-    velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, forward_inches_per_sec,
-            headingSetpoint);
-    updateVelocityHeadingSetpoint();
+public static void setVelocityHeadingSetpoint(double forward_inches_per_sec, Rotation2d headingSetpoint) {
+  configureTalonsForSpeedControl();
+  velocityHeadingPid_.reset();
+  velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, forward_inches_per_sec, headingSetpoint);
+  updateVelocityHeadingSetpoint();
 }
-public static synchronized void followPath(Path path, boolean reversed) {
-  if (driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
+public static void followPath(Path path, boolean reversed) {
       configureTalonsForSpeedControl();
-      driveControlState_ = DriveControlState.PATH_FOLLOWING_CONTROL;
       velocityHeadingPid_.reset();
-  }
   pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead,
           Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed, 0.25);
   updatePathFollower();
 }
 private static void configureTalonsForSpeedControl() {
-  if (driveControlState_ != DriveControlState.VELOCITY_HEADING_CONTROL
-          && driveControlState_ != DriveControlState.VELOCITY_SETPOINT
-          && driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL) {
       mDrive_Left_Master.set(ControlMode.Velocity, 0.0);
       mDrive_Left_Master.selectProfileSlot(kVelocityControlSlot, 0);
       mDrive_Left_Master.configAllowableClosedloopError(0, Constants.kDriveVelocityAllowableError);
@@ -194,21 +181,17 @@ private static void configureTalonsForSpeedControl() {
       mDrive_Right_Master.configAllowableClosedloopError(0, Constants.kDriveVelocityAllowableError);
       DownShift();
       setBrake();
-      }
   }
-    private static synchronized void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-      if (driveControlState_ == DriveControlState.VELOCITY_HEADING_CONTROL
-              || driveControlState_ == DriveControlState.VELOCITY_SETPOINT
-              || driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL) {
-          mDrive_Left_Master.set(inchesPerSecondToRpm(left_inches_per_sec));
-          mDrive_Right_Master.set(inchesPerSecondToRpm(right_inches_per_sec));
-      } else {
-          System.out.println("Hit a bad velocity control state");
-          mDrive_Left_Master.set(0);
-          mDrive_Right_Master.set(0);
-      }
+    public static void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+          //mDrive_Left_Master.set(inchesPerSecondToRpm(left_inches_per_sec));
+          //mDrive_Right_Master.set(inchesPerSecondToRpm(right_inches_per_sec));
+          left = -inchesPerSecondToRpm(left_inches_per_sec);
+          right = inchesPerSecondToRpm(right_inches_per_sec);
+          mDrive_Left_Master.set(ControlMode.Velocity, -1000);
+          mDrive_Right_Master.set(ControlMode.Velocity, 1000);
+          SmartDashboard.putNumber("leftspeed", left);
   }
-  public static synchronized Rotation2d getGyroAngle() {
+  public static Rotation2d getGyroAngle() {
     return Rotation2d.fromDegrees(ahrs.getAngle());
 }
   private static void updateVelocityHeadingSetpoint() {
@@ -235,7 +218,7 @@ private static void configureTalonsForSpeedControl() {
         setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
     }
 }
-public static synchronized boolean isFinishedPath() {
+public static boolean isFinishedPath() {
   return (driveControlState_ == DriveControlState.PATH_FOLLOWING_CONTROL && pathFollowingController_.isDone())
           || driveControlState_ != DriveControlState.PATH_FOLLOWING_CONTROL;
 }
@@ -283,8 +266,6 @@ private static double inchesPerSecondToRpm(double inches_per_second) {
   public static void StopDrivetrain() {
     mDrive_Left_Master.set(ControlMode.PercentOutput, 0.0);
     mDrive_Right_Master.set(ControlMode.PercentOutput, 0.0);
-    leftEncoder.reset();
-    rightEncoder.reset();
   }
   /** @param currentHeading Gyro heading to reset to, in degrees*/
 	public static void setGyroRotation(double currentHeading) {
@@ -348,8 +329,6 @@ private static double inchesPerSecondToRpm(double inches_per_second) {
   }
   public static void ReportData() {
     SmartDashboard.putNumber("IMU_Yaw", ahrs.getYaw());
-    SmartDashboard.putNumber("Left encoder", getleftEncoder());
-    SmartDashboard.putNumber("right encoder", getrightEncoder());
     SmartDashboard.putNumber("Left encoder rate", getLeftVelocity());
     SmartDashboard.putNumber("right encoder rate", getRightVelocity());
     SmartDashboard.putNumber("turnoutput", getTurnOutput());

@@ -9,6 +9,8 @@ import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.*;
 import frc.robot.commands.Auto.*;
+import frc.robot.commands.Auto.AutoCommands.CommandA;
+import frc.robot.commands.Auto.AutoCommands.VelocityPIDtest;
 
 public class Robot extends TimedRobot {
   
@@ -30,7 +32,7 @@ public class Robot extends TimedRobot {
     Elevator.zeroElevatorEncoder();
     Drivebase.setCoast();
 
-    //autoProgram.addDefault("TestAuto1", new TestA());
+    autoProgram.addDefault("TestAuto1", new VelocityPIDtest());
     //autoProgram.addObject("TestAuto2", new TestAuto1());
 
     SmartDashboard.putData("Selected Auto", autoProgram);

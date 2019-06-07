@@ -75,9 +75,9 @@ public class Constants {
 
         // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
-    public static double kDriveVelocityKp = 1.0;
+    public static double kDriveVelocityKp = 0.1; //1.0
     public static double kDriveVelocityKi = 0.0;
-    public static double kDriveVelocityKd = 6.0;
+    public static double kDriveVelocityKd = 0.0; //6.0
     public static double kDriveVelocityKf = 0.5;
     public static int kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0.0;
