@@ -43,9 +43,7 @@ public class CommandA extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    drivebase.left_encoder_prev_distance_ = drivebase.getLeftDistanceInches();
-    drivebase.right_encoder_prev_distance_ = drivebase.getRightDistanceInches();
-    drivebase.resetEncoders();
+    drivebase.normalizeEncoders();
     drivebase.DownShift();
     
     List<Waypoint> first_path = new ArrayList<>();

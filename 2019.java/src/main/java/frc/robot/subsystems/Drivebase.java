@@ -206,7 +206,7 @@ public void updatePathFollower() {
       double scaling = Constants.kPathFollowingMaxVel / max_vel;
       setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
   }
-  updateVelocitySetpoint(setpoint.left, setpoint.right);
+  updateVelocitySetpoint(setpoint.left/0.02086, setpoint.right/0.02086);
     
   SmartDashboard.putNumber("setpoint.left", setpoint.left);
   SmartDashboard.putNumber("setpoint.right", setpoint.right);
@@ -221,6 +221,10 @@ public void updateRobotState() {
   robotstate.addObservations(time, odometry, velocity);
   left_encoder_prev_distance_ = left_distance;
   right_encoder_prev_distance_ = right_distance;
+}
+public void normalizeEncoders() {
+  left_encoder_prev_distance_ = getLeftDistanceInches();
+  right_encoder_prev_distance_ = getRightDistanceInches();
 }
 public boolean isFinishedPath() {
   return pathFollowingController_.isDone();
