@@ -89,12 +89,16 @@ public class Drivebase extends Subsystem {
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
 
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kTimeoutms);
-    mDrive_Left_Master.setSensorPhase(true);
-    mDrive_Left_Master.setInverted(false);
+    mDrive_Left_Master.setSensorPhase(false);
+    mDrive_Left_Master.setInverted(true);
+    mDrive_Left_B.setInverted(true);
+    mDrive_Left_C.setInverted(true);
 
     mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kTimeoutms);
     mDrive_Right_Master.setSensorPhase(false);
     mDrive_Right_Master.setInverted(false);
+    mDrive_Right_B.setInverted(false);
+    mDrive_Right_C.setInverted(false);
 
     mDrive_Left_B.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
     mDrive_Left_C.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
@@ -180,7 +184,7 @@ private static void configureTalonsForSpeedControl() {
       setBrake();
   }
     public static void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-          left = -inchesPerSecondToRpm(left_inches_per_sec);
+          left = inchesPerSecondToRpm(left_inches_per_sec);
           right = inchesPerSecondToRpm(right_inches_per_sec);
           mDrive_Left_Master.set(ControlMode.Velocity, left);
           mDrive_Right_Master.set(ControlMode.Velocity, right);
@@ -188,7 +192,7 @@ private static void configureTalonsForSpeedControl() {
           SmartDashboard.putNumber("rightspeed", right);
   }
   public static Rotation2d getGyroAngle() {
-    return Rotation2d.fromDegrees(ahrs.getAngle());
+    return Rotation2d.fromDegrees(-ahrs.getAngle());
 }
   private static void updateVelocityHeadingSetpoint() {
       Rotation2d actualGyroAngle = getGyroAngle();
@@ -212,9 +216,12 @@ private static void configureTalonsForSpeedControl() {
     if (max_vel > Constants.kPathFollowingMaxVel) {
         double scaling = Constants.kPathFollowingMaxVel / max_vel;
         setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
+        SmartDashboard.putNumber("Scaling", scaling);
     }
+    updateVelocitySetpoint(setpoint.left*3, setpoint.right*3);
     
-    updateVelocitySetpoint(setpoint.left, setpoint.right);
+    SmartDashboard.putNumber("setpoint.left", setpoint.left);
+    SmartDashboard.putNumber("setpoint.right", setpoint.right);
 }
 public static boolean isFinishedPath() {
   return pathFollowingController_.isDone();
@@ -329,6 +336,8 @@ private static double inchesPerSecondToRpm(double inches_per_second) {
     SmartDashboard.putNumber("Left encoder rate", getLeftVelocity());
     SmartDashboard.putNumber("right encoder rate", getRightVelocity());
     SmartDashboard.putNumber("turnoutput", getTurnOutput());
+    SmartDashboard.putNumber("leftIPS", getLeftVelocityInchesPerSec());
+    SmartDashboard.putNumber("rightIPS", getRightVelocityInchesPerSec());
   }
   public static int getCurrentGear() {
     return Constants.CURRENT_GEAR;
@@ -372,11 +381,11 @@ public static double getLeftDistanceInches() {
 public static double getRightDistanceInches() {
     return rotationsToInches(mDrive_Left_Master.getSelectedSensorPosition()/39321.6);
 }
-public double getLeftVelocityInchesPerSec() {
+public static double getLeftVelocityInchesPerSec() {
   return rpmToInchesPerSecond(mDrive_Left_Master.getSelectedSensorVelocity()*10/39321.6*60);
 }
 
-public double getRightVelocityInchesPerSec() {
+public static double getRightVelocityInchesPerSec() {
   return rpmToInchesPerSecond(mDrive_Right_Master.getSelectedSensorVelocity()*10/39321.6*60);
 }
   public static void resetPosition() {

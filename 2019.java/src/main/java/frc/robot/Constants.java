@@ -45,7 +45,7 @@ public class Constants {
     public static final int Elevator_MotionCruiseVelo = 15000;
     public static final int kTimeoutms = 10;
 
-    public static double Drive_kP = 0.1;
+    public static double Drive_kP = 0.5;
     public static double Drive_kI = 0.0;
     public static double Drive_kD = 0.0;
     public static double Drive_kF = 0.0;
@@ -101,8 +101,8 @@ public class Constants {
     public static double kDriveHeadingVelocityKd = 50.0;
 
     public static double kPathFollowingLookahead = 24.0; // inches
-    public static double kPathFollowingMaxVel = 120; // inches/sec
-    public static double kPathFollowingMaxAccel = 60.0; // inches/sec^2
+    public static double kPathFollowingMaxVel = 100; // inches/sec
+    public static double kPathFollowingMaxAccel = 100.0; // inches/sec^2
     
     public static double kLooperDt = 0.01;
     

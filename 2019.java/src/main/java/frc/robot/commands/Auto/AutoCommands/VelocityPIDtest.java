@@ -22,7 +22,7 @@ public class VelocityPIDtest extends Command {
   @Override
   protected void initialize() {
     Drivebase.DownShift();
-    Drivebase.setVelocitySetpoint(500.0, 500.0);
+    Drivebase.setVelocitySetpoint(-500.0, 500.0);
   }
 
   // Called repeatedly when this Command is scheduled to run
