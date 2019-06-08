@@ -28,7 +28,6 @@ public class CommandA extends Command {
 
   Path path;
 
-  double left_encoder_prev_distance_, right_encoder_prev_distance_, left_distance, right_distance, time;
   Rotation2d gyro_angle;
   RigidTransform2d odometry;
   RigidTransform2d.Delta velocity;
@@ -44,9 +43,8 @@ public class CommandA extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    
-    left_encoder_prev_distance_ = drivebase.getLeftDistanceInches();
-    right_encoder_prev_distance_ = drivebase.getRightDistanceInches();
+    drivebase.left_encoder_prev_distance_ = drivebase.getLeftDistanceInches();
+    drivebase.right_encoder_prev_distance_ = drivebase.getRightDistanceInches();
     drivebase.resetEncoders();
     drivebase.DownShift();
     
@@ -63,17 +61,7 @@ public class CommandA extends Command {
   @Override
   protected void execute() {
     SmartDashboard.putNumber("path", path.getRemainingLength());
-
-    time = Timer.getFPGATimestamp();
-    left_distance = drivebase.getLeftDistanceInches();
-    right_distance = drivebase.getRightDistanceInches();
-    gyro_angle = drivebase.getGyroAngle();
-    odometry = robotstate.generateOdometryFromSensors(left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
-    velocity = Kinematics.forwardKinematics(drivebase.getLeftVelocityInchesPerSec(), drivebase.getRightVelocityInchesPerSec());
-    robotstate.addObservations(time, odometry, velocity);
-    left_encoder_prev_distance_ = left_distance;
-    right_encoder_prev_distance_ = right_distance;
-    
+    drivebase.updateRobotState();
     drivebase.updatePathFollower();
   }
   // Make this return true when this Command no longer needs to run execute()

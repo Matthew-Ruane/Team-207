@@ -5,13 +5,14 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorPositions;
 
 public class HatchModeCommand extends Command {
+  private Elevator elevator = Elevator.getInstance();
   public HatchModeCommand() {
   }
 
   @Override
   protected void initialize() {
-    Elevator.SetHatchMode();
-    Elevator.SetElevatorPosition(Elevator.GetElevatorPosition(), Elevator.getMode());
+    elevator.SetHatchMode();
+    elevator.SetElevatorPosition(elevator.GetElevatorPosition(), elevator.getMode());
   }
 
   @Override

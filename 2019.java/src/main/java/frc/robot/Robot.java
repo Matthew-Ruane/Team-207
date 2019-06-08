@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_oi = new OI();
     m_oi.registerControls();
-    Elevator.zeroElevatorEncoder();
+    elevator.zeroElevatorEncoder();
     drivebase.setCoast();
 
     autoProgram.addDefault("PID tuning", new VelocityPIDtest());
@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     drivebase.StopDrivetrain();
-    Elevator.stopElevator();
+    elevator.stopElevator();
     drivebase.resetEncoders();
     Constants.DesiredDistance = 0;
     Constants.DesiredHeading = 0;

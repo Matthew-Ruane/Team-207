@@ -52,7 +52,8 @@ public class Drivebase extends Subsystem {
   protected static final int kVelocityControlSlot = 0;
   protected static final int kBaseLockControlSlot = 1;
 
-  private double TurnrateCurved, mLastHeadingErrorDegrees, leftvelo_,  rightvelo_;
+  private double TurnrateCurved, mLastHeadingErrorDegrees, leftvelo_,  rightvelo_, left_distance, right_distance, time;
+  public double left_encoder_prev_distance_, right_encoder_prev_distance_;
 
   public static enum DriveControlState {OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL }
   
@@ -66,6 +67,11 @@ public class Drivebase extends Subsystem {
 
   private static AdaptivePurePursuitController pathFollowingController_;
   private static SynchronousPID velocityHeadingPid_;
+
+  private Rotation2d gyro_angle;
+  private RigidTransform2d odometry;
+  private RigidTransform2d.Delta velocity;
+  private RobotState robotstate = RobotState.getInstance();
 
 
   public Drivebase() {
@@ -187,23 +193,34 @@ public class Drivebase extends Subsystem {
     double deltaSpeed = velocityHeadingPid_.calculate(mLastHeadingErrorDegrees);
     updateVelocitySetpoint(velocityHeadingSetpoint_.getLeftSpeed() + deltaSpeed / 2, velocityHeadingSetpoint_.getRightSpeed() - deltaSpeed / 2);
   }
-  public void updatePathFollower() {
-    RigidTransform2d robot_pose = RobotState.getInstance().getLatestFieldToVehicle().getValue();
-    RigidTransform2d.Delta command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
-    Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
+public void updatePathFollower() {
+  RigidTransform2d robot_pose = RobotState.getInstance().getLatestFieldToVehicle().getValue();
+  RigidTransform2d.Delta command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
+  Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
 
-    // Scale the command to respect the max velocity limits
-    double max_vel = 0.0;
-    max_vel = Math.max(max_vel, Math.abs(setpoint.left));
-    max_vel = Math.max(max_vel, Math.abs(setpoint.right));
-    if (max_vel > Constants.kPathFollowingMaxVel) {
-        double scaling = Constants.kPathFollowingMaxVel / max_vel;
-        setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
-    }
-    updateVelocitySetpoint(setpoint.left, setpoint.right);
+  // Scale the command to respect the max velocity limits
+  double max_vel = 0.0;
+  max_vel = Math.max(max_vel, Math.abs(setpoint.left));
+  max_vel = Math.max(max_vel, Math.abs(setpoint.right));
+  if (max_vel > Constants.kPathFollowingMaxVel) {
+      double scaling = Constants.kPathFollowingMaxVel / max_vel;
+      setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
+  }
+  updateVelocitySetpoint(setpoint.left, setpoint.right);
     
-    SmartDashboard.putNumber("setpoint.left", setpoint.left);
-    SmartDashboard.putNumber("setpoint.right", setpoint.right);
+  SmartDashboard.putNumber("setpoint.left", setpoint.left);
+  SmartDashboard.putNumber("setpoint.right", setpoint.right);
+}
+public void updateRobotState() {
+  time = Timer.getFPGATimestamp();
+  left_distance = getLeftDistanceInches();
+  right_distance = getRightDistanceInches();
+  gyro_angle = getGyroAngle();
+  odometry = robotstate.generateOdometryFromSensors(left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
+  velocity = Kinematics.forwardKinematics(getLeftVelocityInchesPerSec(), getRightVelocityInchesPerSec());
+  robotstate.addObservations(time, odometry, velocity);
+  left_encoder_prev_distance_ = left_distance;
+  right_encoder_prev_distance_ = right_distance;
 }
 public boolean isFinishedPath() {
   return pathFollowingController_.isDone();

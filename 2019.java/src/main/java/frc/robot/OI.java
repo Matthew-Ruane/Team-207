@@ -12,6 +12,7 @@ public class OI {
     private static final LogitechAttack3Joystick LeftStick = new LogitechAttack3Joystick(RobotMap.LeftStickPort);
     private static final LogitechAttack3Joystick RightStick = new LogitechAttack3Joystick(RobotMap.RightStickPort);
     private static final LogitechF310 Gamepad = new LogitechF310(RobotMap.GamepadPort);
+    private Elevator elevator = Elevator.getInstance();
 
     public void registerControls() {
         //Driver methods to rapidly transition to collecting state for either game piece
@@ -23,13 +24,13 @@ public class OI {
         //cargo shooting control
         RightStick.getButtonTrigger().whenPressed(new ShootCargoCommand());
         //gamepad methods to move elevator to different positions
-        Gamepad.getButtonA().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_BOTTOM, Elevator.getMode()));
-        Gamepad.getButtonB().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_MID, Elevator.getMode()));
-        Gamepad.getButtonY().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_TOP, Elevator.getMode()));
-        Gamepad.getButtonX().whenPressed(new ElevatorCommand(ElevatorPositions.CARGO_SHIP, Elevator.getMode()));
+        Gamepad.getButtonA().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_BOTTOM, elevator.getMode()));
+        Gamepad.getButtonB().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_MID, elevator.getMode()));
+        Gamepad.getButtonY().whenPressed(new ElevatorCommand(ElevatorPositions.ROCKET_TOP, elevator.getMode()));
+        Gamepad.getButtonX().whenPressed(new ElevatorCommand(ElevatorPositions.CARGO_SHIP, elevator.getMode()));
         //Fallback Gamepad method to switch between ball and hatch mode
-        Gamepad.getButtonBack().whenPressed(new ElevatorCommand(Elevator.GetElevatorPosition(), ElevatorModes.CARGO));
-        Gamepad.getButtonStart().whenPressed(new ElevatorCommand(Elevator.GetElevatorPosition(), ElevatorModes.HATCH));
+        Gamepad.getButtonBack().whenPressed(new ElevatorCommand(elevator.GetElevatorPosition(), ElevatorModes.CARGO));
+        Gamepad.getButtonStart().whenPressed(new ElevatorCommand(elevator.GetElevatorPosition(), ElevatorModes.HATCH));
         //Toggling extension of tray with left trigger
         LeftStick.getButtonTrigger().whenPressed(new TrayExtensionToggle());
         }

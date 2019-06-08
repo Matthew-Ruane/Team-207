@@ -23,20 +23,21 @@ public class Elevator extends Subsystem {
       return instance;
     }
 
-    public static enum ElevatorPositions {
+    public enum ElevatorPositions {
       ROCKET_BOTTOM, ROCKET_MID, ROCKET_TOP, CARGO_SHIP, COLLECT;
     }
-    public static enum ElevatorModes {
+    public enum ElevatorModes {
         CARGO, HATCH;
     }
-    public static ElevatorModes Mode = ElevatorModes.CARGO;
-    public static ElevatorPositions DesiredPosition = ElevatorPositions.ROCKET_BOTTOM;
+    public ElevatorModes Mode = ElevatorModes.CARGO;
+    public ElevatorPositions DesiredPosition = ElevatorPositions.ROCKET_BOTTOM;
 
-    public static TalonSRX mElevator_Master, mElevator_Slave;
+    public TalonSRX mElevator_Master, mElevator_Slave;
     
     public Elevator() {
       mElevator_Master = new TalonSRX(RobotMap.mElevator_Master_ID);
       mElevator_Slave = new TalonSRX(RobotMap.mElevator_Slave_ID);
+      mElevator_Master.configFactoryDefault();
       mElevator_Master.setNeutralMode(NeutralMode.Coast);
       mElevator_Master.setSensorPhase(false);
       mElevator_Master.enableCurrentLimit(true);
@@ -51,6 +52,8 @@ public class Elevator extends Subsystem {
       mElevator_Master.configMotionAcceleration(Constants.Elevator_MotionAccel, Constants.kTimeoutms);
       mElevator_Master.configMotionCruiseVelocity(Constants.Elevator_MotionCruiseVelo, Constants.kTimeoutms);
 
+      
+      mElevator_Slave.configFactoryDefault();
       mElevator_Slave.setNeutralMode(NeutralMode.Coast);
       mElevator_Slave.enableCurrentLimit(true);
       mElevator_Slave.configContinuousCurrentLimit(40);
@@ -59,37 +62,37 @@ public class Elevator extends Subsystem {
       mElevator_Slave.setInverted(false);
       mElevator_Slave.set(ControlMode.Follower, RobotMap.mElevator_Master_ID);
     }
-    public static void SetElevatorPosition(ElevatorPositions position, ElevatorModes mode) {
+    public void SetElevatorPosition(ElevatorPositions position, ElevatorModes mode) {
         DesiredPosition = position;
         Mode = mode;
-        Constants.kPosition = Constants.kEncoderTicksPerInch*Elevator.getTargetHeight();
+        Constants.kPosition = Constants.kEncoderTicksPerInch*getTargetHeight();
         mElevator_Master.set(ControlMode.MotionMagic, Constants.kPosition);
     }
-    public static ElevatorPositions GetElevatorPosition() {
+    public ElevatorPositions GetElevatorPosition() {
       return DesiredPosition;
     }
-    public static void SetCargoMode() {
+    public void SetCargoMode() {
         Mode = ElevatorModes.CARGO;
     }
-    public static void SetHatchMode() {
+    public void SetHatchMode() {
         Mode = ElevatorModes.HATCH;
     }
-    public static void SetMode(ElevatorModes mode) {
+    public void SetMode(ElevatorModes mode) {
       Mode = mode;
     }
-    public static ElevatorModes getMode() {
+    public ElevatorModes getMode() {
       return Mode;
     }
-    public static void zeroElevatorEncoder() {
+    public void zeroElevatorEncoder() {
         mElevator_Master.setSelectedSensorPosition(0);
     }
-    public static void stopElevator() {
+    public void stopElevator() {
       mElevator_Master.set(ControlMode.PercentOutput, 0.0);
     }
-    public static double getEncoderValue() {
+    public double getEncoderValue() {
         return mElevator_Master.getSelectedSensorPosition(0);
     }
-    public static double getTargetHeight() {
+    public double getTargetHeight() {
         switch (Mode) {
             case CARGO:
               if (DesiredPosition == ElevatorPositions.ROCKET_BOTTOM) {

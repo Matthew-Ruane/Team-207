@@ -22,11 +22,11 @@ public class Tray extends Subsystem {
       return instance;
     }
     
-    public static Solenoid mTray_Extend, mTray_Retract, mTalons_Hold, mTalons_Release;
-    public static TalonSRX mShooter;
-    public static DigitalInput mCargo_Loaded_Sensor, mHatch_Loaded_Sensor;
+    public Solenoid mTray_Extend, mTray_Retract, mTalons_Hold, mTalons_Release;
+    public TalonSRX mShooter;
+    public DigitalInput mCargo_Loaded_Sensor, mHatch_Loaded_Sensor;
 
-    public static boolean autograb;
+    public boolean autograb;
 
     public Tray() {
         mTray_Extend = new Solenoid(RobotMap.mPCM_B, RobotMap.mTray_Extend_ID);
@@ -35,6 +35,7 @@ public class Tray extends Subsystem {
         mTalons_Release = new Solenoid(RobotMap.mPCM_B, RobotMap.mTalons_Release_ID);
         mShooter = new TalonSRX(RobotMap.mShooter_ID);
 
+        mShooter.configFactoryDefault();
         mShooter.setNeutralMode(NeutralMode.Brake);
         mShooter.configContinuousCurrentLimit(30);
         mShooter.configPeakCurrentLimit(0);
@@ -45,41 +46,43 @@ public class Tray extends Subsystem {
         mHatch_Loaded_Sensor = new DigitalInput(RobotMap.mHatch_Loaded_Sensor_ID);
 
         autograb = false;
+        RetractTray();
+        TalonsRelease();
     }
 
-    public static void ShootCargo() {
+    public void ShootCargo() {
         mShooter.set(ControlMode.PercentOutput, 1.0);
     }
-    public static void StopShootCargo() {
+    public void StopShootCargo() {
         mShooter.set(ControlMode.PercentOutput, 0.0);
     }
-    public static void IntakeCargo() {
+    public void IntakeCargo() {
         mShooter.set(ControlMode.PercentOutput, 1.0);
     }
-    public static void StopIntakeCargo() {
+    public void StopIntakeCargo() {
         mShooter.set(ControlMode.PercentOutput, 0.0);
     }
-    public static void ExtendTray() {
+    public void ExtendTray() {
         mTray_Extend.set(Constants.On);
         mTray_Retract.set(Constants.Off);
         Constants.TRAY_STATE = Constants.TRAY_STATE_EXTENDED;
     }
-    public static void RetractTray() {
+    public void RetractTray() {
         mTray_Extend.set(Constants.Off);
         mTray_Retract.set(Constants.On);
         Constants.TRAY_STATE = Constants.TRAY_STATE_RETRACTED;
     }
-    public static void TalonsHold() {
+    public void TalonsHold() {
         mTalons_Release.set(Constants.Off);
         mTalons_Hold.set(Constants.On);
         Constants.TALON_STATE = Constants.TALON_STATE_HOLDING;
     }
-    public static void TalonsRelease() {
+    public void TalonsRelease() {
         mTalons_Hold.set(Constants.Off);
         mTalons_Release.set(Constants.On);
         Constants.TALON_STATE = Constants.TALON_STATE_RELEASED;
     }
-    public static void TalonsAutoGrab() {
+    public void TalonsAutoGrab() {
             if (Constants.WantHatch == true && !mHatch_Loaded_Sensor.get()) {
                 autograb = false;
                 TalonsHold();
@@ -90,7 +93,7 @@ public class Tray extends Subsystem {
                 TalonsRelease();
             }
     }
-    public static void UpdateLoadState() {
+    public void UpdateLoadState() {
         if (!mCargo_Loaded_Sensor.get()) {
             Constants.CARGO_STATE = Constants.CARGO_STATE_LOADED;
         }

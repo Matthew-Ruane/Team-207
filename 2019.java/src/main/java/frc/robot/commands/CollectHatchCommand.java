@@ -10,6 +10,8 @@ import frc.robot.Constants;
 
 public class CollectHatchCommand extends Command {
   private Elevator elevator = Elevator.getInstance();
+  private Tray tray = Tray.getInstance();
+
   public CollectHatchCommand() {
     isInterruptible();
     requires(elevator);
@@ -17,16 +19,16 @@ public class CollectHatchCommand extends Command {
 
   @Override
   protected void initialize() {
-    Tray.StopIntakeCargo();
-    Tray.TalonsRelease();
-    Tray.ExtendTray();
+    tray.StopIntakeCargo();
+    tray.TalonsRelease();
+    tray.ExtendTray();
     Constants.WantHatch = true;
-    Elevator.SetElevatorPosition(ElevatorPositions.COLLECT, ElevatorModes.HATCH);
+    elevator.SetElevatorPosition(ElevatorPositions.COLLECT, ElevatorModes.HATCH);
   }
 
   @Override
   protected void execute() {
-    Tray.TalonsAutoGrab();
+    tray.TalonsAutoGrab();
   }
 
   @Override
