@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.Auto.AutoCommands;
+package frc.robot.Auto.AutoCommands;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.subsystems.Drivebase;
 
 public class VelocityPIDtest extends Command {
+
+  Drivebase drivebase = Drivebase.getInstance();
   public VelocityPIDtest() {
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
@@ -21,8 +23,8 @@ public class VelocityPIDtest extends Command {
   // Called just before this Command runs the first time
   @Override
   protected void initialize() {
-    Drivebase.DownShift();
-    Drivebase.setVelocitySetpoint(-500.0, 500.0);
+    drivebase.DownShift();
+    drivebase.setVelocitySetpoint(-500.0, 500.0);
   }
 
   // Called repeatedly when this Command is scheduled to run

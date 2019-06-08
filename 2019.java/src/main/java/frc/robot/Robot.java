@@ -8,20 +8,17 @@ import frc.robot.subsystems.*;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.*;
-import frc.robot.commands.Auto.*;
-import frc.robot.commands.Auto.AutoCommands.CommandA;
-import frc.robot.commands.Auto.AutoCommands.VelocityPIDtest;
+import frc.robot.Auto.AutoCommands.*;
 
 public class Robot extends TimedRobot {
   
   private static OI m_oi;
-  Drivebase drive = Drivebase.getInstance();
+  Drivebase drivebase = Drivebase.getInstance();
   Elevator elevator = Elevator.getInstance();
   Tray tray = Tray.getInstance();
   Rangefinder rangefinder = Rangefinder.getInstance();
   RingBuffer shiftbuffer = new RingBuffer(16, 0);
   
-
   Command autonomousCommand;
   SendableChooser<Command> autoProgram = new SendableChooser<>();
 
@@ -30,7 +27,7 @@ public class Robot extends TimedRobot {
     m_oi = new OI();
     m_oi.registerControls();
     Elevator.zeroElevatorEncoder();
-    Drivebase.setCoast();
+    drivebase.setCoast();
 
     autoProgram.addDefault("PID tuning", new VelocityPIDtest());
     autoProgram.addObject("CommandA", new CommandA());
@@ -44,16 +41,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    Drivebase.ReportData();
+    drivebase.ReportData();
   }
   @Override
   public void disabledInit() {
-    Drivebase.StopDrivetrain();
+    drivebase.StopDrivetrain();
     Elevator.stopElevator();
-    Drivebase.resetEncoders();
+    drivebase.resetEncoders();
     Constants.DesiredDistance = 0;
     Constants.DesiredHeading = 0;
-    Drivebase.setCoast();
+    drivebase.setCoast();
   }
   @Override
   public void disabledPeriodic() {
@@ -73,8 +70,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    Drivebase.setCoast();
-    Drivebase.resetPosition();
+    drivebase.setCoast();
+    drivebase.resetPosition();
     autonomousCommand = autoProgram.getSelected();
 
     if (autonomousCommand != null) {
@@ -91,12 +88,12 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    Drivebase.StopDrivetrain();
-    Drivebase.setBrake();
+    drivebase.StopDrivetrain();
+    drivebase.setBrake();
   }
   @Override
   public void teleopPeriodic() {
-    Drivebase.curvature(OI.getLeftThrottleInput(), OI.getRightSteeringInputInverted());
+    drivebase.curvature(OI.getLeftThrottleInput(), OI.getRightSteeringInputInverted());
     Scheduler.getInstance().run();
     
   }
