@@ -72,6 +72,7 @@ public class Constants {
             + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
     public static double kTrackScrubFactor = 0.5;
     public static double kDriveWheelDiameterInches = 6;
+    public static double kRatioFactor = 208.6;
 
         // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.

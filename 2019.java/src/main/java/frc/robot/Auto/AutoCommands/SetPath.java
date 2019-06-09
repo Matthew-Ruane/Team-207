@@ -22,9 +22,10 @@ import frc.utility.PurePursuit.Translation2d;
 import frc.utility.PurePursuit.RigidTransform2d;
 import frc.utility.PurePursuit.Kinematics;
 import frc.robot.RobotState;
+import frc.robot.Auto.AutoPaths;
 import edu.wpi.first.wpilibj.Timer;
 
-public class CommandA extends Command {
+public class SetPath extends Command {
 
   Path path;
 
@@ -35,9 +36,8 @@ public class CommandA extends Command {
   Drivebase drivebase = Drivebase.getInstance();
 
 
-  public CommandA() {
-    // Use requires() here to declare subsystem dependencies
-    // eg. requires(chassis);
+  public SetPath(Path path) {
+    this.path = path;
   }
 
   // Called just before this Command runs the first time
@@ -45,22 +45,15 @@ public class CommandA extends Command {
   protected void initialize() {
     drivebase.normalizeEncoders();
     drivebase.DownShift();
-    
-    List<Waypoint> first_path = new ArrayList<>();
-    first_path.add(new Waypoint(new Translation2d(0, 0), 100.0));
-    first_path.add(new Waypoint(new Translation2d(72, 0), 100.0));
-    first_path.add(new Waypoint(new Translation2d(72, 72), 100.0));
-
-    path = new Path(first_path);
     drivebase.followPath(path, false);
   }
 
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    SmartDashboard.putNumber("path", path.getRemainingLength());
     drivebase.updateRobotState();
     drivebase.updatePathFollower();
+    SmartDashboard.putNumber("path", path.getRemainingLength());
   }
   // Make this return true when this Command no longer needs to run execute()
   @Override

@@ -82,13 +82,13 @@ public class Drivebase extends Subsystem {
     mDrive_Right_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_B_ID);
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
 
-    mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kTimeoutms);
+    mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTimeoutms);
     mDrive_Left_Master.setSensorPhase(false);
     mDrive_Left_Master.setInverted(true);
     mDrive_Left_B.setInverted(true);
     mDrive_Left_C.setInverted(true);
 
-    mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, Constants.kTimeoutms);
+    mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTimeoutms);
     mDrive_Right_Master.setSensorPhase(false);
     mDrive_Right_Master.setInverted(false);
     mDrive_Right_B.setInverted(false);
@@ -206,10 +206,10 @@ public void updatePathFollower() {
       double scaling = Constants.kPathFollowingMaxVel / max_vel;
       setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
   }
-  updateVelocitySetpoint(setpoint.left/0.02086, setpoint.right/0.02086);
+  updateVelocitySetpoint(setpoint.left*Constants.kRatioFactor, setpoint.right*Constants.kRatioFactor);
     
-  SmartDashboard.putNumber("setpoint.left", setpoint.left);
-  SmartDashboard.putNumber("setpoint.right", setpoint.right);
+  SmartDashboard.putNumber("setpoint.left", setpoint.left*Constants.kRatioFactor);
+  SmartDashboard.putNumber("setpoint.right", setpoint.right*Constants.kRatioFactor);
 }
 public void updateRobotState() {
   time = Timer.getFPGATimestamp();

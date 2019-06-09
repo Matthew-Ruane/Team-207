@@ -9,6 +9,7 @@ import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.utility.*;
 import frc.robot.Auto.AutoCommands.*;
+import frc.robot.Auto.AutoPaths;
 
 public class Robot extends TimedRobot {
   
@@ -18,6 +19,7 @@ public class Robot extends TimedRobot {
   Tray tray = Tray.getInstance();
   Rangefinder rangefinder = Rangefinder.getInstance();
   RingBuffer shiftbuffer = new RingBuffer(16, 0);
+  AutoPaths paths = AutoPaths.getInstance();
   
   Command autonomousCommand;
   SendableChooser<Command> autoProgram = new SendableChooser<>();
@@ -30,7 +32,7 @@ public class Robot extends TimedRobot {
     drivebase.setCoast();
 
     autoProgram.addDefault("PID tuning", new VelocityPIDtest());
-    autoProgram.addObject("CommandA", new CommandA());
+    autoProgram.addObject("CommandA", new SetPath(paths.getFirstPath()));
 
     SmartDashboard.putData("Selected Auto", autoProgram);
   }
