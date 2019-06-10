@@ -44,7 +44,7 @@ public class SetPath extends Command {
   @Override
   protected void initialize() {
     drivebase.normalizeEncoders();
-    drivebase.DownShift();
+    drivebase.UpShift();
     drivebase.followPath(path, false);
   }
 

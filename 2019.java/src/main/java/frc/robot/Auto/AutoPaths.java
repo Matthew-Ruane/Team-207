@@ -40,16 +40,16 @@ public class AutoPaths {
     public AutoPaths() {
 
         List<Waypoint> first_path = new ArrayList<>();
-        first_path.add(new Waypoint(new Translation2d(0, 0), 100.0));
-        first_path.add(new Waypoint(new Translation2d(72, 0), 100.0));
-        first_path.add(new Waypoint(new Translation2d(72, 72), 100.0));
+        first_path.add(new Waypoint(new Translation2d(0, 0), 75.0));
+        first_path.add(new Waypoint(new Translation2d(-100, 0), 75.0));
+        first_path.add(new Waypoint(new Translation2d(-200, 100), 75.0));
+        first_path.add(new Waypoint(new Translation2d(-250, 100), 75.0));
 
         PathA = new Path(first_path);
 
         List<Waypoint> second_path = new ArrayList<>();
         second_path.add(new Waypoint(new Translation2d(0, 0), 100.0));
-        second_path.add(new Waypoint(new Translation2d(72, 0), 100.0));
-        second_path.add(new Waypoint(new Translation2d(72, 72), 100.0));
+        second_path.add(new Waypoint(new Translation2d(-72000, 0), 100.0));
 
         PathB = new Path(second_path);
     }

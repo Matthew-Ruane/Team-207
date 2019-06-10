@@ -11,6 +11,7 @@ import frc.utility.*;
 import frc.robot.Auto.AutoCommands.*;
 import frc.robot.Auto.AutoPaths;
 
+
 public class Robot extends TimedRobot {
   
   private static OI m_oi;
@@ -33,6 +34,7 @@ public class Robot extends TimedRobot {
 
     autoProgram.addDefault("PID tuning", new VelocityPIDtest());
     autoProgram.addObject("CommandA", new SetPath(paths.getFirstPath()));
+    autoProgram.addObject("CommandB", new SetPath(paths.getSecondPath()));
 
     SmartDashboard.putData("Selected Auto", autoProgram);
   }

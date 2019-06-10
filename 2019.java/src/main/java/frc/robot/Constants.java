@@ -72,13 +72,13 @@ public class Constants {
             + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
     public static double kTrackScrubFactor = 0.5;
     public static double kDriveWheelDiameterInches = 6;
-    public static double kRatioFactor = 208.6;
+    public static double kRatioFactor = 20.86;
 
         // PID gains for drive velocity loop (LOW GEAR)
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     public static double kDriveVelocityKp = 0.1; //1.0
     public static double kDriveVelocityKi = 0.0;
-    public static double kDriveVelocityKd = 0.0; //6.0
+    public static double kDriveVelocityKd = 1.0; //6.0
     public static double kDriveVelocityKf = 0.5;
     public static int kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0.0;
@@ -101,9 +101,9 @@ public class Constants {
     public static double kDriveHeadingVelocityKi = 0.0;
     public static double kDriveHeadingVelocityKd = 50.0;
 
-    public static double kPathFollowingLookahead = 24.0; // inches
-    public static double kPathFollowingMaxVel = 100; // inches/sec
-    public static double kPathFollowingMaxAccel = 100.0; // inches/sec^2
+    public static double kPathFollowingLookahead = 72.0; // inches
+    public static double kPathFollowingMaxVel = 100.0; // inches/sec
+    public static double kPathFollowingMaxAccel = 75.0; // inches/sec^2
     
     public static double kLooperDt = 0.01;
     
