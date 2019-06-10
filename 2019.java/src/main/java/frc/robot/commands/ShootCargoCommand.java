@@ -6,16 +6,16 @@ import frc.robot.subsystems.Tray;
 
 public class ShootCargoCommand extends Command {
 
-  private static Timer shootTimer = new Timer();
-  private static boolean doneshooting = false;
-
+  private Timer shootTimer = new Timer();
+  private boolean doneshooting = false;
+  private Tray tray = Tray.getInstance();
 
   public ShootCargoCommand() {
   }
 
   @Override
   protected void initialize() {
-    Tray.ShootCargo();
+    tray.ShootCargo();
     shootTimer.start();
   }
 
@@ -24,7 +24,7 @@ public class ShootCargoCommand extends Command {
     if (shootTimer.get() >= 1.0) {
       shootTimer.stop();
       shootTimer.reset();
-      Tray.StopShootCargo();
+      tray.StopShootCargo();
       doneshooting = true;
     }
     else {

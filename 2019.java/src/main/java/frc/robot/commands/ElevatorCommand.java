@@ -8,8 +8,9 @@ import frc.robot.subsystems.Elevator.ElevatorPositions;
 
 
 public class ElevatorCommand extends Command {
-  ElevatorPositions position;
-  ElevatorModes mode;
+  private ElevatorPositions position;
+  private ElevatorModes mode;
+  private Elevator elevator = Elevator.getInstance();
 
   public ElevatorCommand(ElevatorPositions Position, ElevatorModes Mode) {
     position = Position;
@@ -23,7 +24,7 @@ public class ElevatorCommand extends Command {
 
   @Override
   protected void execute() {
-    Elevator.SetElevatorPosition(position, mode);
+    elevator.SetElevatorPosition(position, mode);
   }
 
   @Override

@@ -4,13 +4,15 @@ import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.subsystems.Tray;
 
 public class TalonsReleaseCommand extends Command {
+  private Tray tray = Tray.getInstance();
+
   public TalonsReleaseCommand() {
   }
 
   @Override
   protected void initialize() {
-    if (Tray.autograb == false) {
-      Tray.TalonsRelease();
+    if (tray.autograb == false) {
+      tray.TalonsRelease();
     }
   }
 

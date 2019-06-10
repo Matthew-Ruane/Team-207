@@ -4,13 +4,15 @@ import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.subsystems.Tray;
 
 public class TalonsHoldCommand extends Command {
+  private Tray tray = Tray.getInstance();
+
   public TalonsHoldCommand() {
   }
 
   @Override
   protected void initialize() {
-    if (Tray.autograb == false) {}
-      Tray.TalonsHold();
+    if (tray.autograb == false) {}
+      tray.TalonsHold();
     }
 
   @Override

@@ -10,7 +10,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Drivebase;
-import frc.utility.PIDGains;
 import frc.robot.Constants;
 
 
@@ -22,6 +21,7 @@ public class RotateToAngle extends Command {
   private int holding = 0;
   private int moving = 1;
   private boolean timerflag = Constants.Off;
+  Drivebase drivebase = Drivebase.getInstance();
 
   public RotateToAngle(double DesiredHeading) {
     heading = DesiredHeading;
@@ -40,7 +40,7 @@ public class RotateToAngle extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    Drivebase.pidTurn();
+    drivebase.pidTurn();
   }
 
   // Make this return true when this Command no longer needs to run execute()
@@ -75,9 +75,9 @@ public class RotateToAngle extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    Drivebase.StopDrivetrain();
-    Drivebase.PIDturn.disable();
-    Drivebase.PIDturn.reset();
+    drivebase.StopDrivetrain();
+    drivebase.PIDturn.disable();
+    drivebase.PIDturn.reset();
   }
 
   // Called when another command which requires one or more of the same

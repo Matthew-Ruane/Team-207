@@ -17,9 +17,9 @@ public class Rangefinder extends Subsystem {
     return instance;
   }
 
-  public static Ultrasonic mRangefinder;
-  public static double kDistance;
-  public static SendableBuilder RangefinderDisplay;
+  private Ultrasonic mRangefinder;
+  private double kDistance;
+  private SendableBuilder RangefinderDisplay;
 
   public Rangefinder() {
     mRangefinder = new Ultrasonic(RobotMap.mUltrasonic_Ping_ID, RobotMap.mUltrasonic_Echo_ID, Unit.kInches);
@@ -27,7 +27,7 @@ public class Rangefinder extends Subsystem {
     kDistance = mRangefinder.getRangeInches();
   }
 
-  public static double getDistance() {
+  public double getDistance() {
     return kDistance;
   }
 

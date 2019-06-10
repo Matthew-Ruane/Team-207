@@ -8,7 +8,9 @@ import frc.robot.subsystems.Elevator.ElevatorPositions;
 import frc.robot.Constants;
 
 public class CollectCargoCommand extends Command {
-  Elevator elevator = Elevator.getInstance();
+  private Elevator elevator = Elevator.getInstance();
+  private Tray tray = Tray.getInstance();
+
   public CollectCargoCommand() {
     requires(elevator);
     isInterruptible();
@@ -16,27 +18,27 @@ public class CollectCargoCommand extends Command {
 
   @Override
   protected void initialize() {    
-    Tray.TalonsRelease();
+    tray.TalonsRelease();
     Constants.WantHatch = false;
-    Tray.UpdateLoadState();
+    tray.UpdateLoadState();
     if (Constants.CARGO_STATE == Constants.CARGO_STATE_UNLOADED) {
-        Tray.ExtendTray();
-        Tray.IntakeCargo();
-        Elevator.SetElevatorPosition(ElevatorPositions.COLLECT, ElevatorModes.CARGO);
+        tray.ExtendTray();
+        tray.IntakeCargo();
+        elevator.SetElevatorPosition(ElevatorPositions.COLLECT, ElevatorModes.CARGO);
     }
   }
 
   @Override
   protected void execute() {
-    Tray.UpdateLoadState();
+    tray.UpdateLoadState();
     }
 
   @Override
   protected boolean isFinished() {
       if (Constants.CARGO_STATE == Constants.CARGO_STATE_LOADED) {
-        Tray.StopIntakeCargo();
-        Tray.RetractTray();
-        Elevator.SetElevatorPosition(ElevatorPositions.ROCKET_BOTTOM, ElevatorModes.CARGO);
+        tray.StopIntakeCargo();
+        tray.RetractTray();
+        elevator.SetElevatorPosition(ElevatorPositions.ROCKET_BOTTOM, ElevatorModes.CARGO);
         return true;
       }
       else {

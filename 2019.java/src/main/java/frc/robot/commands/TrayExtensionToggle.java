@@ -5,16 +5,17 @@ import frc.robot.subsystems.Tray;
 import frc.robot.Constants;
 
 public class TrayExtensionToggle extends Command {
+  private Tray tray = Tray.getInstance();
   public TrayExtensionToggle() {
   }
 
   @Override
   protected void initialize() {
     if (Constants.TRAY_STATE == Constants.TRAY_STATE_EXTENDED) {
-      Tray.RetractTray();
+      tray.RetractTray();
     }
     else if (Constants.TRAY_STATE == Constants.TRAY_STATE_RETRACTED) {
-      Tray.ExtendTray();
+      tray.ExtendTray();
     }
   }
 

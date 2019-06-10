@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -20,8 +21,9 @@ import frc.robot.Constants;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.kauailabs.navx.frc.AHRS;
-
-import org.usfirst.frc330.wpilibj.MultiPIDController;
+import frc.utility.PurePursuit.*;
+import frc.robot.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 
 import edu.wpi.first.wpilibj.SerialPort;
 import frc.utility.DummyPIDOutput;
@@ -37,9 +39,9 @@ public class Drivebase extends Subsystem {
     return instance;
   }
 
-  private static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
+  public static DefaultDriveTalonSRX mDrive_Left_Master, mDrive_Left_B, mDrive_Left_C, mDrive_Right_Master, mDrive_Right_B, mDrive_Right_C;
 
-  private static double left, right, lowerbound, upperbound, target;
+  private static double leftpow_, rightpow_;
 
   public static DifferentialDrive mDrive;
 
@@ -47,23 +49,29 @@ public class Drivebase extends Subsystem {
 
   public static DummyPIDOutput PIDturnOutput, PIDleftOutput, PIDrightOutput;
 
-  public static int leftEncoderZero = 0;
-  public static int rightEncoderZero = 0;
+  protected static final int kVelocityControlSlot = 0;
+  protected static final int kBaseLockControlSlot = 1;
 
-  private static double x, y, distance, leftEncoderDistance, prevLeftEncoderDistance, rightEncoderDistance, 
-                        prevRightEncoderDistance, gyroAngle, desiredDistanceInches, desiredDistanceTicks,
-                        TurnrateCurved;
+  private double TurnrateCurved, mLastHeadingErrorDegrees, leftvelo_,  rightvelo_, left_distance, right_distance, time;
+  public double left_encoder_prev_distance_, right_encoder_prev_distance_;
 
-  private static double setAngle = 0;
-  private static double desiredAngle = 0;
+  public static enum DriveControlState {OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL }
+  
+  private static DriveControlState driveControlState_;
+  
+  private VelocityHeadingSetpoint velocityHeadingSetpoint_;
 
+  private AHRS ahrs;
 
-  private static double yawZero = 0;
-  public static AHRS ahrs;
+  public static PIDController PIDturn;
 
-  public static PIDController PIDturn, PIDleft, PIDright;
+  private static AdaptivePurePursuitController pathFollowingController_;
+  private static SynchronousPID velocityHeadingPid_;
 
-  public static Encoder leftEncoder, rightEncoder;
+  private Rotation2d gyro_angle;
+  private RigidTransform2d odometry;
+  private RigidTransform2d.Delta velocity;
+  private RobotState robotstate = RobotState.getInstance();
 
 
   public Drivebase() {
@@ -74,242 +82,254 @@ public class Drivebase extends Subsystem {
     mDrive_Right_B = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_B_ID);
     mDrive_Right_C = new DefaultDriveTalonSRX(RobotMap.mDrive_Right_C_ID);
 
-    leftEncoder = new Encoder(3, 4, true, EncodingType.k4X);
-    rightEncoder = new Encoder(1, 2, false, EncodingType.k4X);
-
     mDrive_Left_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTimeoutms);
     mDrive_Left_Master.setSensorPhase(false);
-    mDrive_Left_Master.configMotionCruiseVelocity(Constants.kDriveCruiseVelo);
-    mDrive_Left_Master.configMotionAcceleration(Constants.kDriveAccel);
+    mDrive_Left_Master.setInverted(false);
+    mDrive_Left_B.setInverted(false);
+    mDrive_Left_C.setInverted(false);
 
     mDrive_Right_Master.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTimeoutms);
     mDrive_Right_Master.setSensorPhase(false);
-    mDrive_Right_Master.configMotionCruiseVelocity(Constants.kDriveCruiseVelo);
-    mDrive_Right_Master.configMotionAcceleration(Constants.kDriveAccel);
+    mDrive_Right_Master.setInverted(false);
+    mDrive_Right_B.setInverted(false);
+    mDrive_Right_C.setInverted(false);
 
     mDrive_Left_B.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
     mDrive_Left_C.set(ControlMode.Follower, RobotMap.mDrive_Left_A_ID);
     mDrive_Right_B.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
     mDrive_Right_C.set(ControlMode.Follower, RobotMap.mDrive_Right_A_ID);
 
-    mDrive_Left_Master.config_kP(0, Constants.Drive_kP);
-    mDrive_Left_Master.config_kI(0, Constants.Drive_kI);
-    mDrive_Left_Master.config_kD(0, Constants.Drive_kD);
-    mDrive_Left_Master.config_kF(0, Constants.Drive_kF);
+    mDrive_Left_Master.config_kP(kVelocityControlSlot, Constants.kDriveVelocityKp);
+    mDrive_Left_Master.config_kI(kVelocityControlSlot, Constants.kDriveVelocityKi);
+    mDrive_Left_Master.config_kD(kVelocityControlSlot, Constants.kDriveVelocityKd);
+    mDrive_Left_Master.config_kF(kVelocityControlSlot, Constants.kDriveVelocityKf);
+    mDrive_Left_Master.config_IntegralZone(kVelocityControlSlot, Constants.Drive_kIzone);
 
-    mDrive_Right_Master.config_kP(0, Constants.Drive_kP);
-    mDrive_Right_Master.config_kI(0, Constants.Drive_kI);
-    mDrive_Right_Master.config_kD(0, Constants.Drive_kD);
-    mDrive_Right_Master.config_kF(0, Constants.Drive_kF);
+    mDrive_Right_Master.config_kP(kVelocityControlSlot, Constants.kDriveVelocityKp);
+    mDrive_Right_Master.config_kI(kVelocityControlSlot, Constants.kDriveVelocityKi);
+    mDrive_Right_Master.config_kD(kVelocityControlSlot, Constants.kDriveVelocityKd);
+    mDrive_Right_Master.config_kF(kVelocityControlSlot, Constants.kDriveVelocityKf);
+    mDrive_Right_Master.config_IntegralZone(kVelocityControlSlot, Constants.Drive_kIzone);
+
+    velocityHeadingPid_ = new SynchronousPID(Constants.kDriveHeadingVelocityKp, Constants.kDriveHeadingVelocityKi, Constants.kDriveHeadingVelocityKd);
+    velocityHeadingPid_.setOutputRange(-30, 30);
     
     mDrive = new DifferentialDrive(mDrive_Left_Master, mDrive_Right_Master);
     mDrive.setSafetyEnabled(false);
     
     mShifter_Low = new Solenoid(RobotMap.mPCM_A, RobotMap.mShift_Low_ID);
     mShifter_High = new Solenoid(RobotMap.mPCM_B, RobotMap.mShift_High_ID);
-    mShifter_High.set(Constants.On);
-    mShifter_Low.set(Constants.Off);
-    Constants.CURRENT_GEAR = Constants.HIGH_GEAR;
 
     ahrs = new AHRS(SerialPort.Port.kMXP);
 
     PIDturnOutput = new DummyPIDOutput();
-    PIDleftOutput = new DummyPIDOutput();
-    PIDrightOutput = new DummyPIDOutput();
 
     PIDturn = new PIDController(Constants.Turn_kP, Constants.Turn_kI, Constants.Turn_kD, Constants.Turn_kF, ahrs, PIDturnOutput, 0.02);
     PIDturn.setInputRange(-180.0,  180.0);
     PIDturn.setOutputRange(-0.65, 0.65);
     PIDturn.setAbsoluteTolerance(Constants.kToleranceDegrees);
     PIDturn.setContinuous(true);
-
-    PIDleft = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kF, leftEncoder, PIDleftOutput, 0.02);
-    PIDright = new PIDController(Constants.Drive_kP, Constants.Drive_kI, Constants.Drive_kD, Constants.Drive_kF, rightEncoder, PIDrightOutput, 0.02);
   }
-  public static void UpShift() {
+  public void UpShift() {
     mShifter_High.set(Constants.On);
     mShifter_Low.set(Constants.Off);
     Constants.CURRENT_GEAR = Constants.HIGH_GEAR;
   }
-  public static void DownShift() {
+  public void DownShift() {
     mShifter_High.set(Constants.Off);
     mShifter_Low.set(Constants.On);
     Constants.CURRENT_GEAR = Constants.LOW_GEAR;
   }
-  public static void tank(double left, double right) {
+  public void tank(double left, double right) {
     mDrive.tankDrive(left, right);
   }
-  public static void curvature(double throttleaxis, double turnaxis) {
+  public void curvature(double throttleaxis, double turnaxis) {
     TurnrateCurved = (Constants.kTurnrateCurve * Math.pow(turnaxis, 3)+(1-Constants.kTurnrateCurve)*turnaxis*Constants.kTurnrateLimit);
     mDrive.curvatureDrive(throttleaxis, TurnrateCurved, true);
   }
-  /*   
-  Begin NavX specific Content*/
-  public static void zeroYaw() {
-    ahrs.zeroYaw();
+  /* PURE PURSUIT */
+  public void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+    configureTalonsForSpeedControl();
+    updateVelocitySetpoint(left_inches_per_sec, right_inches_per_sec);
   }
-  public static double getYaw() {
-    return ahrs.getYaw();
+  public void setVelocityHeadingSetpoint(double forward_inches_per_sec, Rotation2d headingSetpoint) {
+  configureTalonsForSpeedControl();
+  velocityHeadingPid_.reset();
+  velocityHeadingSetpoint_ = new VelocityHeadingSetpoint(forward_inches_per_sec, forward_inches_per_sec, headingSetpoint);
+  updateVelocityHeadingSetpoint();
   }
-  public static double getAngle() {
-    return ahrs.getAngle();
+  public void followPath(Path path, boolean reversed) {
+  configureTalonsForSpeedControl();
+  velocityHeadingPid_.reset();
+  pathFollowingController_ = new AdaptivePurePursuitController(Constants.kPathFollowingLookahead,
+    Constants.kPathFollowingMaxAccel, Constants.kLooperDt, path, reversed, 0.25);
+  updatePathFollower();
   }
-  /* Enabling volt comp apparently yields better resolution in auto routines but lower max power output. voltage comp config set in talon class */
-  public static void EnableVoltComp() {
-    mDrive_Left_Master.enableVoltageCompensation(true);
-    mDrive_Left_B.enableVoltageCompensation(true);
-    mDrive_Left_C.enableVoltageCompensation(true);
-    mDrive_Right_Master.enableVoltageCompensation(true);
-    mDrive_Right_B.enableVoltageCompensation(true);
-    mDrive_Right_C.enableVoltageCompensation(true);
+  private void configureTalonsForSpeedControl() {
+    mDrive_Left_Master.set(ControlMode.Velocity, 0.0);
+    mDrive_Left_Master.selectProfileSlot(kVelocityControlSlot, 0);
+    mDrive_Left_Master.configAllowableClosedloopError(0, Constants.kDriveVelocityAllowableError);
+    mDrive_Right_Master.set(ControlMode.Velocity, 0.0);
+    mDrive_Right_Master.selectProfileSlot(kVelocityControlSlot, 0);
+    mDrive_Right_Master.configAllowableClosedloopError(0, Constants.kDriveVelocityAllowableError);
+    setBrake();
   }
-  public static void DisableVoltComp() {
-    mDrive_Left_Master.enableVoltageCompensation(false);
-    mDrive_Left_B.enableVoltageCompensation(false);
-    mDrive_Left_C.enableVoltageCompensation(false);
-    mDrive_Right_Master.enableVoltageCompensation(false);
-    mDrive_Right_B.enableVoltageCompensation(false);
-    mDrive_Right_C.enableVoltageCompensation(false);
+  public void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
+    leftvelo_ = inchesPerSecondToRpm(left_inches_per_sec);
+    rightvelo_ = inchesPerSecondToRpm(right_inches_per_sec);
+    mDrive_Left_Master.set(ControlMode.Velocity, -leftvelo_);
+    mDrive_Right_Master.set(ControlMode.Velocity, rightvelo_);
+    SmartDashboard.putNumber("leftspeed", leftvelo_);
+    SmartDashboard.putNumber("rightspeed", rightvelo_);
+    SmartDashboard.putNumber("leftunits/ms", mDrive_Left_Master.getSelectedSensorVelocity());
   }
-  public static void StopDrivetrain() {
-    mDrive_Left_Master.set(ControlMode.PercentOutput, 0.0);
-    mDrive_Right_Master.set(ControlMode.PercentOutput, 0.0);
-    PIDleft.reset();
-    PIDright.reset();
-    leftEncoder.reset();
-    rightEncoder.reset();
+  public Rotation2d getGyroAngle() {
+    return Rotation2d.fromDegrees(ahrs.getAngle());
   }
-  /** @param currentHeading Gyro heading to reset to, in degrees*/
-	public static void setGyroRotation(double currentHeading) {
-		// set yawZero to gyro angle, offset to currentHeading
-    yawZero = -ahrs.getAngle() - currentHeading;
+  private void updateVelocityHeadingSetpoint() {
+    Rotation2d actualGyroAngle = getGyroAngle();
+
+    mLastHeadingErrorDegrees = velocityHeadingSetpoint_.getHeading().rotateBy(actualGyroAngle.inverse()).getDegrees();
+
+    double deltaSpeed = velocityHeadingPid_.calculate(mLastHeadingErrorDegrees);
+    updateVelocitySetpoint(velocityHeadingSetpoint_.getLeftSpeed() + deltaSpeed / 2, velocityHeadingSetpoint_.getRightSpeed() - deltaSpeed / 2);
   }
-  /*Zeros the gyro position in software*/
-	public static void zeroGyroRotation() {
-    yawZero = -ahrs.getAngle();
+public void updatePathFollower() {
+  RigidTransform2d robot_pose = RobotState.getInstance().getLatestFieldToVehicle().getValue();
+  RigidTransform2d.Delta command = pathFollowingController_.update(robot_pose, Timer.getFPGATimestamp());
+  Kinematics.DriveVelocity setpoint = Kinematics.inverseKinematics(command);
+
+  // Scale the command to respect the max velocity limits
+  double max_vel = 0.0;
+  max_vel = Math.max(max_vel, Math.abs(setpoint.left));
+  max_vel = Math.max(max_vel, Math.abs(setpoint.right));
+  if (max_vel > Constants.kPathFollowingMaxVel) {
+      double scaling = Constants.kPathFollowingMaxVel / max_vel;
+      setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
   }
-  public static double getGyroRotation() {
-    double angle = -ahrs.getAngle() - yawZero;
-    /*Angle will be in terms of raw gyro units (-inf,inf), so you need to convert to (-180, 180]*/
-    angle = angle % 360;
-    angle = (angle <= -180) ? (angle + 360) : angle;
-    angle = (angle > 180) ? (angle - 360) : angle;
-    return angle;
+  updateVelocitySetpoint(setpoint.left*13.7, setpoint.right*13.7);
+    
+  SmartDashboard.putNumber("setpoint.left", setpoint.left*13.7);
+  SmartDashboard.putNumber("setpoint.right", setpoint.right*13.7);
+}
+public void updateRobotState() {
+  time = Timer.getFPGATimestamp();
+  left_distance = getLeftDistanceInchesLow();
+  right_distance = getRightDistanceInchesLow();
+  gyro_angle = getGyroAngle();
+  odometry = robotstate.generateOdometryFromSensors(left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
+  velocity = Kinematics.forwardKinematics(getLeftVelocityInchesPerSecLow(), getRightVelocityInchesPerSecLow());
+  robotstate.addObservations(time, odometry, velocity);
+  left_encoder_prev_distance_ = left_distance;
+  right_encoder_prev_distance_ = right_distance;
+}
+public void normalizeEncoders() {
+  left_encoder_prev_distance_ = getLeftDistanceInchesLow();
+  right_encoder_prev_distance_ = getRightDistanceInchesLow();
+}
+public boolean isFinishedPath() {
+  return pathFollowingController_.isDone();
+}
+private double rotationsToInches(double rotations) {
+  return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
+}
+private double rpmToInchesPerSecond(double rpm) {
+  return rotationsToInches(rpm) / 60;
+}
+private double inchesToRotations(double inches) {
+  return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
+}
+private double inchesPerSecondToRpm(double inches_per_second) {
+  return inchesToRotations(inches_per_second) * 60;
+}
+public void zeroYaw() {
+  ahrs.zeroYaw();
+}
+public void resetGyro() {
+  ahrs.reset();
+}
+public double getYaw() {
+  return ahrs.getYaw();
+}
+public double getAngle() {
+  return ahrs.getAngle();
+}
+public void EnableVoltComp() {
+  mDrive_Left_Master.enableVoltageCompensation(true);
+  mDrive_Left_B.enableVoltageCompensation(true);
+  mDrive_Left_C.enableVoltageCompensation(true);
+  mDrive_Right_Master.enableVoltageCompensation(true);
+  mDrive_Right_B.enableVoltageCompensation(true);
+  mDrive_Right_C.enableVoltageCompensation(true);
+}
+public void DisableVoltComp() {
+  mDrive_Left_Master.enableVoltageCompensation(false);
+  mDrive_Left_B.enableVoltageCompensation(false);
+  mDrive_Left_C.enableVoltageCompensation(false);
+  mDrive_Right_Master.enableVoltageCompensation(false);
+  mDrive_Right_B.enableVoltageCompensation(false);
+  mDrive_Right_C.enableVoltageCompensation(false);
+}
+public void StopDrivetrain() {
+  mDrive_Left_Master.set(ControlMode.PercentOutput, 0.0);
+  mDrive_Right_Master.set(ControlMode.PercentOutput, 0.0);
+}
+public void pidTurn() {
+  leftpow_ = -PIDturnOutput.getOutput();
+  rightpow_ = PIDturnOutput.getOutput();
+  tank(leftpow_, rightpow_);
   }
-  public static void pidTurn() {
-    left = -PIDturnOutput.getOutput();
-    right = PIDturnOutput.getOutput();
-    tank(left, right);
-  }
-  public static void pidDrive(double left, double right, double turnInput) {
-    mDrive_Left_Master.set(-left - turnInput);
-    mDrive_Right_Master.set(right + turnInput);
-  }
-  public static double getTurnOutput() {
+public double getTurnOutput() {
     return PIDturnOutput.getOutput();
-  }
-  public static void motionmagic(double leftTarget, double rightTarget, double turnoutput) {
-    mDrive_Left_Master.set(ControlMode.MotionMagic, -leftTarget, DemandType.ArbitraryFeedForward, -turnoutput*.75);
-    mDrive_Right_Master.set(ControlMode.MotionMagic, rightTarget, DemandType.ArbitraryFeedForward, -turnoutput*.75);
-  }
-  /** @param current must be pulled directly from actively updating source, generally from getLeftDistance or getRightDistance */
-  public static boolean onTargetDistance(double target, double current) {
-    lowerbound = Math.abs(target) - Constants.kToleranceDistance;
-    upperbound = Math.abs(target) + Constants.kToleranceDistance;
-    if (lowerbound <= Math.abs(current) && Math.abs(current) <= upperbound) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-  public static void setBrake() {
-    mDrive_Left_Master.setNeutralMode(NeutralMode.Brake);
-    mDrive_Left_B.setNeutralMode(NeutralMode.Brake);
-    mDrive_Left_C.setNeutralMode(NeutralMode.Brake);
-    mDrive_Right_Master.setNeutralMode(NeutralMode.Brake);
-    mDrive_Right_B.setNeutralMode(NeutralMode.Brake);
-    mDrive_Right_C.setNeutralMode(NeutralMode.Brake);
-  }
-  public static void setCoast() {
-    mDrive_Left_Master.setNeutralMode(NeutralMode.Coast);
-    mDrive_Left_B.setNeutralMode(NeutralMode.Coast);
-    mDrive_Left_C.setNeutralMode(NeutralMode.Coast);
-    mDrive_Right_Master.setNeutralMode(NeutralMode.Coast);
-    mDrive_Right_B.setNeutralMode(NeutralMode.Coast);
-    mDrive_Right_C.setNeutralMode(NeutralMode.Coast);
-  }
-  public static double DistanceInchesToTicks (double desiredDistanceInches) {
-    desiredDistanceTicks = desiredDistanceInches*Constants.encoderTicksPerInch;
-    return desiredDistanceTicks;
-  }
-  public static void resetEncoders() {
-    mDrive_Left_Master.setSelectedSensorPosition(0, 0, Constants.kTimeoutms);
-    mDrive_Right_Master.setSelectedSensorPosition(0, 0, Constants.kTimeoutms);
-  }
-  public static void ReportData() {
-    SmartDashboard.putNumber("IMU_Yaw", ahrs.getYaw());
-    SmartDashboard.putNumber("Left encoder", getleftEncoder());
-    SmartDashboard.putNumber("right encoder", getrightEncoder());
-    SmartDashboard.putNumber("Left encoder rate", getLeftVelocity());
-    SmartDashboard.putNumber("right encoder rate", getRightVelocity());
-    SmartDashboard.putNumber("turnoutput", getTurnOutput());
-  }
-  public static int getCurrentGear() {
-    return Constants.CURRENT_GEAR;
-  }
-  public static int getleftEncoder() {
-    return mDrive_Left_Master.getSelectedSensorPosition(0);
-  }
-  public static int getrightEncoder() {
-    return mDrive_Right_Master.getSelectedSensorPosition(0);
-  }
-  public static int getLeftVelocity() {
-		return mDrive_Left_Master.getSelectedSensorVelocity(0);
-	}
-	public static int getRightVelocity() {
-		return mDrive_Right_Master.getSelectedSensorVelocity(0);
-  }
-  public void calcXY() {
-		 leftEncoderDistance  = getLeftDistance();
-		 rightEncoderDistance = getRightDistance();
-		 gyroAngle = getAngle();
-		 distance = ((leftEncoderDistance - prevLeftEncoderDistance) + (rightEncoderDistance - prevRightEncoderDistance))/2;
-		 x = x + distance * Math.sin(Math.toRadians(gyroAngle));
-		 y = y + distance * Math.cos(Math.toRadians(gyroAngle));
-		 prevLeftEncoderDistance  = leftEncoderDistance;
-		 prevRightEncoderDistance = rightEncoderDistance;
-  }
-  public double getX() {
-		return x;
-	}
-	public double getY() {
-		return y;
-  }
-	public static void zeroLeftEncoder() {
-    leftEncoderZero = Math.abs(mDrive_Left_Master.getSelectedSensorPosition(0));
-	}
-	public static void zeroRightEncoder() {
-		rightEncoderZero = Math.abs(mDrive_Right_Master.getSelectedSensorPosition(0));
-	}
-	public static int getLeftEncoderTicks() {
-		return Math.abs(mDrive_Left_Master.getSelectedSensorPosition(0)) - leftEncoderZero;
-	}
-	public static int getRightEncoderTicks() {
-		return Math.abs(mDrive_Right_Master.getSelectedSensorPosition(0)) - rightEncoderZero;
-  }
+}
+public void setBrake() {
+  mDrive_Left_Master.setNeutralMode(NeutralMode.Brake);
+  mDrive_Left_B.setNeutralMode(NeutralMode.Brake);
+  mDrive_Left_C.setNeutralMode(NeutralMode.Brake);
+  mDrive_Right_Master.setNeutralMode(NeutralMode.Brake);
+  mDrive_Right_B.setNeutralMode(NeutralMode.Brake);
+  mDrive_Right_C.setNeutralMode(NeutralMode.Brake);
+}
+public void setCoast() {
+  mDrive_Left_Master.setNeutralMode(NeutralMode.Coast);
+  mDrive_Left_B.setNeutralMode(NeutralMode.Coast);
+  mDrive_Left_C.setNeutralMode(NeutralMode.Coast);
+  mDrive_Right_Master.setNeutralMode(NeutralMode.Coast);
+  mDrive_Right_B.setNeutralMode(NeutralMode.Coast);
+  mDrive_Right_C.setNeutralMode(NeutralMode.Coast);
+}
+public void resetEncoders() {
+  mDrive_Left_Master.setSelectedSensorPosition(0, 0, Constants.kTimeoutms);
+  mDrive_Right_Master.setSelectedSensorPosition(0, 0, Constants.kTimeoutms);
+}
+public void ReportData() {
+  SmartDashboard.putNumber("IMU_Yaw", ahrs.getYaw());
+  SmartDashboard.putNumber("turnoutput", getTurnOutput());
+  SmartDashboard.putNumber("leftIPS", getLeftVelocityInchesPerSecLow());
+  SmartDashboard.putNumber("rightIPS", getRightVelocityInchesPerSecLow());
+  SmartDashboard.putNumber("leftraw", mDrive_Left_Master.getSelectedSensorPosition());
+  SmartDashboard.putNumber("rightraw", mDrive_Right_Master.getSelectedSensorPosition());
+}
   /* Returns distance in inches */
-	public static double getLeftDistance() {
-		return getLeftEncoderTicks()*Constants.encoderTicksPerInch;
-	}
-	public static double getRightDistance() {
-		return getRightEncoderTicks()*Constants.encoderTicksPerInch;
-  }
-  public static void resetPosition() {
-    resetEncoders();
-    ahrs.reset();
-  }
-  @Override
-  public void initDefaultCommand() {
-  }
+public double getLeftDistanceInchesLow() {
+  return rotationsToInches(mDrive_Left_Master.getSelectedSensorPosition()/39321.6);
+}
+
+public double getRightDistanceInchesLow() {
+  return rotationsToInches(mDrive_Left_Master.getSelectedSensorPosition()/39321.6);
+}
+public double getLeftVelocityInchesPerSecLow() {
+  return rpmToInchesPerSecond(mDrive_Left_Master.getSelectedSensorVelocity()*10/39321.6*60);
+}
+
+public double getRightVelocityInchesPerSecLow() {
+  return rpmToInchesPerSecond(mDrive_Right_Master.getSelectedSensorVelocity()*10/39321.6*60);
+}
+public void resetPosition() {
+  resetEncoders();
+  ahrs.reset();
+}
+@Override
+public void initDefaultCommand() {
+}
 }
