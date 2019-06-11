@@ -175,13 +175,10 @@ public class Drivebase extends Subsystem {
     setBrake();
   }
   public void updateVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) {
-    leftvelo_ = inchesPerSecondToRpm(left_inches_per_sec);
-    rightvelo_ = inchesPerSecondToRpm(right_inches_per_sec);
+    leftvelo_ = inchesPerSecondToVelo(left_inches_per_sec);
+    rightvelo_ = inchesPerSecondToVelo(right_inches_per_sec);
     mDrive_Left_Master.set(ControlMode.Velocity, -leftvelo_);
     mDrive_Right_Master.set(ControlMode.Velocity, rightvelo_);
-    SmartDashboard.putNumber("leftspeed", leftvelo_);
-    SmartDashboard.putNumber("rightspeed", rightvelo_);
-    SmartDashboard.putNumber("leftunits/ms", mDrive_Left_Master.getSelectedSensorVelocity());
   }
   public Rotation2d getGyroAngle() {
     return Rotation2d.fromDegrees(ahrs.getAngle());
@@ -207,25 +204,22 @@ public void updatePathFollower() {
       double scaling = Constants.kPathFollowingMaxVel / max_vel;
       setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
   }
-  updateVelocitySetpoint(setpoint.left*13.7, setpoint.right*13.7);
-    
-  SmartDashboard.putNumber("setpoint.left", setpoint.left*13.7);
-  SmartDashboard.putNumber("setpoint.right", setpoint.right*13.7);
+  updateVelocitySetpoint(setpoint.left, setpoint.right);
 }
 public void updateRobotState() {
   time = Timer.getFPGATimestamp();
-  left_distance = getLeftDistanceInchesLow();
-  right_distance = getRightDistanceInchesLow();
+  left_distance = getLeftDistanceInches();
+  right_distance = getRightDistanceInches();
   gyro_angle = getGyroAngle();
   odometry = robotstate.generateOdometryFromSensors(left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
-  velocity = Kinematics.forwardKinematics(getLeftVelocityInchesPerSecLow(), getRightVelocityInchesPerSecLow());
+  velocity = Kinematics.forwardKinematics(getLeftVelocityInchesPerSec(), getRightVelocityInchesPerSec());
   robotstate.addObservations(time, odometry, velocity);
   left_encoder_prev_distance_ = left_distance;
   right_encoder_prev_distance_ = right_distance;
 }
 public void normalizeEncoders() {
-  left_encoder_prev_distance_ = getLeftDistanceInchesLow();
-  right_encoder_prev_distance_ = getRightDistanceInchesLow();
+  left_encoder_prev_distance_ = getLeftDistanceInches();
+  right_encoder_prev_distance_ = getRightDistanceInches();
 }
 public boolean isFinishedPath() {
   return pathFollowingController_.isDone();
@@ -241,6 +235,9 @@ private double inchesToRotations(double inches) {
 }
 private double inchesPerSecondToRpm(double inches_per_second) {
   return inchesToRotations(inches_per_second) * 60;
+}
+private double inchesPerSecondToVelo(double inches_per_second) {
+  return inches_per_second * Constants.kRatioFactor;
 }
 public void zeroYaw() {
   ahrs.zeroYaw();
@@ -305,24 +302,22 @@ public void resetEncoders() {
 public void ReportData() {
   SmartDashboard.putNumber("IMU_Yaw", ahrs.getYaw());
   SmartDashboard.putNumber("turnoutput", getTurnOutput());
-  SmartDashboard.putNumber("leftIPS", getLeftVelocityInchesPerSecLow());
-  SmartDashboard.putNumber("rightIPS", getRightVelocityInchesPerSecLow());
+  SmartDashboard.putNumber("leftIPS", getLeftVelocityInchesPerSec());
+  SmartDashboard.putNumber("rightIPS", getRightVelocityInchesPerSec());
   SmartDashboard.putNumber("leftraw", mDrive_Left_Master.getSelectedSensorPosition());
   SmartDashboard.putNumber("rightraw", mDrive_Right_Master.getSelectedSensorPosition());
 }
   /* Returns distance in inches */
-public double getLeftDistanceInchesLow() {
+public double getLeftDistanceInches() {
   return rotationsToInches(mDrive_Left_Master.getSelectedSensorPosition()/39321.6);
 }
-
-public double getRightDistanceInchesLow() {
+public double getRightDistanceInches() {
   return rotationsToInches(mDrive_Left_Master.getSelectedSensorPosition()/39321.6);
 }
-public double getLeftVelocityInchesPerSecLow() {
+public double getLeftVelocityInchesPerSec() {
   return rpmToInchesPerSecond(mDrive_Left_Master.getSelectedSensorVelocity()*10/39321.6*60);
 }
-
-public double getRightVelocityInchesPerSecLow() {
+public double getRightVelocityInchesPerSec() {
   return rpmToInchesPerSecond(mDrive_Right_Master.getSelectedSensorVelocity()*10/39321.6*60);
 }
 public void resetPosition() {

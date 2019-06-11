@@ -71,10 +71,10 @@ public class Constants {
     public static double kTrackEffectiveDiameter = (kTrackWidthInches * kTrackWidthInches
             + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
     public static double kTrackScrubFactor = 0.5;
-    public static double kDriveWheelDiameterInches = 6;
-    public static double kRatioFactor = 20.86;
+    public static double kDriveWheelDiameterInches = 6.25;
+    public static double kRatioFactor = 200.263;//4096 / (10 * (20/64) * (12/36) * (Constants.kDriveWheelDiameterInches*Math.PI));
 
-        // PID gains for drive velocity loop (LOW GEAR)
+        // PID gains for drive velocity loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     public static double kDriveVelocityKp = 0.1; //1.0
     public static double kDriveVelocityKi = 0.0;
@@ -102,7 +102,7 @@ public class Constants {
     public static double kDriveHeadingVelocityKd = 50.0;
 
     public static double kPathFollowingLookahead = 72.0; // inches
-    public static double kPathFollowingMaxVel = 150.0; // inches/sec
+    public static double kPathFollowingMaxVel = 120.0; // inches/sec
     public static double kPathFollowingMaxAccel = 100.0; // inches/sec^2
     
     public static double kLooperDt = 0.01;
@@ -112,4 +112,4 @@ public class Constants {
 }
     // 12t pinions, 50/24 first reduction, 60/34 second reduction, 20->64 final drive
     // 36/12 encoder
-    // 39321.6 ticks per wheel rotation in low gear (experimentally confirmed)
+    // 39321.6 ticks per wheel rotation (experimentally confirmed)
