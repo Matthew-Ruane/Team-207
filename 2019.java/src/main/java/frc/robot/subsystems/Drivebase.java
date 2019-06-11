@@ -179,6 +179,8 @@ public class Drivebase extends Subsystem {
     rightvelo_ = inchesPerSecondToVelo(right_inches_per_sec);
     mDrive_Left_Master.set(ControlMode.Velocity, -leftvelo_);
     mDrive_Right_Master.set(ControlMode.Velocity, rightvelo_);
+    SmartDashboard.putNumber("leftvelo", leftvelo_);
+    SmartDashboard.putNumber("rightvelo", rightvelo_);
   }
   public Rotation2d getGyroAngle() {
     return Rotation2d.fromDegrees(ahrs.getAngle());
@@ -205,6 +207,8 @@ public void updatePathFollower() {
       setpoint = new Kinematics.DriveVelocity(setpoint.left * scaling, setpoint.right * scaling);
   }
   updateVelocitySetpoint(setpoint.left, setpoint.right);
+  SmartDashboard.putNumber("setpoint.left", setpoint.left);
+  SmartDashboard.putNumber("setpoint.right", setpoint.right);
 }
 public void updateRobotState() {
   time = Timer.getFPGATimestamp();
@@ -298,8 +302,8 @@ public void ReportData() {
   SmartDashboard.putNumber("turnoutput", getTurnOutput());
   SmartDashboard.putNumber("leftIPS", getLeftVelocityInchesPerSec());
   SmartDashboard.putNumber("rightIPS", getRightVelocityInchesPerSec());
-  SmartDashboard.putNumber("leftraw", mDrive_Left_Master.getSelectedSensorPosition());
-  SmartDashboard.putNumber("rightraw", mDrive_Right_Master.getSelectedSensorPosition());
+  SmartDashboard.putNumber("leftraw", mDrive_Left_Master.getSelectedSensorVelocity());
+  SmartDashboard.putNumber("rightraw", mDrive_Right_Master.getSelectedSensorVelocity());
 }
   /* Returns distance in inches */
 public double getLeftDistanceInches() {

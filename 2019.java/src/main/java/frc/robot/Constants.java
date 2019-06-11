@@ -72,8 +72,8 @@ public class Constants {
             + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
     public static double kTrackScrubFactor = 0.5;
     public static double kDriveWheelDiameterInches = 6.25;
-    public static double kRatioFactor = 200.263;//4096 / (10 * (20/64) * (12/36) * (Constants.kDriveWheelDiameterInches*Math.PI));
-
+    public static double kRatioFactor = 43;//(4096 / (10 * (20/64) * (12/36) * (Constants.kDriveWheelDiameterInches*Math.PI))); // 200.0263
+                                            // roughly 20k units/100ms at ~103 ips
         // PID gains for drive velocity loop
     // Units: error is 4096 counts/rev. Max output is +/- 1023 units.
     public static double kDriveVelocityKp = 0.1; //1.0
