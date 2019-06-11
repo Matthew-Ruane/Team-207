@@ -230,12 +230,6 @@ private double rotationsToInches(double rotations) {
 private double rpmToInchesPerSecond(double rpm) {
   return rotationsToInches(rpm) / 60;
 }
-private double inchesToRotations(double inches) {
-  return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
-}
-private double inchesPerSecondToRpm(double inches_per_second) {
-  return inchesToRotations(inches_per_second) * 60;
-}
 private double inchesPerSecondToVelo(double inches_per_second) {
   return inches_per_second * Constants.kRatioFactor;
 }

@@ -32,9 +32,8 @@ public class Robot extends TimedRobot {
     elevator.zeroElevatorEncoder();
     drivebase.setCoast();
 
-    autoProgram.addDefault("PID tuning", new VelocityPIDtest());
-    autoProgram.addObject("CommandA", new SetPath(paths.getFirstPath()));
-    autoProgram.addObject("CommandB", new SetPath(paths.getSecondPath()));
+    autoProgram.addDefault("PathA", new PathFollower(paths.getFirstPath()));
+    autoProgram.addObject("PathB", new PathFollower(paths.getSecondPath()));
 
     SmartDashboard.putData("Selected Auto", autoProgram);
   }

@@ -25,7 +25,7 @@ import frc.robot.RobotState;
 import frc.robot.Auto.AutoPaths;
 import edu.wpi.first.wpilibj.Timer;
 
-public class SetPath extends Command {
+public class PathFollower extends Command {
 
   Path path;
 
@@ -36,7 +36,7 @@ public class SetPath extends Command {
   Drivebase drivebase = Drivebase.getInstance();
 
 
-  public SetPath(Path path) {
+  public PathFollower(Path path) {
     this.path = path;
   }
 

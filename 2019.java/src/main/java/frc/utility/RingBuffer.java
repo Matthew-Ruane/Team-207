@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 
 public class RingBuffer {
-    final int bufferSize;
+    private final int bufferSize;
     private int[] valueBuffer;
     private int pos, sum;
 
@@ -18,7 +18,6 @@ public class RingBuffer {
         Arrays.fill(valueBuffer, initialValue);
         pos = 0;
     }
-
     public void Record(int value) {
         pos = Math.floorMod(pos + 1, bufferSize);
         valueBuffer[pos] = value;
