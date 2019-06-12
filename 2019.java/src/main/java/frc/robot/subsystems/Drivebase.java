@@ -53,7 +53,7 @@ public class Drivebase extends Subsystem {
   protected static final int kBaseLockControlSlot = 1;
 
   private double TurnrateCurved, mLastHeadingErrorDegrees, leftvelo_,  rightvelo_, left_distance, right_distance, time;
-  public double left_encoder_prev_distance_, right_encoder_prev_distance_;
+  public double left_encoder_prev_distance_, right_encoder_prev_distance_, leftveloIPS_, rightveloIPS_;
 
   public static enum DriveControlState {OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL }
   
@@ -216,7 +216,7 @@ public void updateRobotState() {
   right_distance = getRightDistanceInches();
   gyro_angle = getGyroAngle();
   odometry = robotstate.generateOdometryFromSensors(left_distance - left_encoder_prev_distance_, right_distance - right_encoder_prev_distance_, gyro_angle);
-  velocity = Kinematics.forwardKinematics(getLeftVelocityInchesPerSec(), getRightVelocityInchesPerSec());
+  velocity = Kinematics.forwardKinematics(getLeftVelocityInchesPerSec(mDrive_Left_Master.getSelectedSensorVelocity()), getRightVelocityInchesPerSec(mDrive_Right_Master.getSelectedSensorVelocity()));
   robotstate.addObservations(time, odometry, velocity);
   left_encoder_prev_distance_ = left_distance;
   right_encoder_prev_distance_ = right_distance;
@@ -297,8 +297,8 @@ public void resetEncoders() {
 public void ReportData() {
   SmartDashboard.putNumber("IMU_Yaw", ahrs.getYaw());
   SmartDashboard.putNumber("turnoutput", getTurnOutput());
-  SmartDashboard.putNumber("leftIPS", getLeftVelocityInchesPerSec());
-  SmartDashboard.putNumber("rightIPS", getRightVelocityInchesPerSec());
+  SmartDashboard.putNumber("leftIPS", leftveloIPS_);
+  SmartDashboard.putNumber("rightIPS", rightveloIPS_);
   SmartDashboard.putNumber("leftraw", mDrive_Left_Master.getSelectedSensorVelocity());
   SmartDashboard.putNumber("rightraw", mDrive_Right_Master.getSelectedSensorVelocity());
 }
@@ -309,11 +309,13 @@ public double getLeftDistanceInches() {
 public double getRightDistanceInches() {
   return rotationsToInches(mDrive_Left_Master.getSelectedSensorPosition()/39321.6);
 }
-public double getLeftVelocityInchesPerSec() {
-  return mDrive_Left_Master.getSelectedSensorVelocity() * 10 * ((20/64) * (12/36)) * (6.25*Math.PI) / 4096;
+public double getLeftVelocityInchesPerSec(int encoderRaw) {
+  leftveloIPS_ = encoderRaw * (10.0 * ((20.0/64.0) * (12.0/36.0)) * (6.25*Math.PI) / 4096.0);
+  return leftveloIPS_;
 }
-public double getRightVelocityInchesPerSec() {
-  return mDrive_Right_Master.getSelectedSensorVelocity() * 10 * ((20/64) * (12/36)) * (6.25*Math.PI) / 4096;
+public double getRightVelocityInchesPerSec(int encoderRaw) {
+  rightveloIPS_ = encoderRaw * (10.0 * ((20.0/64.0) * (12.0/36.0)) * (6.25*Math.PI) / 4096.0);
+  return rightveloIPS_;
 }
 public void resetPosition() {
   resetEncoders();

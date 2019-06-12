@@ -48,8 +48,8 @@ public class AutoPaths {
         PathA = new Path(first_path);
 
         List<Waypoint> second_path = new ArrayList<>();
-        second_path.add(new Waypoint(new Translation2d(0, 0), 100.0));
-        second_path.add(new Waypoint(new Translation2d(-150, 0), 100.0));
+        second_path.add(new Waypoint(new Translation2d(0, 0), 50.0));
+        second_path.add(new Waypoint(new Translation2d(-150000, 0), 50.0));
 
         PathB = new Path(second_path);
     }
