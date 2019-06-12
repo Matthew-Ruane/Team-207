@@ -231,9 +231,6 @@ public boolean isFinishedPath() {
 private double rotationsToInches(double rotations) {
   return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
 }
-private double rpmToInchesPerSecond(double rpm) {
-  return rotationsToInches(rpm) / 60;
-}
 private double inchesPerSecondToVelo(double inches_per_second) {
   return inches_per_second * Constants.kRatioFactor;
 }
@@ -313,10 +310,10 @@ public double getRightDistanceInches() {
   return rotationsToInches(mDrive_Left_Master.getSelectedSensorPosition()/39321.6);
 }
 public double getLeftVelocityInchesPerSec() {
-  return rpmToInchesPerSecond(mDrive_Left_Master.getSelectedSensorVelocity()*10/39321.6*60);
+  return mDrive_Left_Master.getSelectedSensorVelocity() * 10 * ((20/64) * (12/36)) * (6.25*Math.PI) / 4096;
 }
 public double getRightVelocityInchesPerSec() {
-  return rpmToInchesPerSecond(mDrive_Right_Master.getSelectedSensorVelocity()*10/39321.6*60);
+  return mDrive_Right_Master.getSelectedSensorVelocity() * 10 * ((20/64) * (12/36)) * (6.25*Math.PI) / 4096;
 }
 public void resetPosition() {
   resetEncoders();
