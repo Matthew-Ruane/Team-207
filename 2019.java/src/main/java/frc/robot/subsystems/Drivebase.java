@@ -53,7 +53,7 @@ public class Drivebase extends Subsystem {
   protected static final int kBaseLockControlSlot = 1;
 
   private double TurnrateCurved, mLastHeadingErrorDegrees, leftvelo_,  rightvelo_, left_distance, right_distance, time;
-  public double left_encoder_prev_distance_, right_encoder_prev_distance_, leftveloIPS_, rightveloIPS_;
+  public double left_encoder_prev_distance_, right_encoder_prev_distance_, leftveloIPS_, rightveloIPS_, veloIPS_;
 
   public static enum DriveControlState {OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING_CONTROL, PATH_FOLLOWING_CONTROL }
   
@@ -228,12 +228,6 @@ public void normalizeEncoders() {
 public boolean isFinishedPath() {
   return pathFollowingController_.isDone();
 }
-private double rotationsToInches(double rotations) {
-  return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
-}
-private double inchesPerSecondToVelo(double inches_per_second) {
-  return inches_per_second * Constants.kRatioFactor;
-}
 public void zeroYaw() {
   ahrs.zeroYaw();
 }
@@ -316,6 +310,16 @@ public double getLeftVelocityInchesPerSec(int encoderRaw) {
 public double getRightVelocityInchesPerSec(int encoderRaw) {
   rightveloIPS_ = encoderRaw * (10.0 * ((20.0/64.0) * (12.0/36.0)) * (6.25*Math.PI) / 4096.0);
   return rightveloIPS_;
+}
+public double getVelocityInchesPerSec(int encoderRaw) {
+  veloIPS_ = encoderRaw * (10.0 * ((20.0/64.0) * (12.0/36.0)) * (6.25*Math.PI) / 4096.0);
+  return veloIPS_;
+}
+private double rotationsToInches(double rotations) {
+  return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
+}
+private double inchesPerSecondToVelo(double inches_per_second) {
+  return inches_per_second * Constants.kRatioFactor;
 }
 public void resetPosition() {
   resetEncoders();
